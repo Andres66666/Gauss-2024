@@ -2,12 +2,13 @@
 para ejecutar el proyecto se necesita realizar estas instalaciones correspondietes 
 ## InstallationDJ
 bash
-pip install foobar
+pip install boot3
 
 
 # AngularAG
 ## InstallationAG
-
+bash 
+ npm install
 
 ## Revisar la Documentacion
 
