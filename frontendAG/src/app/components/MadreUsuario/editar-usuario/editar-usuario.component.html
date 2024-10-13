@@ -1,0 +1,247 @@
+<!-- editar-usuario.component.html -->
+<div class="container mt-5">
+  <h2>Editar Usuario</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="nombreUsuario">Nombre Usuarios</label>
+      <input
+        type="text"
+        id="nombreUsuario"
+        formControlName="nombreUsuario"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            form.get('nombreUsuario')?.invalid &&
+            form.get('nombreUsuario')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          form.get('nombreUsuario')?.invalid &&
+          form.get('nombreUsuario')?.touched
+        "
+        class="invalid-feedback"
+      >
+        El nombre de usuario es requerido.
+      </div>
+      <div
+        *ngIf="
+          form.get('nombreUsuario')?.invalid &&
+          (form.get('nombreUsuario')?.dirty ||
+            form.get('nombreUsuario')?.touched)
+        "
+      >
+        <div *ngIf="form.get('nombreUsuario')?.errors?.['required']">
+          El nombre es obligatorio
+        </div>
+        <div *ngIf="form.get('nombreUsuario')?.errors?.['pattern']">
+          El nombre solo puede contener texto
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="apellido" class="form-label">Apellido</label>
+      <input
+        type="text"
+        id="apellido"
+        formControlName="apellido"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          form.get('apellido')?.invalid &&
+          (form.get('apellido')?.dirty || form.get('apellido')?.touched)
+        "
+      >
+        <div *ngIf="form.get('apellido')?.errors?.['required']">
+          El apellido es obligatorio
+        </div>
+        <div *ngIf="form.get('apellido')?.errors?.['pattern']">
+          El apellido solo puede contener texto
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="correo" class="form-label">Correo Electrónico</label>
+      <input
+        type="email"
+        id="correo"
+        formControlName="correo"
+        class="form-control"
+        required
+      />
+      <div
+        *ngIf="
+          form.get('correo')?.invalid &&
+          (form.get('correo')?.touched || form.get('correo')?.dirty)
+        "
+        class="text-danger"
+      >
+        Se requiere un correo electrónico válido.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="telefono" class="form-label">Teléfono</label>
+      <input
+        type="text"
+        id="telefono"
+        formControlName="telefono"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          form.get('telefono')?.invalid &&
+          (form.get('telefono')?.touched || form.get('telefono')?.dirty)
+        "
+        class="text-danger"
+      >
+        El teléfono es requerido
+      </div>
+      <div
+        *ngIf="
+          form.get('telefono')?.errors?.['telefono-existe']
+        "
+        class="text-danger"
+      >
+        El teléfono ya existe
+      </div>
+    </div>
+
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="ci">Cédula de Identidad (CI):</label>
+      <div class="d-flex align-items-center">
+        <input
+          id="ci"
+          type="text"
+          class="form-control"
+          formControlName="ci"
+          placeholder="Ingrese el CI (Ej: 12345678)"
+          [value]="ciNumero"
+          [ngClass]="{
+            'is-invalid': form.get('ci')?.invalid && form.get('ci')?.touched
+          }"
+        />
+        <br />
+        <label for="departamento"></label>
+        <select
+          id="departamento"
+          class="form-control"
+          formControlName="departamento"
+          required
+        >
+          <option value="" disabled selected>Seleccione un departamento</option>
+          <option
+            *ngFor="let departamento of departamentos"
+            [value]="departamento"
+            [selected]="departamento === departamentoAbreviatura"
+          >
+            {{ departamento }}
+          </option>
+        </select>
+      </div>
+      <div
+        *ngIf="
+          (form.get('ci')?.invalid && form.get('ci')?.touched) ||
+          (form.get('departamento')?.invalid &&
+            form.get('departamento')?.touched)
+        "
+        class="text-danger"
+      >
+        El CI y el departamento son obligatorios.
+      </div>
+      <div
+        *ngIf="
+          form.get('ci')?.invalid &&
+          (form.get('ci')?.dirty || form.get('ci')?.touched)
+        "
+      >
+        <div *ngIf="form.get('ci')?.errors?.['required']">
+          El CI es obligatorio
+        </div>
+        <div
+          *ngIf="form.get('ci')?.errors?.['pattern'] || form.get('ci')?.errors?.['minlength'] || form.get('ci')?.errors?.['maxlength']"
+        >
+          El CI debe tener entre 8 y 9 dígitos
+        </div>
+        <div *ngIf="form.get('ci')?.errors?.['ci-existe']">
+          El CI ya existe en la base de datos
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="obra" class="form-label">Obra</label>
+
+      <select id="obra" formControlName="obra" class="form-select" required>
+        <option *ngFor="let obra of obra" [value]="obra.id">
+          {{ obra.nombreObra }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          form.get('obra')?.invalid &&
+          (form.get('obra')?.touched || form.get('obra')?.dirty)
+        "
+        class="text-danger"
+      >
+        Se requiere seleccionar una obra.
+      </div>
+    </div>
+
+    <!-- ... -->
+
+    <div class="mb-3">
+      <input
+        type="checkbox"
+        id="activo"
+        formControlName="activo"
+        class="form-check-input"
+      />
+      <label for="activo" class="form-check-label">Activo</label>
+      <div
+        *ngIf="
+          form.get('activo')?.invalid &&
+          (form.get('activo')?.touched || form.get('activo')?.dirty)
+        "
+        class="text-danger"
+      >
+        Se requiere seleccionar un estado activo.
+      </div>
+    </div>
+
+    <!-- ... -->
+
+    <div class="mb-3">
+      <label for="imagen" class="form-label">Imagen</label>
+      <input
+        type="file"
+        id="imagen"
+        (change)="onImageChange($event)"
+        class="form-control"
+      />
+      <div *ngIf="imagenPreview" class="mt-2">
+        <img
+          [src]="imagenPreview"
+          alt="Imagen previa"
+          class="img-thumbnail"
+          width="100"
+        />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      Actualizar Usuario
+    </button>
+    <div *ngIf="errorMessage" class="text-danger mt-3">{{ errorMessage }}</div>
+  </form>
+  <!-- Mensaje de alerta -->
+  <div
+    *ngIf="mensaje"
+    class="alert"
+    [ngClass]="{ 'alert-success': esExito, 'alert-danger': !esExito }"
+  >
+    {{ mensaje }}
+  </div>
+</div>

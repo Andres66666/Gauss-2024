@@ -1,0 +1,60 @@
+<div class="container">
+  <h2>Actualizar Obra</h2>
+
+  <form *ngIf="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label for="nombre">Nombre de Obra:</label>
+      <input
+        type="text"
+        id="nombreObra"
+        formControlName="nombreObra"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          form.get('nombreObra')?.invalid && form.get('nombreObra')?.touched
+        "
+        class="text-danger"
+      >
+        El nombre del permiso es requerido.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="ubicacionObra">Ubicación</label>
+      <input
+        type="text"
+        id="ubicacionObra"
+        formControlName="ubicacionObra"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          form.get('ubicacionObra')?.invalid &&
+          form.get('ubicacionObra')?.touched
+        "
+        class="text-danger"
+      >
+        El descripcion del permiso es requerido.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="estadoObra">Activo:</label>
+      <select id="estadoObra" formControlName="estadoObra" class="form-control">
+        <option [value]="true">Activo</option>
+        <option [value]="false">Inactivo</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      Actualizar Obra
+    </button>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+  </form>
+</div>

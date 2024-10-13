@@ -1,0 +1,126 @@
+<div class="container" style="padding-bottom: 50px">
+  <h2>Registrar Equipo</h2>
+  <form [formGroup]="registrarForm" (ngSubmit)="registrarEquipos()">
+    <!-- Campo para nombre del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="nombreEquipo">Nombre:</label>
+      <input
+        id="nombreEquipo"
+        type="text"
+        class="form-control"
+        formControlName="nombreEquipo"
+        placeholder="Ingrese el nombre del equipo"
+      />
+    </div>
+
+    <!-- Campo para marca del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="marca">Marca:</label>
+      <input
+        id="marca"
+        type="text"
+        class="form-control"
+        formControlName="marca"
+        placeholder="Ingrese la marca del equipo"
+      />
+    </div>
+
+    <!-- Campo para modelo del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="modelo">Modelo:</label>
+      <input
+        id="modelo"
+        type="text"
+        class="form-control"
+        formControlName="modelo"
+        placeholder="Ingrese el modelo del equipo"
+      />
+    </div>
+
+    <!-- Campo para estado de uso del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="estadoUsoEquipo">Estado de Uso:</label>
+      <select
+        id="estadoUsoEquipo"
+        class="form-control"
+        formControlName="estadoUsoEquipo"
+      >
+        <option value="" disabled selected>-- Seleccione un estado --</option>
+        <option value="Disponible">Disponible</option>
+        <option value="En uso">En uso</option>
+        <option value="En mantenimiento">En mantenimiento</option>
+      </select>
+    </div>
+
+    <!-- Campo para vida útil del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="vidaUtil">Vida Útil:</label>
+      <input
+        id="vidaUtil"
+        type="text"
+        class="form-control"
+        formControlName="vidaUtil"
+        placeholder="Ingrese la vida útil del equipo"
+      />
+    </div>
+
+    <!-- Campo para fecha de adquisición del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="fechaAdquiscion">Fecha de Adquisición:</label>
+      <input
+        id="fechaAdquiscion"
+        type="date"
+        class="form-control"
+        formControlName="fechaAdquiscion"
+        placeholder="Ingrese la fecha de adquisición del equipo"
+      />
+    </div>
+
+    <!-- Campo para seleccionar un almacen -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="almacen">Almacén:</label>
+      <select id="almacen" class="form-control" formControlName="almacen">
+        <option value="" disabled selected>-- Seleccione un almacen --</option>
+        <option *ngFor="let almacen of almacenes" [value]="almacen.id">
+          {{ almacen.nombreAlmacen }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Campo para cargar una imagen -->
+    <!-- Campo para cargar una imagen -->
+    <div class="mb-3 d-flex flex-column align-items-center">
+      <label for="imagenEquipos">Cargar Imagen:</label>
+      <input
+        id="imagenEquipos"
+        type="file"
+        class="form-control"
+        (change)="onFileChange($event)"
+        formControlName="imagenEquipos"
+      />
+      <div *ngIf="imagenPreview" class="mt-2">
+        <img
+          *ngIf="registrarForm.get('imagenEquipos')?.value"
+          [ngStyle]="{ width: '100px', height: '100px' }"
+          [src]="imagenPreview"
+          class="img-thumbnail"
+        />
+      </div>
+    </div>
+    <!-- Botón de registro -->
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!registrarForm.valid"
+    >
+      Registrar Equipo
+    </button>
+  </form>
+  <!-- Mensaje de alerta -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>

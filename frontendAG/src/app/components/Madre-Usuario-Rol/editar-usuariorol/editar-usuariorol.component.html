@@ -1,0 +1,32 @@
+<h1>Editar Usuario Rol</h1>
+<form (ngSubmit)="onSubmit()" class="p-4 border rounded shadow-sm">
+  <div class="form-group mb-3">
+    <label for="rol" class="form-label">Rol:</label>
+    <select
+      [(ngModel)]="usuarioRol.rol.id"
+      name="rol"
+      class="form-control"
+      required
+    >
+      <option *ngFor="let rol of roles" [value]="rol.id">
+        {{ rol.nombreRol }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="usuario" class="form-label">Usuario:</label>
+    <select
+      [(ngModel)]="usuarioRol.usuario.id"
+      name="usuario"
+      class="form-control"
+      required
+    >
+      <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+        {{ usuario.nombreUsuario }}
+      </option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+</form>

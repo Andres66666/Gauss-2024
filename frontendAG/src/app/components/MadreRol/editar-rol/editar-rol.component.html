@@ -1,0 +1,40 @@
+<div class="container">
+  <h2>Actualizar Rol</h2>
+
+  <form *ngIf="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label for="nombreRol">Nombre de Rol:</label>
+      <input
+        type="text"
+        id="nombreRol"
+        formControlName="nombreRol"
+        class="form-control"
+      />
+      <div
+        *ngIf="form.get('nombreRol')?.invalid && form.get('nombreRol')?.touched"
+        class="text-danger"
+      >
+        El nombre de rol es requerido.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="activo">Activo:</label>
+      <select id="activo" formControlName="activo" class="form-control">
+        <option [value]="true">Activo</option>
+        <option [value]="false">Inactivo</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      Actualizar Rol
+    </button>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+  </form>
+</div>

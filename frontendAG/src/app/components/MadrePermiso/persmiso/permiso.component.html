@@ -1,0 +1,46 @@
+<div class="container">
+  <h2 class="text-center">Lista de Permisos</h2>
+  <div class="mb-3">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar por Nombre de Usuario"
+      [(ngModel)]="searchTerm"
+    />
+  </div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Descripcion</th>
+        <th class="text-center">Estado</th>
+        <th class="text-center">Accion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let permiso of filteredPermiso()"
+        [ngClass]="{
+          'table-danger': !permiso.activo,
+          'table-success': permiso.activo
+        }"
+      >
+        <td class="text-start">{{ permiso.nombre }}</td>
+        <td class="text-start">{{ permiso.descripcion }}</td>
+        <td>{{ permiso.activo ? "Activo" : "Inactivo" }}</td>
+        <td>
+          <button class="btn btn-primary" (click)="editarPermiso(permiso.id)">
+            Editar
+          </button>
+          <button
+            class="btn"
+            [ngClass]="permiso.activo ? 'btn-danger' : 'btn-success'"
+            (click)="togglePermisoActivo(permiso)"
+          >
+            {{ permiso.activo ? "Desactivar" : "Activar" }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,35 @@
+<h1>Registrar Usuario Rol</h1>
+<form
+  [formGroup]="registrarForm"
+  (ngSubmit)="registrarUsarioRol()"
+  class="p-4 border rounded shadow-sm"
+>
+  <div class="form-group mb-3">
+    <label for="rol" class="form-label">Rol</label>
+    <select formControlName="rol" id="rol" class="form-control" required>
+      <option *ngFor="let rol of roles" [value]="rol.id">
+        {{ rol.nombreRol }}
+      </option>
+    </select>
+  </div>
+  <div class="form-group mb-3">
+    <label for="usuario" class="form-label">Usuario</label>
+    <select
+      formControlName="usuario"
+      id="usuario"
+      class="form-control"
+      required
+    >
+      <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+        {{ usuario.nombreUsuario }}
+      </option>
+    </select>
+  </div>
+  <button
+    type="submit"
+    class="btn btn-primary w-100"
+    [disabled]="!registrarForm.valid"
+  >
+    Registrar
+  </button>
+</form>

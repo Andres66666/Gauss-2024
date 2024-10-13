@@ -1,0 +1,26 @@
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Registrar Rol</h2>
+  <form (ngSubmit)="registrarRol()" class="needs-validation" novalidate>
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre del Rol:</label>
+      <input
+        type="text"
+        id="nombre"
+        [(ngModel)]="rol.nombreRol"
+        name="nombre"
+        class="form-control"
+        required
+      />
+      <div class="invalid-feedback">Por favor, ingrese un nombre del rol.</div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Registrar</button>
+  </form>
+
+  <!-- Success and Error Messages -->
+  <p *ngIf="successMessage" class="text-success text-center mt-3">
+    {{ successMessage }}
+  </p>
+  <p *ngIf="errorMessage" class="text-danger text-center mt-3">
+    {{ errorMessage }}
+  </p>
+</div>

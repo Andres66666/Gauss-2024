@@ -1,0 +1,64 @@
+<div class="container">
+  <h2>Registrar Obra</h2>
+
+  <form (ngSubmit)="registrarObra()" #obraForm="ngForm">
+    <!-- Nombre de la obra -->
+    <div class="form-group">
+      <label for="nombreObra">Nombre de la obra</label>
+      <input
+        type="text"
+        id="nombreObra"
+        [(ngModel)]="obra.nombreObra"
+        name="nombreObra"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <!-- Ubicación de la obra -->
+    <div class="form-group">
+      <label for="ubicacionObra">Ubicación de la obra</label>
+      <input
+        type="text"
+        id="ubicacionObra"
+        [(ngModel)]="obra.ubicacionObra"
+        name="ubicacionObra"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <!-- Estado de la obra -->
+    <div class="form-group">
+      <label for="estadoObra">Estado de la obra</label>
+      <select
+        id="estadoObra"
+        [(ngModel)]="obra.estadoObra"
+        name="estadoObra"
+        class="form-control"
+      >
+        <option [value]="true">Activa</option>
+        <option [value]="false">Inactiva</option>
+      </select>
+    </div>
+
+    <!-- Botón para registrar -->
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!obraForm.form.valid"
+    >
+      Registrar Obra
+    </button>
+
+    <!-- Mensaje de éxito -->
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+  </form>
+</div>

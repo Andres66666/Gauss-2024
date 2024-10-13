@@ -1,0 +1,129 @@
+<div class="container">
+  <h2 class="text-center">Editar Solicitud</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Campo para fecha de solicitud -->
+    <div class="form-group">
+      <label for="fechaSolicitud">Fecha de Solicitud:</label>
+      <input
+        id="fechaSolicitud"
+        type="date"
+        class="form-control"
+        formControlName="fechaSolicitud"
+        required
+      />
+      <div
+        *ngIf="
+          form.get('fechaSolicitud')?.invalid &&
+          form.get('fechaSolicitud')?.touched
+        "
+        class="text-danger"
+      >
+        La fecha de solicitud es obligatoria.
+      </div>
+    </div>
+
+    <!-- Campo para fecha de retorno estimada -->
+    <div class="form-group">
+      <label for="fechaRetornoEstimada">Fecha de Retorno Estimada:</label>
+      <input
+        id="fechaRetornoEstimada"
+        type="date"
+        class="form-control"
+        formControlName="fechaRetornoEstimada"
+        required
+      />
+      <div
+        *ngIf="
+          form.get('fechaRetornoEstimada')?.invalid &&
+          form.get('fechaRetornoEstimada')?.touched
+        "
+        class="text-danger"
+      >
+        La fecha de retorno estimada es obligatoria.
+      </div>
+    </div>
+
+    <!-- Campo para fecha de retorno real -->
+    <div class="form-group">
+      <label for="fechaRetornoReal">Fecha de Retorno Real:</label>
+      <input
+        id="fechaRetornoReal"
+        type="date"
+        class="form-control"
+        formControlName="fechaRetornoReal"
+        required
+      />
+      <div
+        *ngIf="
+          form.get('fechaRetornoReal')?.invalid &&
+          form.get('fechaRetornoReal')?.touched
+        "
+        class="text-danger"
+      >
+        La fecha de retorno real es obligatoria.
+      </div>
+    </div>
+
+    <!-- Campo para seleccionar un equipo -->
+    <div class="form-group">
+      <label for="equipo" class="col-form-label">Seleccione un equipo:</label>
+      <select id="equipo" class="form-select" formControlName="equipo" required>
+        <option value="">Seleccione un equipo</option>
+        <option *ngFor="let equipo of equipo" [value]="equipo.id">
+          {{ equipo.nombreEquipo }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('equipo')?.invalid && form.get('equipo')?.touched"
+        class="text-danger"
+      >
+        Seleccionar un equipo es obligatorio.
+      </div>
+    </div>
+
+    <!-- Campo para seleccionar una obra -->
+    <div class="form-group">
+      <label for="obra" class="col-form-label">Seleccione una obra:</label>
+      <select id="obra" class="form-select" formControlName="obra" required>
+        <option value="">Seleccione una obra</option>
+        <option *ngFor="let obra of obra" [value]="obra.id">
+          {{ obra.nombreObra }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('obra')?.invalid && form.get('obra')?.touched"
+        class="text-danger"
+      >
+        Seleccionar una obra es obligatorio.
+      </div>
+    </div>
+
+    <!-- Campo para seleccionar un usuario -->
+    <div class="form-group">
+      <label for="usuario" class="col-form-label">Seleccione un usuario:</label>
+      <select
+        id="usuario"
+        class="form-select"
+        formControlName="usuario"
+        required
+      >
+        <option value="">Seleccione un usuario</option>
+        <option *ngFor="let usuario of usuario" [value]="usuario.id">
+          {{ usuario.nombreUsuario }} {{ usuario.apellido }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('usuario')?.invalid && form.get('usuario')?.touched"
+        class="text-danger"
+      >
+        Seleccionar un usuario es obligatorio.
+      </div>
+    </div>
+
+    <!-- Botón de guardar cambios -->
+    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+      Guardar Cambios
+    </button>
+  </form>
+</div>

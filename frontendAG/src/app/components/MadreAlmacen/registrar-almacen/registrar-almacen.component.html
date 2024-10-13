@@ -1,0 +1,64 @@
+<div class="container">
+  <h2>Registrar Almacen</h2>
+  <form [formGroup]="registrarForm" (ngSubmit)="registrarAlmacen()">
+    <!-- Campo para nombre del usuario -->
+    <div class="form-group">
+      <label for="nombreAlmacen">nombre Almacen:</label>
+      <input
+        id="nombreAlmacen"
+        type="text"
+        class="form-control"
+        formControlName="nombreAlmacen"
+        placeholder="Ingrese el nombre del Almacen"
+        required
+      />
+      <div
+        *ngIf="
+          registrarForm.get('nombreAlmacen')?.invalid &&
+          registrarForm.get('nombreAlmacen')?.touched
+        "
+        class="text-danger"
+      >
+        El nombre es obligatorio.
+      </div>
+    </div>
+
+    <!-- Campo para seleccionar una obra -->
+    <div class="form-group">
+      <label for="obra">Seleccione una obra:</label>
+      <select id="obra" class="form-control" formControlName="obra" required>
+        <option value="" disabled selected>Seleccione una obra</option>
+        <option *ngFor="let obra of obras" [value]="obra.id">
+          {{ obra.nombreObra }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          registrarForm.get('obra')?.invalid &&
+          registrarForm.get('obra')?.touched
+        "
+        class="text-danger"
+      >
+        Seleccionar una obra es obligatorio.
+      </div>
+    </div>
+
+    <!-- Botón de registro -->
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!registrarForm.valid"
+    >
+      Registrar Usuario
+    </button>
+  </form>
+  <!-- Mensaje de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>

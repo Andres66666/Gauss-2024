@@ -1,0 +1,37 @@
+<h1>Crear Rol Permiso</h1>
+<form
+  [formGroup]="registrarForm"
+  (ngSubmit)="registrarRolPermiso()"
+  class="p-4 border rounded shadow-sm"
+>
+  <div class="form-group mb-3">
+    <label for="rol" class="form-label">Rol</label>
+    <select formControlName="rol" id="rol" class="form-control" required>
+      <option *ngFor="let rol of roles" [value]="rol.id">
+        {{ rol.nombreRol }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="permiso" class="form-label">Permiso</label>
+    <select
+      formControlName="permiso"
+      id="permiso"
+      class="form-control"
+      required
+    >
+      <option *ngFor="let permiso of permisos" [value]="permiso.id">
+        {{ permiso.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <button
+    type="submit"
+    class="btn btn-primary w-100"
+    [disabled]="!registrarForm.valid"
+  >
+    Registrar
+  </button>
+</form>

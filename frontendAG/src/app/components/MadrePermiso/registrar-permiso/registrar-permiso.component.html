@@ -1,0 +1,42 @@
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Registrar Permisos</h2>
+  <form (ngSubmit)="registrarPermiso()" class="needs-validation" novalidate>
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre del Permiso:</label>
+      <input
+        type="text"
+        id="nombre"
+        [(ngModel)]="permiso.nombre"
+        name="nombre"
+        class="form-control"
+        required
+      />
+      <div class="invalid-feedback">
+        Por favor, ingrese un nombre del Permiso.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="descripcion" class="form-label"
+        >Descripcion del permiso:</label
+      >
+      <input
+        type="text"
+        id="descripcion"
+        [(ngModel)]="permiso.descripcion"
+        name="descripcion"
+        class="form-control"
+        required
+      />
+      <div class="invalid-feedback">Por favor, ingrese una descripcion.</div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Registrar</button>
+  </form>
+  <!-- Success and Error Messages -->
+  <p *ngIf="successMessage" class="text-success text-center mt-3">
+    {{ successMessage }}
+  </p>
+  <p *ngIf="errorMessage" class="text-danger text-center mt-3">
+    {{ errorMessage }}
+  </p>
+</div>

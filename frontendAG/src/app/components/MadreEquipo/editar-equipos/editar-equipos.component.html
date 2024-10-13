@@ -1,0 +1,141 @@
+<div class="container">
+  <h2>Editar Equipo</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="nombreEquipo">Nombre del Equipo:</label>
+      <input
+        type="text"
+        id="nombreEquipo"
+        formControlName="nombreEquipo"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            form.get('nombreEquipo')?.invalid &&
+            form.get('nombreEquipo')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          form.get('nombreEquipo')?.invalid && form.get('nombreEquipo')?.touched
+        "
+        class="invalid-feedback"
+      >
+        El nombre Equipo es requerido.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="marca">Marca:</label>
+      <input
+        type="text"
+        id="marca"
+        formControlName="marca"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="modelo">Modelo:</label>
+      <input
+        type="text"
+        id="modelo"
+        formControlName="modelo"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="estadoUsoEquipo">Estado de Uso:</label>
+      <select
+        id="estadoUsoEquipo"
+        formControlName="estadoUsoEquipo"
+        class="form-control"
+        required
+      >
+        <option value="" disabled>Seleccionar estado</option>
+        <option value="Disponible">Disponible</option>
+        <option value="En uso">En uso</option>
+        <option value="En mantenimiento">En mantenimiento</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="vidaUtil">Vida Útil:</label>
+      <input
+        type="text"
+        id="vidaUtil"
+        formControlName="vidaUtil"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fechaAdquiscion">Fecha de Adquisición:</label>
+      <input
+        type="date"
+        id="fechaAdquiscion"
+        formControlName="fechaAdquiscion"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="almacen">Almacén:</label>
+
+      <select
+        id="almacen"
+        formControlName="almacen"
+        class="form-control"
+        required
+      >
+        <option *ngFor="let almacen of almacenes" [value]="almacen.id">
+          {{ almacen.nombreAlmacen }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          form.get('almacen')?.invalid &&
+          (form.get('almacen')?.touched || form.get('almacen')?.dirty)
+        "
+        class="text-danger"
+      >
+        Se requiere seleccionar una almacen.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="imagenEquipos">Imagen del Equipo:</label>
+      <input
+        type="file"
+        id="imagenEquipos"
+        (change)="onImageChange($event)"
+        class="form-control"
+      />
+      <div *ngIf="imagenPreview" class="mt-2">
+        <img
+          [src]="imagenPreview"
+          alt="Imagen previa"
+          class="img-thumbnail"
+          width="100"
+        />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      Actualizar
+    </button>
+  </form>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+  <!-- Mensaje de alerta -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>

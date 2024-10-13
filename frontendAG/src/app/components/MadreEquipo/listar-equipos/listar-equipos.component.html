@@ -1,0 +1,56 @@
+<h1>Lista de Equipos</h1>
+<div class="container mt-4">
+  <!-- Campo de búsqueda -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar equipo..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+  </div>
+
+  <!-- Listado de equipos en tarjetas -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div *ngFor="let equipo of filteredEquipo()" class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ equipo.nombreEquipo }}</h5>
+              <img
+                *ngIf="equipo.imagenEquipos_url"
+                [src]="equipo.imagenEquipos_url"
+                alt="Foto de Perfil"
+                class="img-redonda"
+                style="width: 200px; height: 200px"
+              />
+              <p class="card-text">
+                <strong>Marca:</strong> {{ equipo.marca }}<br />
+                <strong>Modelo:</strong> {{ equipo.modelo }}<br />
+                <strong>Estado:</strong> {{ equipo.estadoUsoEquipo }}<br />
+                <strong>Vida Útil:</strong> {{ equipo.vidaUtil }}<br />
+                <strong>Fecha de Adquisición:</strong>
+                {{ equipo.fechaAdquiscion | date : "dd/MM/yyyy" }}<br />
+                <strong>Almacén:</strong> {{ equipo.almacen.nombreAlmacen }}
+              </p>
+              <button
+                class="btn btn-primary btn-sm"
+                (click)="editarEquipo(equipo.id)"
+              >
+                Editar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no se encuentran equipos -->
+  <div *ngIf="filteredEquipo().length === 0" class="alert alert-info">
+    No se encontraron equipos que coincidan con la búsqueda.
+  </div>
+</div>

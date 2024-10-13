@@ -1,0 +1,60 @@
+<div class="container">
+  <h2 class="text-center">Lista de Mantenimientos</h2>
+
+  <!-- Search Input -->
+  <div class="mb-3">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar por Detalle de Mantenimiento"
+      [(ngModel)]="searchTerm"
+    />
+  </div>
+
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th class="text-center">Detalle de Mantenimiento</th>
+        <th class="text-center">Fecha de Inicio</th>
+        <th class="text-center">Fecha de Fin</th>
+        <th class="text-center">Estado de mantenimiento</th>
+
+        <th class="text-center">Tipo de Mantenimiento</th>
+        <th class="text-center">Responsable</th>
+        <th class="text-center">Equipo</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let mantenimiento of filteredMantenimiento()"
+        [ngClass]="{
+          'table-danger': !mantenimiento.estadoMantenimiento,
+          'table-success': mantenimiento.estadoMantenimiento
+        }"
+      >
+        <td class="text-start">{{ mantenimiento.detalleMantenimiento }}</td>
+        <td class="text-start">
+          {{ mantenimiento.fechaInicio | date : "dd/MM/yyyy" }}
+        </td>
+        <td class="text-start">
+          {{ mantenimiento.fechaFin | date : "dd/MM/yyyy" }}
+        </td>
+        <td class="text-start">{{ mantenimiento.estadoMantenimiento }}</td>
+
+        <td class="text-start">{{ mantenimiento.tipoMantenimiento }}</td>
+        <td class="text-start">{{ mantenimiento.responsable }}</td>
+        <td class="text-start">{{ mantenimiento.equipo.nombreEquipo }}</td>
+
+        <td>
+          <button
+            class="btn btn-primary"
+            (click)="editarMantenimiento(mantenimiento.id)"
+          >
+            Editar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
