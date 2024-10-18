@@ -14,6 +14,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class UsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
+
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrar = new EventEmitter<number>(); // Emit an event when editing
 

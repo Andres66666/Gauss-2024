@@ -34,6 +34,7 @@ export class EditarUsuarioComponent implements OnInit {
 
   manejarModal: boolean = false;
   mensajeModal: string = '';
+  errorModal: string = '';
 
   ciNumero: string = '';
   departamentoAbreviatura: string = '';
@@ -69,9 +70,6 @@ export class EditarUsuarioComponent implements OnInit {
       next: (obra) => {
         this.obra = obra;
       },
-      error: (error) => {
-        console.error('Error al cargar las obras:', error);
-      },
     });
   }
 
@@ -82,10 +80,6 @@ export class EditarUsuarioComponent implements OnInit {
         this.processCI(this.usuario.ci);
         this.initializeForm();
         this.imagenPreview = this.usuario.imagen_url;
-      },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del usuario.';
-        console.error('Error loading user data:', error);
       },
     });
   }
@@ -188,19 +182,14 @@ export class EditarUsuarioComponent implements OnInit {
               next: () => {
                 this.mensajeModal = 'Usuario actualizado exitosamente'; // Mensaje para el modal
                 this.manejarModal = true; // Mostrar el modal
-                this.esExito = true; // Indicar éxito
               },
               error: (err) => {
-                this.errorMessage =
-                  'Error al actualizar el usuario. Por favor, intenta nuevamente.';
-                console.error('Error al actualizar el usuario:', err);
+                this.errorModal = 'Error al actualizar el usuario';
+                this.manejarModal = true;
               },
             });
         }
       });
-    } else {
-      this.errorMessage =
-        'El formulario no es válido. Por favor, revisa los campos.';
     }
   }
   manejarOk() {
