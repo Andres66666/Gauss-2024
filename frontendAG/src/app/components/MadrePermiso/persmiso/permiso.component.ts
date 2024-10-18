@@ -15,6 +15,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export class PermisoComponent implements OnInit {
   permisos: Permiso[] = [];
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+  @Output() registrarPermiso = new EventEmitter<number>(); // Emit an event when editing
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private permisoService: PermisoService) {}
@@ -31,6 +33,9 @@ export class PermisoComponent implements OnInit {
   }
   editarPermiso(id: number) {
     this.editar.emit(id);
+  }
+  registrarPermisos() {
+    this.registrarPermiso.emit(); // Emit an event to register a new user
   }
   filteredPermiso(): Permiso[] {
     if (!this.searchTerm) {

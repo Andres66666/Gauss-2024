@@ -12,7 +12,7 @@ import {
   Mantenimiento,
   Obra,
 } from './../models/mantenimiento';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -30,11 +30,14 @@ export class EditarMantenimientoComponent implements OnInit {
   obra: Obra[] = [];
 
   form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
-
   almacenSeleccionado: string = '';
   obraSeleccionada: string = '';
+
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarMantenimientoEditado = new EventEmitter<void>();
+
   @Input() mantenimientoId: number | null = null; // Allow null value
 
   constructor(
@@ -102,10 +105,6 @@ export class EditarMantenimientoComponent implements OnInit {
       next: (data) => {
         this.mantenimiento = data; // Populate form with user data
         this.initializeForm(); // Initialize form after loading user data
-      },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del mantenimiento.';
-        console.error('Error loading user data:', error);
       },
     });
   }
@@ -202,20 +201,18 @@ export class EditarMantenimientoComponent implements OnInit {
         .editarMantenimiento(this.mantenimiento.id, updatedMantenimiento)
         .subscribe({
           next: () => {
-            alert('Mantenimiento actualizado exitosamente');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            this.mensajeModal = 'Mantenimiento actualizado con éxito';
+            this.manejarModal = true;
           },
           error: (err) => {
-            this.errorMessage =
-              'Error al actualizar el mantenimiento. Por favor, intenta nuevamente.';
-            console.error('Error al actualizar el mantenimiento:', err);
+            this.errorModal = 'Error al actualizar el mantenimiento';
+            this.manejarModal = true;
           },
         });
-    } else {
-      this.errorMessage =
-        'El formulario no es válido. Por favor, revisa los campos.';
     }
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarMantenimientoEditado.emit();
   }
 }

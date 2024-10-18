@@ -166,13 +166,60 @@
       Registrar Mantenimiento
     </button>
   </form>
-  <!-- Mensaje de éxito -->
-  <div *ngIf="successMessage" class="alert alert-success mt-3">
-    {{ successMessage }}
-  </div>
+</div>
 
-  <!-- Mensaje de error -->
-  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
-    {{ errorMessage }}
+<!-- Modal de Éxito -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && !errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Información</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ mensajeModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Error -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ errorModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
   </div>
 </div>

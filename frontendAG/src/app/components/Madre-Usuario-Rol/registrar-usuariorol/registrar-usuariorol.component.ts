@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -24,6 +24,11 @@ export class RegistrarUsuariorolComponent {
   roles: Rol[] = [];
   obra: Obra[] = [];
   usuarios: Usuario[] = [];
+
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarUsuarioRol = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -63,15 +68,18 @@ export class RegistrarUsuariorolComponent {
         .registrarUsarioRol(this.registrarForm.value)
         .subscribe(
           (response) => {
-            console.log('Usuario registrado exitosamente', response);
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            this.mensajeModal = 'Usuario Rol registrado exitosamente'; // Mensaje para el modal
+            this.manejarModal = true;
           },
           (error) => {
-            console.error('Error al registrar el Rol-Permiso', error);
+            this.errorModal = 'Error al registrar el usuario rol';
+            this.manejarModal = true;
           }
         );
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarUsuarioRol.emit(); // Emitir el evento para listar usuarios
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -20,12 +20,11 @@ export class RegistrarEquiposComponent implements OnInit {
   registrarForm: FormGroup;
   almacenes: Almacen[] = []; // Para almacenar los almacenes disponibles
 
-  mensaje: string = '';
-  esExito: boolean = false;
-
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
   imagenPreview: string | ArrayBuffer | null = null;
+  @Output() listarEquipo = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private equiposService: EquiposService) {
     // Inicializar el formulario con los controles necesarios
@@ -81,16 +80,18 @@ export class RegistrarEquiposComponent implements OnInit {
       .registrarEquipos(formData as unknown as Equipo)
       .subscribe(
         (response) => {
-          this.successMessage = 'Equipo registrado exitosamente';
-          this.esExito = true;
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
+          this.mensajeModal = 'Equipo registrado exitosamente';
+          this.manejarModal = true;
         },
         (error) => {
-          this.errorMessage = 'Error al registrar el equipo';
+          this.errorModal = 'Error al registrar el equipo';
+          this.manejarModal = true;
         }
       );
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarEquipo.emit(); // Emitir el evento para listar usuarios
   }
 
   // Manejar la selección de archivo

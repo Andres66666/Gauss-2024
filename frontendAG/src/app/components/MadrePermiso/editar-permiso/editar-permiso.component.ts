@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Permiso } from '../models/permiso';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,10 +24,12 @@ export class EditarPermisoComponent implements OnInit {
     activo: true,
   };
   form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
 
   @Input() permisoId: number | null = null; // Allow null value
+  @Output() listarPermisoEditado = new EventEmitter<void>();
 
   constructor(private permisoService: PermisoService) {}
 
@@ -45,10 +47,6 @@ export class EditarPermisoComponent implements OnInit {
         this.permiso = data;
         this.initializerFrom();
       },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos de los permisos';
-        console.error('Error al cargar los datos:', error);
-      },
     });
   }
 
@@ -62,7 +60,6 @@ export class EditarPermisoComponent implements OnInit {
 
   submit() {
     if (this.form.invalid) {
-      this.errorMessage = 'porfavor complete todos los campos requeridos';
       return;
     }
     const updatedPermiso = { ...this.permiso, ...this.form.value };
@@ -71,15 +68,17 @@ export class EditarPermisoComponent implements OnInit {
       .subscribe({
         next: (data) => {
           console.log(data);
-          this.successMessage = 'Rol actualizado con exito';
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.mensajeModal = 'Permiso actualizado con éxito';
+          this.manejarModal = true;
         },
         error: (error) => {
-          this.errorMessage = 'Error al actualizar el permiso';
-          console.error('Error al actualizar el permiso');
+          this.errorModal = 'Error al actualizar el permiso';
+          this.manejarModal = true;
         },
       });
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarPermisoEditado.emit(); // Emitir el evento para listar usuarios
   }
 }

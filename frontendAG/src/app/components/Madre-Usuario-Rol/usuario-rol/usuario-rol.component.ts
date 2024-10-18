@@ -15,8 +15,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class UsuarioRolComponent implements OnInit {
   usuarioRoles: UsuarioRol[] = [];
-  
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarUsuarioPermiso = new EventEmitter<number>();
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private usuarioRolService: UsuarioRolService) {}
@@ -43,5 +45,8 @@ export class UsuarioRolComponent implements OnInit {
   }
   editarRolPermiso(id: number) {
     this.editar.emit(id);
+  }
+  registrarUsuarioRol() {
+    this.registrarUsuarioPermiso.emit();
   }
 }

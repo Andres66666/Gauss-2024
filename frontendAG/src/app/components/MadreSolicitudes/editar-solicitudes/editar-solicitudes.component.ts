@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { SolicitudesService } from './../services/solicitudes.service';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Equipo, Obra, Solicitudes, Usuario } from '../models/solicitudes';
 import {
   FormBuilder,
@@ -24,10 +24,12 @@ export class EditarSolicitudesComponent {
   usuario: Usuario[] = [];
 
   form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
 
-  @Input() solicitudId: number | null = null; // Allow null value
+  @Input() solicitudId: number | null = null;
+  @Output() listarSolicitudEditado = new EventEmitter<void>();
 
   constructor(
     private solicitudesService: SolicitudesService,
@@ -69,18 +71,12 @@ export class EditarSolicitudesComponent {
       next: (usuario) => {
         this.usuario = usuario;
       },
-      error: (error) => {
-        console.error('Error al cargar los usuario:', error);
-      },
     });
   }
   loadObras(): void {
     this.solicitudesService.getObras().subscribe({
       next: (obra) => {
         this.obra = obra;
-      },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
       },
     });
   }
@@ -89,10 +85,6 @@ export class EditarSolicitudesComponent {
       next: (data) => {
         this.solicitudes = data; // Populate form with user data
         this.initializeForm(); // Initialize form after loading user data
-      },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del solicitud.';
-        console.error('Error loading user data:', error);
       },
     });
   }
@@ -155,20 +147,18 @@ export class EditarSolicitudesComponent {
         .editarSolicitudes(this.solicitudes.id, updatedSolicitud)
         .subscribe({
           next: () => {
-            alert('Solicitud actualizada exitosamente');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            this.mensajeModal = 'Solicitud actualizado con éxito';
+            this.manejarModal = true;
           },
           error: (err) => {
-            this.errorMessage =
-              'Error al actualizar la solicitud. Por favor, intenta nuevamente.';
-            console.error('Error al actualizar la solicitud:', err);
+            this.errorModal = 'Error al actualizar el solicitud';
+            this.manejarModal = true;
           },
         });
-    } else {
-      this.errorMessage =
-        'El formulario no es válido. Por favor, revisa los campos.';
     }
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarSolicitudEditado.emit();
   }
 }

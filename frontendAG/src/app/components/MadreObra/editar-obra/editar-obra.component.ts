@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Obra } from '../models/obra';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,9 +24,11 @@ export class EditarObraComponent implements OnInit {
     estadoObra: true,
   };
   form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
-  @Input() obraId: number | null = null; // Allow null value
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Input() obraId: number | null = null;
+  @Output() listarObraEditado = new EventEmitter<void>();
 
   constructor(private obraServise: ObraService) {}
 
@@ -43,10 +45,6 @@ export class EditarObraComponent implements OnInit {
         this.obra = data;
         this.initializerFrom();
       },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos de los permisos';
-        console.error('Error al cargar los datos:', error);
-      },
     });
   }
   initializerFrom() {
@@ -58,22 +56,23 @@ export class EditarObraComponent implements OnInit {
   }
   submit() {
     if (this.form.invalid) {
-      this.errorMessage = 'porfavor complete todos los campos requeridos';
       return;
     }
     const updatedObra = { ...this.obra, ...this.form.value };
     this.obraServise.editarObra(this.obra.id, updatedObra).subscribe({
       next: (data) => {
         console.log(data);
-        this.successMessage = 'Rol actualizado con exito';
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        this.mensajeModal = 'Obra actualizado con éxito';
+        this.manejarModal = true;
       },
       error: (error) => {
-        this.errorMessage = 'Error al actualizar el obra';
-        console.error('Error al actualizar el obra');
+        this.errorModal = 'Error al actualizar el Obra';
+        this.manejarModal = true;
       },
     });
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarObraEditado.emit();
   }
 }

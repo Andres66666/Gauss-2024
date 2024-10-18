@@ -13,8 +13,11 @@ import { EquiposService } from '../service/equipos.service';
 })
 export class ListarEquiposComponent implements OnInit {
   equipos: Equipo[] = [];
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
-  searchTerm: string = ''; // Property for storing the search term
+  searchTerm: string = '';
+
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarEquipo = new EventEmitter<number>();
+
   constructor(private equiposService: EquiposService) {}
   ngOnInit(): void {
     this.getEquipo();
@@ -27,9 +30,11 @@ export class ListarEquiposComponent implements OnInit {
   }
 
   editarEquipo(id: number) {
-    this.editar.emit(id); // Emit the ID of the user to be edited
+    this.editar.emit(id);
   }
-
+  registrarEquipos() {
+    this.registrarEquipo.emit();
+  }
   filteredEquipo(): Equipo[] {
     if (!this.searchTerm) {
       return this.equipos; // Return all users if no search term is provided

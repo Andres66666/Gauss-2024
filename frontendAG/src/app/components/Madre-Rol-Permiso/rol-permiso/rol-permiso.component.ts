@@ -27,7 +27,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class RolPermisoComponent implements OnInit {
   rolePermisos: RolPermiso[] = [];
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarRolPermiso = new EventEmitter<number>();
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private rolPermisoService: RolPermisoService) {}
@@ -56,5 +58,8 @@ export class RolPermisoComponent implements OnInit {
   //medodo para jalar a la vista de editar permiso
   editarRolPermiso(id: number) {
     this.editar.emit(id);
+  }
+  registrarRolPermisos() {
+    this.registrarRolPermiso.emit(); // Emit an event to register a new user
   }
 }

@@ -1,10 +1,13 @@
 from django.contrib.auth.hashers import make_password
-from users.models import Usuario
+from users.models import Usuarios
 
 # Cifra la contraseña del usuario 'andy'
-usuario = Usuario.objects.get(nombreUsuario='pepE')
-usuario.password = make_password('1234')  # Reemplaza '1234' con la contraseña actual en texto plano
+usuario = Usuarios.objects.get(nombreUsuario='Andres')
+usuario.password = make_password('Andres1234*')  # Reemplaza '1234' con la contraseña actual en texto plano
 usuario.save()
 
-""" exec(open('scripts/encriptar_contrasenas.py').read())
-"""
+""" Paso 1 """
+""" python manage.py shell    """
+
+""" Paso 2 """
+""" exec(open('scripts/encriptar_contrasenas.py').read()) """

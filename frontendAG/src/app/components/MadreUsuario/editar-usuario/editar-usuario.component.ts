@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { UsuarioService } from '../services/usuario.service';
 import { Obra, Usuario } from '../models/usuario';
 import { CommonModule } from '@angular/common';
@@ -25,10 +25,16 @@ export class EditarUsuarioComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
   @Input() usuarioId: number | null = null;
+  @Output() listarUsuarioEditado = new EventEmitter<void>();
+
   imagenPreview: string | ArrayBuffer | null = null;
 
   mensaje: string = '';
   esExito: boolean = false;
+
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+
   ciNumero: string = '';
   departamentoAbreviatura: string = '';
 
@@ -180,11 +186,9 @@ export class EditarUsuarioComponent implements OnInit {
             .editarUsuario(this.usuario.id, updatedUsuario)
             .subscribe({
               next: () => {
-                this.mensaje = 'Usuario actualizado exitosamente';
-                this.esExito = true;
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
+                this.mensajeModal = 'Usuario actualizado exitosamente'; // Mensaje para el modal
+                this.manejarModal = true; // Mostrar el modal
+                this.esExito = true; // Indicar éxito
               },
               error: (err) => {
                 this.errorMessage =
@@ -198,6 +202,10 @@ export class EditarUsuarioComponent implements OnInit {
       this.errorMessage =
         'El formulario no es válido. Por favor, revisa los campos.';
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarUsuarioEditado.emit(); // Emitir el evento para listar usuarios
   }
 
   private usuariosCargados = false;

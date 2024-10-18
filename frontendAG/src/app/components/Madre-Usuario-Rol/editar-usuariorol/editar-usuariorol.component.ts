@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Rol, Usuario, UsuarioRol, Obra } from '../models/usuario-rol';
 import {
   FormControl,
@@ -25,10 +25,12 @@ export class EditarUsuariorolComponent implements OnInit {
   obra: Obra[] = [];
 
   form!: FormGroup;
-  successMessage: string = '';
-  errorMessage: string = '';
 
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
   @Input() usuarioRolId: number | null = null;
+  @Output() listarUsuarioRolEditado = new EventEmitter<void>();
 
   constructor(
     private UsuarioRolService: UsuarioRolService,
@@ -54,11 +56,6 @@ export class EditarUsuariorolComponent implements OnInit {
         this.usuarioRol = data;
         this.initializeForm();
       },
-      error: (error) => {
-        this.errorMessage =
-          'Error al cargar los datos de la relación Usuario Rol';
-        console.error('Error al cargar los datos:', error);
-      },
     });
   }
   initializeForm(): void {
@@ -78,18 +75,12 @@ export class EditarUsuariorolComponent implements OnInit {
       next: (roles) => {
         this.roles = roles;
       },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
-      },
     });
   }
   loadObras(): void {
     this.UsuarioRolService.getObras().subscribe({
       next: (obras) => {
         this.obra = obras;
-      },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
       },
     });
   }
@@ -99,9 +90,6 @@ export class EditarUsuariorolComponent implements OnInit {
     this.usuarioService.getUsuarios().subscribe({
       next: (usuarios) => {
         this.usuarios = usuarios;
-      },
-      error: (error) => {
-        console.error('Error al cargar los usuarios:', error);
       },
     });
   }
@@ -135,11 +123,13 @@ export class EditarUsuariorolComponent implements OnInit {
         this.usuarioRol.id,
         updatedUsuarioRol
       ).subscribe(() => {
-        alert('Usuario Rol actualizado exitosamente');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        this.mensajeModal = 'Usuario Rol actualizado con éxito';
+        this.manejarModal = true;
       });
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; 
+    this.listarUsuarioRolEditado.emit();
   }
 }

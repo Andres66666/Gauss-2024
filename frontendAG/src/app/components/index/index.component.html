@@ -24,292 +24,124 @@
     </div>
     <hr />
     <!-- Lista de navegación lateral -->
+    <!-- registrarUsuarios-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarUsuarios')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('usuario')"
+        (click)="mostrarComponente('VerUsuario')"
       >
-        <i class="fas fa-users-cog mr-2"></i>
-        <span>Usuarios</span>
+        <i class="fas fa-users mr-2"></i>
+        <span>Usuarios </span>
       </li>
-      <ul *ngIf="activeSection === 'usuario'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarUsuario')"
-        >
-          <i class="fas fa-user-plus mr-2"></i>
-
-          <span>Registrar</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerUsuario')"
-        >
-          <i class="fas fa-users mr-2"></i>
-          <span>lista de usuario </span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarRoles-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarRoles')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('Roles')"
+        (click)="mostrarComponente('VerRol')"
       >
         <i class="fas fa-user-tie mr-2"></i>
         <span>Roles</span>
       </li>
-      <ul *ngIf="activeSection === 'Roles'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarRol')"
-        >
-          <i class="fas fa-user-plus mr-2"></i>
-          <span>Registrar Roles</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerRol')"
-        >
-          <i class="fas fa-eye mr-2"></i>
-          <span>Lista de roles</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarPermisos-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarPermisos')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('permisos')"
+        (click)="mostrarComponente('VerPermisos')"
       >
         <i class="fas fa-key mr-2"></i>
         <span>Permisos</span>
       </li>
-      <ul *ngIf="activeSection === 'permisos'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarPermisos')"
-        >
-          <i class="fas fa-keyboard mr-2"></i>
-          <span>Registrar Permisos</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerPermisos')"
-        >
-          <i class="fas fa-eye mr-2"></i>
-          <span>Listar Permisos</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarRolPermiso-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarRolPermiso')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('rolpermisos')"
+        (click)="mostrarComponente('VerRolPermisos')"
       >
         <i class="fas fa-user-shield mr-2"></i>
-        <span>Rol Permiso</span>
+        <span>Roles Permisos</span>
       </li>
-      <ul *ngIf="activeSection === 'rolpermisos'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarRolPermisos')"
-        >
-          <i class="fas fa-user-tag mr-2"></i>
-          <span>Registrar Rol Permiso</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerRolPermisos')"
-        >
-          <i class="fas fa-eye mr-2"></i>
-          <span>Lista de Roles y Permisos</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarUsuarioRol-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarUsuarioRol')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('usuariorol')"
+        (click)="mostrarComponente('VerUsuarioRol')"
       >
         <i class="fas fa-user-cog mr-2"></i>
-        <span>Usuario Rol</span>
+        <span>Usuarios Roles</span>
       </li>
-      <ul *ngIf="activeSection === 'usuariorol'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarUsuarioRol')"
-        >
-          <i class="fas fa-user-plus mr-2"></i>
-          <span>Registrar Usuario Rol</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerUsuarioRol')"
-        >
-          <i class="fas fa-clipboard-list mr-2"></i>
-          <span>Listar Usuario Rol </span>
-        </li>
-      </ul>
     </ol>
+
+    <!-- registrarObra-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarObra')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('obra')"
+        (click)="mostrarComponente('VerObra')"
       >
         <i class="fas fa-hard-hat mr-2"></i>
         <span>Obras</span>
       </li>
-      <ul *ngIf="activeSection === 'obra'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarObra')"
-        >
-          <i class="fas fa-hammer mr-2"></i>
-          <span>Registrar Obra</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerObra')"
-        >
-          <i class="fas fa-folder-open mr-2"></i>
-          <span>Listar Obras</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarAlmacen-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarAlmacen')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('almacen')"
+        (click)="mostrarComponente('VerAlmacen')"
       >
         <i class="fas fa-warehouse mr-2"></i>
         <span>Almacenes</span>
       </li>
-      <ul *ngIf="activeSection === 'almacen'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarAlmacen')"
-        >
-          <i class="fas fa-plus-square mr-2"></i>
-          <span>Registrar Almacen</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerAlmacen')"
-        >
-          <i class="fas fa-list-alt mr-2"></i>
-          <span>Listar Almacen</span>
-        </li>
-      </ul>
     </ol>
+
+    <!-- registrarEquipos-->
     <ol class="list-group">
       <li
         *ngIf="puedeVer('registrarEquipos')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('equipos')"
+        (click)="mostrarComponente('VerEquipos')"
       >
         <i class="fas fa-tools mr-2"></i>
         <span>Equipos</span>
       </li>
-      <ul *ngIf="activeSection === 'equipos'" class="list-unstyled ml-3">
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarEquipos')"
-        >
-          <i class="fas fa-plus-circle mr-2"></i>
-          <span>Registrar Equipos</span>
-        </li>
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerEquipos')"
-        >
-          <i class="fas fa-eye mr-2"></i>
-
-          <span>Listar Equipos</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarMantenimiento-->
     <ol class="list-group">
-      <!-- Opción de Mantenimiento -->
       <li
         *ngIf="puedeVer('registrarMantenimiento')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('mantenimiento')"
+        (click)="mostrarComponente('VerMantenimiento')"
       >
-        <!-- Icono de ajustes/engranaje para mantenimiento -->
-        <i class="fas fa-cogs mr-2"></i>
-        <span>Mantenimiento</span>
+        <i class="fas fa-list mr-2"></i>
+        <span>Mantenimientos</span>
       </li>
-
-      <!-- Opciones dentro de Mantenimiento -->
-      <ul *ngIf="activeSection === 'mantenimiento'" class="list-unstyled ml-3">
-        <!-- Opción para registrar mantenimiento -->
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarMantenimiento')"
-        >
-          <!-- Icono de añadir para registrar -->
-          <i class="fas fa-wrench mr-2"></i>
-          <span>Registrar Mantenimiento</span>
-        </li>
-
-        <!-- Opción para listar mantenimientos -->
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerMantenimiento')"
-        >
-          <!-- Icono de lista para ver mantenimientos -->
-          <i class="fas fa-list mr-2"></i>
-          <span>Listar Mantenimiento</span>
-        </li>
-      </ul>
     </ol>
 
+    <!-- registrarSolicitudes-->
     <ol class="list-group">
-      <!-- Opción de Solicitudes -->
       <li
         *ngIf="puedeVer('registrarSolicitudes')"
         class="list-group-item list-group-item-action d-flex align-items-center"
-        (click)="toggleOptions('solicitud')"
+        (click)="mostrarComponente('VerSolicitudes')"
       >
-        <!-- Icono de carpeta para solicitudes -->
         <i class="fas fa-folder-open mr-2"></i>
         <span>Solicitudes</span>
       </li>
-
-      <!-- Opciones dentro de Solicitudes -->
-      <ul *ngIf="activeSection === 'solicitud'" class="list-unstyled ml-3">
-        <!-- Opción para registrar solicitudes -->
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('RegistrarSolicitudes')"
-        >
-          <!-- Icono de formulario para registrar -->
-          <i class="fas fa-file-signature mr-2"></i>
-          <span>Registrar Solicitudes</span>
-        </li>
-
-        <!-- Opción para listar solicitudes -->
-        <li
-          class="list-group-item list-group-item-action d-flex align-items-center"
-          (click)="mostrarComponente('VerSolicitudes')"
-        >
-          <!-- Icono de lista para ver solicitudes -->
-          <i class="fas fa-clipboard-list mr-2"></i>
-          <span>Listar Solicitudes</span>
-        </li>
-      </ul>
     </ol>
   </div>
 </aside>
@@ -397,174 +229,213 @@
     style="min-height: calc(100vh - 70px)"
   >
     <div class="text-center" style="margin-top: 10px">
-      <!-- Renderizar el componente seleccionado -->
-      <ng-container *ngIf="componenteActual === 'RegistrarUsuario'">
-        <app-registrar-usuario></app-registrar-usuario>
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerUsuario'">
         <app-usuario
+          (registrar)="onRegistrarUsuario()"
           (editar)="mostrarComponente('EditarUsuario', $event)"
         ></app-usuario>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarUsuario'">
+        <app-registrar-usuario
+          (listarUsuario)="mostrarComponente('VerUsuario')"
+        ></app-registrar-usuario>
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarUsuario'">
         <app-editar-usuario
           [usuarioId]="usuarioIdParaEditar"
+          (listarUsuarioEditado)="mostrarComponente('VerUsuario')"
         ></app-editar-usuario>
       </ng-container>
 
       <!-- est es la seccion de roles  -->
-      <ng-container *ngIf="componenteActual === 'RegistrarRol'">
-        <app-registrar-rol></app-registrar-rol>
+      <ng-container *ngIf="componenteActual === 'VerRol'">
+        <app-rol
+          (registrar_Rol)="onRegistrarRol()"
+          (editar)="mostrarComponente('EditarRol', $event)"
+        ></app-rol>
       </ng-container>
 
-      <ng-container *ngIf="componenteActual === 'VerRol'">
-        <app-rol (editar)="mostrarComponente('EditarRol', $event)"></app-rol>
+      <ng-container *ngIf="componenteActual === 'RegistrarRol'">
+        <app-registrar-rol
+          (listarRol)="mostrarComponente('VerRol')"
+        ></app-registrar-rol>
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarRol'">
-        <app-editar-rol [rolId]="rolIdParaEditar"></app-editar-rol>
+        <app-editar-rol
+          [rolId]="rolIdParaEditar"
+          (listarRolEditado)="mostrarComponente('VerRol')"
+        ></app-editar-rol>
       </ng-container>
 
       <!-- est es la seccion de permisos  -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarPermisos'">
-        <app-registrar-permiso></app-registrar-permiso>
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerPermisos'">
         <app-permiso
+          (registrarPermiso)="onRegistrarPermiso()"
           (editar)="mostrarComponente('EditarPermiso', $event)"
         ></app-permiso>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarPermisos'">
+        <app-registrar-permiso
+          (listarPermiso)="mostrarComponente('VerPermisos')"
+        ></app-registrar-permiso>
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarPermiso'">
         <app-editar-permiso
           [permisoId]="permisoIdParaEditar"
+          (listarPermisoEditado)="mostrarComponente('VerPermisos')"
         ></app-editar-permiso>
       </ng-container>
 
       <!-- est es la seccion de rol permisos  -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarRolPermisos'">
-        <app-registrar-rolpermiso></app-registrar-rolpermiso>
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerRolPermisos'">
         <app-rol-permiso
+          (registrarRolPermiso)="onRegistrarRolPermiso()"
           (editar)="mostrarComponente('EditarRolPermiso', $event)"
         ></app-rol-permiso>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarRolPermisos'">
+        <app-registrar-rolpermiso
+          (listarRolPermiso)="mostrarComponente('VerRolPermisos')"
+        ></app-registrar-rolpermiso>
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarRolPermiso'">
         <app-editar-rolpermiso
           [rolPermisoId]="rolpermisoIdParaEditar"
+          (listarRolPermisoEditado)="mostrarComponente('VerRolPermisos')"
         ></app-editar-rolpermiso>
       </ng-container>
 
       <!-- esta la seccion de Usuario Rol -->
-      <ng-container *ngIf="componenteActual === 'RegistrarUsuarioRol'">
-        <app-registrar-usuariorol />
-      </ng-container>
 
       <ng-container *ngIf="componenteActual === 'VerUsuarioRol'">
         <app-usuario-rol
+          (registrarUsuarioPermiso)="onRegistrarUsuarioRoles()"
           (editar)="mostrarComponente('EditarUsuarioRol', $event)"
         ></app-usuario-rol>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarUsuarioRol'">
+        <app-registrar-usuariorol
+          (listarUsuarioRol)="mostrarComponente('VerUsuarioRol')"
+        />
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarUsuarioRol'">
         <app-editar-usuariorol
           [usuarioRolId]="usuariorolIdParaEditar"
+          (listarUsuarioRolEditado)="mostrarComponente('VerUsuarioRol')"
         ></app-editar-usuariorol>
       </ng-container>
 
       <!-- esta la seccion de Obras -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarObra'">
-        <app-registrar-obra />
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerObra'">
         <app-listar-obra
+          (registrarObras)="onRegistrarObras()"
           (editar)="mostrarComponente('EditarObra', $event)"
         ></app-listar-obra>
       </ng-container>
 
+      <ng-container *ngIf="componenteActual === 'RegistrarObra'">
+        <app-registrar-obra (listarObras)="mostrarComponente('VerObra')" />
+      </ng-container>
+
       <ng-container *ngIf="componenteActual === 'EditarObra'">
-        <app-editar-obra [obraId]="obraIdParaEditar"></app-editar-obra>
+        <app-editar-obra
+          [obraId]="obraIdParaEditar"
+          (listarObraEditado)="mostrarComponente('VerObra')"
+        ></app-editar-obra>
       </ng-container>
 
       <!-- esta la seccion de Almacen -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarAlmacen'">
-        <app-registrar-almacen />
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerAlmacen'">
         <app-listar-almacen
+          (registrarAlmacen)="onRegistrarAlmacenes()"
           (editar)="mostrarComponente('EditarAlmacen', $event)"
         ></app-listar-almacen>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarAlmacen'">
+        <app-registrar-almacen
+          (listarAlmacen)="mostrarComponente('VerAlmacen')"
+        />
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarAlmacen'">
         <app-editar-almacen
           [almacenId]="almacenIdParaEditar"
+          (listarAlmacenEditado)="mostrarComponente('VerAlmacen')"
         ></app-editar-almacen>
       </ng-container>
 
-      <!-- esta la seccion de Almacen -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarEquipos'">
-        <app-registrar-equipos />
-      </ng-container>
-
+      <!-- esta la seccion de equipos -->
       <ng-container *ngIf="componenteActual === 'VerEquipos'">
         <app-listar-equipos
+          (registrarEquipo)="onRegistrarEquipos()"
           (editar)="mostrarComponente('EditarEquipo', $event)"
         ></app-listar-equipos>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarEquipos'">
+        <app-registrar-equipos
+          (listarEquipo)="mostrarComponente('VerEquipos')"
+        />
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarEquipo'">
         <app-editar-equipos
           [equipoId]="equipoIdParaEditar"
+          (listarEquipoEditado)="mostrarComponente('VerEquipos')"
         ></app-editar-equipos>
       </ng-container>
 
       <!-- esta la seccion de mantenimientos -->
 
-      <ng-container *ngIf="componenteActual === 'RegistrarMantenimiento'">
-        <app-registrar-mantenimiento />
-      </ng-container>
-
       <ng-container *ngIf="componenteActual === 'VerMantenimiento'">
         <app-listar-mantenimiento
+          (registrarMantenimiento)="onRegistrarMatenimientos()"
           (editar)="mostrarComponente('EditarMantenimiento', $event)"
         ></app-listar-mantenimiento>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarMantenimiento'">
+        <app-registrar-mantenimiento
+          (listarMantenimiento)="mostrarComponente('VerMantenimiento')"
+        />
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarMantenimiento'">
         <app-editar-mantenimiento
           [mantenimientoId]="mantenimientoIdParaEditar"
+          (listarMantenimientoEditado)="mostrarComponente('VerMantenimiento')"
         ></app-editar-mantenimiento>
       </ng-container>
 
-      <!-- esta la seccion de mantenimientos -->
-
-      <ng-container *ngIf="componenteActual === 'RegistrarSolicitudes'">
-        <app-registrar-solicitudes />
-      </ng-container>
+      <!-- esta la seccion de solicitudes -->
 
       <ng-container *ngIf="componenteActual === 'VerSolicitudes'">
         <app-listar-solicitudes
+          (registrarSolicitud)="onRegistrarSolicitudes()"
           (editar)="mostrarComponente('EditarSolicitudes', $event)"
         ></app-listar-solicitudes>
+      </ng-container>
+
+      <ng-container *ngIf="componenteActual === 'RegistrarSolicitudes'">
+        <app-registrar-solicitudes
+          (listarSolicitud)="mostrarComponente('VerSolicitudes')"
+        />
       </ng-container>
 
       <ng-container *ngIf="componenteActual === 'EditarSolicitudes'">
         <app-editar-solicitudes
           [solicitudId]="solicitudIdParaEditar"
+          (listarSolicitudEditado)="mostrarComponente('VerSolicitudes')"
         ></app-editar-solicitudes>
       </ng-container>
     </div>

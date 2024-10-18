@@ -1,6 +1,6 @@
 import { Almacen, Obra } from './../models/almacen';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -19,11 +19,15 @@ import { AlmacenService } from '../service/almacen.service';
 export class EditarAlmacenComponent {
   almacenes!: Almacen;
   obras: Obra[] = [];
-  form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
+  form!: FormGroup;
 
-  @Input() almacenId: number | null = null; // Allow null value
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+
+  @Input() almacenId: number | null = null;
+  @Output() listarAlmacenEditado = new EventEmitter<void>();
+
   constructor(private almacenService: AlmacenService) {}
 
   ngOnInit(): void {
@@ -39,20 +43,13 @@ export class EditarAlmacenComponent {
       next: (obra) => {
         this.obras = obra;
       },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
-      },
     });
   }
   loadAlmacenData(id: number) {
     this.almacenService.getAlmacenById(id).subscribe({
       next: (data) => {
-        this.almacenes = data; // Populate form with user data
-        this.initializeForm(); // Initialize form after loading user data
-      },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del usuario.';
-        console.error('Error loading user data:', error);
+        this.almacenes = data;
+        this.initializeForm();
       },
     });
   }
@@ -84,18 +81,18 @@ export class EditarAlmacenComponent {
         .editarAlmacen(this.almacenes.id, updatedAlmacen)
         .subscribe({
           next: () => {
-            this.successMessage = 'Almacen actualizado exitosamente';
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            this.mensajeModal = 'Almacen actualizado con éxito';
+            this.manejarModal = true;
           },
           error: (err) => {
-            this.errorMessage = this.errorMessage =
-              'Error al actualizar el almacen';
+            this.errorModal = 'Error al actualizar el Almacen';
+            this.manejarModal = true;
           },
         });
-    } else {
-      this.errorMessage = 'El formulario no es válido';
     }
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarAlmacenEditado.emit();
   }
 }

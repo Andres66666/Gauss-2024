@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Rol } from '../models/rol';
 import { CommonModule } from '@angular/common';
@@ -25,10 +25,11 @@ export class EditarRolComponent implements OnInit {
   };
 
   form!: FormGroup; // Declare form as a class property
-  successMessage: string = '';
-  errorMessage: string = '';
-
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
   @Input() rolId: number | null = null; // Allow null value
+  @Output() listarRolEditado = new EventEmitter<void>();
 
   constructor(
     private rolService: RolService,
@@ -50,10 +51,6 @@ export class EditarRolComponent implements OnInit {
         this.rol = data;
         this.initializeForm(); // Initialize form after loading role data
       },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del rol';
-        console.error('Error al cargar los datos:', error);
-      },
     });
   }
 
@@ -66,8 +63,6 @@ export class EditarRolComponent implements OnInit {
 
   submit() {
     if (this.form.invalid) {
-      // Check if the form is invalid
-      this.errorMessage = 'Por favor completa todos los campos requeridos'; // Show error message
       return; // Exit early if the form is invalid
     }
 
@@ -75,15 +70,17 @@ export class EditarRolComponent implements OnInit {
     this.rolService.editarRol(this.rol.id, updatedRol).subscribe({
       next: (data) => {
         console.log(data);
-        this.successMessage = 'Rol actualizado con éxito';
-        setTimeout(() => {
-          window.location.reload(); // Redirect to roles list after success
-        }, 1000); // Wait before redirecting
+        this.mensajeModal = 'Rol actualizado con éxito';
+        this.manejarModal = true;
       },
       error: (error) => {
-        this.errorMessage = 'Error al actualizar el rol';
-        console.error('Error al actualizar el rol:', error);
+        this.errorModal = 'Error al actualizar el rol';
+        this.manejarModal = true;
       },
     });
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarRolEditado.emit();
   }
 }

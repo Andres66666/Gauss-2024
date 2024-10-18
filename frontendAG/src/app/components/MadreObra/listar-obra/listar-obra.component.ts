@@ -13,11 +13,10 @@ import { ObraService } from '../service/obra.service';
 })
 export class ListarObraComponent implements OnInit {
   obra: Obra[] = [];
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
-  searchTerm: string = ''; // Property for storing the search term
 
-  searchTermNombre: string = ''; // Property for storing the search term
-  searchTermUbicacion: string = ''; // Property for storing the search term
+  searchTerm: string = '';
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarObras = new EventEmitter<number>();
 
   constructor(private obraServise: ObraService) {}
   ngOnInit(): void {
@@ -33,6 +32,10 @@ export class ListarObraComponent implements OnInit {
   editarObra(id: number) {
     this.editar.emit(id);
   }
+  registrarObra() {
+    this.registrarObras.emit(); // Emit an event to register a new user
+  }
+
   filteredObra(): Obra[] {
     if (!this.searchTerm) {
       return this.obra;

@@ -81,7 +81,6 @@ import { EditarSolicitudesComponent } from '../MadreSolicitudes/editar-solicitud
 export class IndexComponent implements OnInit {
   isSidebarOpen = true; // La barra lateral está inicialmente visible
   windowWidth: number;
-
   permisos: string[] = [];
   nombreUsuario: string = '';
   apellido: string | null = '';
@@ -146,10 +145,8 @@ export class IndexComponent implements OnInit {
     this.router.navigate(['/login']); // Redirigir al login
   }
 
-  componenteActual: string = ''; // Variable para controlar el componente a mostrar
-
   activeSection: string | null = null; // Variable para controlar la sección activa
-
+  componenteActual: string = ''; // Valor inicial
   // Método para cambiar el componente actual basado en el ítem clickeado
   mostrarComponente(componente: string, id?: number): void {
     this.componenteActual = componente;
@@ -181,7 +178,38 @@ export class IndexComponent implements OnInit {
 
     this.activeSection = null; // Resetea la sección activa después de seleccionar un componente
   }
-
+  // Método para manejar el evento de registrar
+  // Método para manejar el evento de registrar
+  onRegistrarUsuario() {
+    this.componenteActual = 'RegistrarUsuario'; // Cambia a la vista de registro
+  }
+  onRegistrarRol() {
+    this.componenteActual = 'RegistrarRol';
+  }
+  onRegistrarPermiso() {
+    this.componenteActual = 'RegistrarPermisos';
+  }
+  onRegistrarRolPermiso() {
+    this.componenteActual = 'RegistrarRolPermisos';
+  }
+  onRegistrarUsuarioRoles() {
+    this.componenteActual = 'RegistrarUsuarioRol';
+  }
+  onRegistrarObras() {
+    this.componenteActual = 'RegistrarObra';
+  }
+  onRegistrarAlmacenes() {
+    this.componenteActual = 'RegistrarAlmacen';
+  }
+  onRegistrarEquipos() {
+    this.componenteActual = 'RegistrarEquipos';
+  }
+  onRegistrarMatenimientos() {
+    this.componenteActual = 'RegistrarMantenimiento';
+  }
+  onRegistrarSolicitudes() {
+    this.componenteActual = 'RegistrarSolicitudes';
+  }
   // Método para alternar la visualización de las opciones
   toggleOptions(section: string): void {
     this.activeSection = this.activeSection === section ? null : section; // Alterna la sección activa

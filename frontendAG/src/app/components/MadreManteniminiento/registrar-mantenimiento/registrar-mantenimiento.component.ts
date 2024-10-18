@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -22,8 +22,12 @@ export class RegistrarMantenimientoComponent implements OnInit {
   equipos: Equipo[] = [];
   almacenes: Almacen[] = [];
   obras: Obra[] = [];
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+
+  @Output() listarMantenimiento = new EventEmitter<void>();
+
   constructor(
     private fb: FormBuilder,
     private mantenimientoService: MantenimientoService
@@ -120,16 +124,19 @@ export class RegistrarMantenimientoComponent implements OnInit {
           .createMantenimiento(nuevoMantenimiento)
           .subscribe(
             (response) => {
-              this.successMessage = 'Mantenimiento registrado exitosamente';
-              setTimeout(() => {
-                window.location.reload();
-              }, 1000);
+              this.mensajeModal = 'Mantenimiento registrado exitosamente'; // Mensaje para el modal
+              this.manejarModal = true; // Mostrar el modal
             },
             (error) => {
-              this.errorMessage = 'Error al registrar el mantenimiento';
+              this.errorModal = 'Error al registrar el mantenimiento';
+              this.manejarModal = true;
             }
           );
       }
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarMantenimiento.emit(); // Emitir el evento para listar usuarios
   }
 }

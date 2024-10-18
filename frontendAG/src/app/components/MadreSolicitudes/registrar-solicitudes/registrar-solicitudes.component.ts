@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -29,6 +29,11 @@ export class RegistrarSolicitudesComponent implements OnInit {
   almacenes: Almacen[] = [];
   obras: Obra[] = [];
   usuarios: Usuario[] = [];
+
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarSolicitud = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -82,15 +87,18 @@ export class RegistrarSolicitudesComponent implements OnInit {
 
       this.solicitudesService.createSolicitudes(nuevoSolicitudes).subscribe(
         (response) => {
-          console.log('Solicitudes registrado exitosamente', response);
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
+          this.mensajeModal = 'Solicitud registrado exitosamente';
+          this.manejarModal = true;
         },
         (error) => {
-          console.error('Error al registrar el Solicitudes', error);
+          this.errorModal = 'Error al registrar el solicitud';
+          this.manejarModal = true;
         }
       );
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarSolicitud.emit(); // Emitir el evento para listar usuarios
   }
 }

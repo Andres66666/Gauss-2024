@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -28,15 +28,15 @@ export class EditarRolpermisoComponent implements OnInit {
   permisos: Permiso[] = []; // Lista de permisos disponibles
 
   form!: FormGroup;
-  successMessage: string = '';
-  errorMessage: string = '';
-
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
   @Input() rolPermisoId: number | null = null;
-
+  @Output() listarRolPermisoEditado = new EventEmitter<void>();
   constructor(
     private rolPermisoService: RolPermisoService,
     private rolService: RolService,
-    private permisoService: PermisoService,
+    private permisoService: PermisoService
   ) {}
 
   ngOnInit(): void {
@@ -57,11 +57,6 @@ export class EditarRolpermisoComponent implements OnInit {
         this.rolPermiso = data;
         this.initializeForm();
       },
-      error: (error) => {
-        this.errorMessage =
-          'Error al cargar los datos de la relación Rol-Permiso';
-        console.error('Error al cargar los datos:', error);
-      },
     });
   }
 
@@ -71,9 +66,6 @@ export class EditarRolpermisoComponent implements OnInit {
       next: (roles) => {
         this.roles = roles;
       },
-      error: (error) => {
-        console.error('Error al cargar los roles:', error);
-      },
     });
   }
 
@@ -82,9 +74,6 @@ export class EditarRolpermisoComponent implements OnInit {
     this.permisoService.getPermisos().subscribe({
       next: (permisos) => {
         this.permisos = permisos;
-      },
-      error: (error) => {
-        console.error('Error al cargar los permisos:', error);
       },
     });
   }
@@ -115,11 +104,13 @@ export class EditarRolpermisoComponent implements OnInit {
       this.rolPermisoService
         .editarRolPermiso(this.rolPermiso.id, updatedRolPermiso)
         .subscribe(() => {
-          alert('Rol-Permiso actualizado exitosamente.');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.mensajeModal = 'Rol Permiso Actualizado con exito';
+          this.manejarModal = true;
         });
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarRolPermisoEditado.emit(); // Emitir el evento para listar usuarios
   }
 }

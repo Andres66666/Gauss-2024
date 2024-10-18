@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Almacen, Equipo, Obra } from '../models/equipos';
 import { EquiposService } from '../service/equipos.service';
 import {
@@ -23,13 +23,14 @@ export class EditarEquiposComponent implements OnInit {
   almacenes: Almacen[] = [];
 
   form!: FormGroup;
-  successMessage: string = '';
-  errorMessage: string = '';
-  @Input() equipoId: number | null = null;
-  imagenPreview: string | ArrayBuffer | null = null;
 
-  mensaje: string = '';
-  esExito: boolean = false;
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+
+  imagenPreview: string | ArrayBuffer | null = null;
+  @Input() equipoId: number | null = null;
+  @Output() listarEquipoEditado = new EventEmitter<void>();
 
   constructor(private equiposService: EquiposService) {}
 
@@ -47,9 +48,6 @@ export class EditarEquiposComponent implements OnInit {
       next: (almacen) => {
         this.almacenes = almacen;
       },
-      error: (error) => {
-        console.error('Error al cargar los almacenes:', error);
-      },
     });
   }
 
@@ -59,10 +57,6 @@ export class EditarEquiposComponent implements OnInit {
         this.equipo = data;
         this.initializeForm();
         this.imagenPreview = this.equipo.imagenEquipos_url; // Mostrar imagen antigua
-      },
-      error: (error) => {
-        this.errorMessage = 'Error al cargar los datos del equipo.';
-        console.error('Error loading equipo data:', error);
       },
     });
   }
@@ -128,21 +122,18 @@ export class EditarEquiposComponent implements OnInit {
         .editarEquipo(this.equipo.id, updatedEquipo)
         .subscribe({
           next: () => {
-            this.mensaje = 'Equipo actualizado exitosamente';
-            this.esExito = true;
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
+            this.mensajeModal = 'Equipo actualizado con éxito';
+            this.manejarModal = true;
           },
           error: (err) => {
-            this.errorMessage =
-              'Error al actualizar el Equipo. Por favor, intenta nuevamente.';
-            console.error('Error al actualizar el Equipo:', err);
+            this.errorModal = 'Error al actualizar el Equipo';
+            this.manejarModal = true;
           },
         });
-    } else {
-      this.errorMessage =
-        'El formulario no es válido. Por favor, revisa los campos.';
     }
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarEquipoEditado.emit();
   }
 }

@@ -14,8 +14,11 @@ import { Almacen, Equipo, Mantenimiento, Obra } from '../models/mantenimiento';
 })
 export class ListarMantenimientoComponent implements OnInit {
   mantenimientos: Mantenimiento[] = [];
-  @Output() editar = new EventEmitter<number>();
   searchTerm: string = '';
+
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarMantenimiento = new EventEmitter<number>();
+
   constructor(private mantenimientoService: MantenimientoService) {}
 
   ngOnInit(): void {
@@ -31,6 +34,9 @@ export class ListarMantenimientoComponent implements OnInit {
 
   editarMantenimiento(id: number) {
     this.editar.emit(id); // Emit the ID of the user to be edited
+  }
+  registrarMantenimientos() {
+    this.registrarMantenimiento.emit(); // Emit an event to register a new user
   }
 
   filteredMantenimiento(): Mantenimiento[] {

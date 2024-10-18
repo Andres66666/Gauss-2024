@@ -1,15 +1,16 @@
 <h1>Lista de Equipos</h1>
 <div class="container mt-4">
   <!-- Campo de búsqueda -->
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Buscar equipo..."
-        [(ngModel)]="searchTerm"
-      />
-    </div>
+  <div class="mb-3 d-flex align-items-center">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar equipo..."
+      [(ngModel)]="searchTerm"
+    />
+    <button class="btn btn-success ms-2" (click)="registrarEquipos()">
+      Registrar
+    </button>
   </div>
 
   <!-- Listado de equipos en tarjetas -->

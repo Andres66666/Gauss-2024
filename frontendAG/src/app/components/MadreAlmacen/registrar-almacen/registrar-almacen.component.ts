@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -21,8 +21,11 @@ export class RegistrarAlmacenComponent {
   registrarForm: FormGroup;
   obras: Obra[] = [];
 
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarAlmacen = new EventEmitter<void>();
+
   constructor(private fb: FormBuilder, private almacenService: AlmacenService) {
     this.registrarForm = this.fb.group({
       nombreAlmacen: ['', Validators.required],
@@ -46,15 +49,18 @@ export class RegistrarAlmacenComponent {
 
       this.almacenService.registrarAlmacen(nuevoAlmacen).subscribe(
         (response) => {
-          this.successMessage = 'Almacen registrado exitosamente';
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.mensajeModal = 'Almacen registrado exitosamente'; // Mensaje para el modal
+          this.manejarModal = true; // Mostrar el modal
         },
         (error) => {
-          this.errorMessage = 'Error al registrar el Almacen';
+          this.errorModal = 'Error al registrar el Almacen';
+          this.manejarModal = true;
         }
       );
     }
+  }
+  manejarOk() {
+    this.manejarModal = false;
+    this.listarAlmacen.emit();
   }
 }

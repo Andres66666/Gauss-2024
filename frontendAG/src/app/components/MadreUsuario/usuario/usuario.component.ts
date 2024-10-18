@@ -15,6 +15,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export class UsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+  @Output() registrar = new EventEmitter<number>(); // Emit an event when editing
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private usuarioService: UsuarioService, private router: Router) {}
@@ -34,6 +36,9 @@ export class UsuarioComponent implements OnInit {
   editarUsuario(id: number) {
     this.editar.emit(id); // Emit the ID of the user to be edited
     this.getUsuarios(); // Volver a obtener la lista después de editar
+  }
+  registrarUsuario() {
+    this.registrar.emit(); // Emit an event to register a new user
   }
 
   filteredUsuarios(): Usuario[] {

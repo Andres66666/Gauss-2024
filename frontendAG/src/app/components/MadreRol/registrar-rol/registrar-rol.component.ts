@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,27 +18,33 @@ export class RegistrarRolComponent {
     nombreRol: '',
     activo: true,
   };
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+
+  @Output() listarRol = new EventEmitter<void>();
+
   constructor(private rolService: RolService, private router: Router) {}
 
   registrarRol(): void {
     this.rolService.registrarRol(this.rol).subscribe({
       next: () => {
-        this.successMessage = 'Rol registrado exitosamente.';
         this.rol = {
           id: 0,
           nombreRol: '',
           activo: true,
         };
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        this.mensajeModal = 'Rol registrado exitosamente'; // Mensaje para el modal
+        this.manejarModal = true; // Mostrar el modal
       },
       error: (error) => {
-        this.errorMessage = 'Error al registrar el usuario';
-        console.error(error);
+        this.errorModal = 'Error al registrar el rol';
+        this.manejarModal = true;
       },
     });
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarRol.emit(); // Emitir el evento para listar usuarios
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Obra, Usuario } from '../models/usuario'; // Asegúrate de que la ruta sea correcta
 import { UsuarioService } from '../services/usuario.service';
 import { Router } from '@angular/router';
@@ -26,6 +26,11 @@ export class RegistrarUsuarioComponent {
   mensaje: string = '';
   esExito: boolean = false;
 
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+
+  @Output() listarUsuario = new EventEmitter<void>();
+  
   departmentAbbreviations = [
     'LP',
     'CB',
@@ -92,6 +97,7 @@ export class RegistrarUsuarioComponent {
       this.obras = data;
     });
   }
+
   // Registrar usuario con manejo de imagen
   registrarUsuario() {
     if (this.registrarForm.valid) {
@@ -166,11 +172,9 @@ export class RegistrarUsuarioComponent {
             .registrarUsuario(formData as unknown as Usuario)
             .subscribe(
               (response) => {
-                this.mensaje = 'Registro de usuario exitoso';
-                this.esExito = true;
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
+                this.mensajeModal = 'Registro de usuario exitoso'; // Mensaje para el modal
+                this.manejarModal = true; // Mostrar el modal
+                this.esExito = true; // Indicar éxito
               },
               (error) => {
                 console.error('Error al registrar usuario', error);
@@ -179,6 +183,10 @@ export class RegistrarUsuarioComponent {
         }
       });
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarUsuario.emit(); // Emitir el evento para listar usuarios
   }
 
   imagenPreview: string | ArrayBuffer | null = null;

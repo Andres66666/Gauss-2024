@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { RolPermisoService } from './../services/rol-permiso.service';
 import { Rol } from '../../MadreRol/models/rol';
 import { Permiso } from '../../MadrePermiso/models/permiso';
@@ -24,6 +24,12 @@ export class RegistrarRolpermisoComponent {
   registrarForm: FormGroup;
   roles: Rol[] = [];
   permisos: Permiso[] = [];
+
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+
+  @Output() listarRolPermiso = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -60,15 +66,18 @@ export class RegistrarRolpermisoComponent {
         .registrarRolPermiso(this.registrarForm.value)
         .subscribe(
           (response) => {
-            console.log('Rol-Permiso registrado exitosamente', response);
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            this.mensajeModal = 'Rol Permiso registrado exitosamente'; // Mensaje para el modal
+            this.manejarModal = true; // Mostrar el modal
           },
           (error) => {
-            console.error('Error al registrar el Rol-Permiso', error);
+            this.mensajeModal = 'Error a la registrar Rol Permiso'; // Mensaje para el modal
+            this.manejarModal = true; // Mostrar el modal
           }
         );
     }
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarRolPermiso.emit(); // Emitir el evento para listar usuarios
   }
 }

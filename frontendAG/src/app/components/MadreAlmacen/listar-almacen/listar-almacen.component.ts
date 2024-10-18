@@ -14,7 +14,9 @@ import { Almacen } from '../models/almacen';
 export class ListarAlmacenComponent implements OnInit {
   almacenes: Almacen[] = [];
 
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarAlmacen = new EventEmitter<number>(); // Emit an event when editing
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private almacenService: AlmacenService) {}
@@ -30,6 +32,9 @@ export class ListarAlmacenComponent implements OnInit {
   }
   editarAlmacen(id: number) {
     this.editar.emit(id); // Emit the ID of the user to be edited
+  }
+  registrarAlmacenes() {
+    this.registrarAlmacen.emit();
   }
 
   filteredAlmacen(): Almacen[] {

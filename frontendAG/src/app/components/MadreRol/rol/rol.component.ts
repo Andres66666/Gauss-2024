@@ -14,7 +14,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class RolComponent {
   roles: Rol[] = [];
-  @Output() editar = new EventEmitter<number>(); // Emit an event when editing
+  @Output() editar = new EventEmitter<number>(); 
+  @Output() registrar_Rol = new EventEmitter<number>(); 
+
   searchTerm: string = ''; // Property for storing the search term
 
   constructor(private rolService: RolService, private router: Router) {}
@@ -32,6 +34,10 @@ export class RolComponent {
   editarRol(id: number) {
     this.editar.emit(id);
   }
+  registrarRol() {
+    this.registrar_Rol.emit(); // Emit an event to register a new user
+  }
+
   filteredRol(): Rol[] {
     if (!this.searchTerm) {
       return this.roles;

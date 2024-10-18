@@ -291,11 +291,41 @@
     </button>
   </form>
   <!-- Mensaje de alerta -->
+  <!-- Mensaje de alerta -->
   <div
     *ngIf="mensaje"
     class="alert"
     [ngClass]="{ 'alert-success': esExito, 'alert-danger': !esExito }"
   >
     {{ mensaje }}
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Información</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ mensajeModal }}</p>
+        <!-- Mensaje que se muestra en el modal -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
   </div>
 </div>

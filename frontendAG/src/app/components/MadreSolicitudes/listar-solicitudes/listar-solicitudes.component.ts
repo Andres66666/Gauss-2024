@@ -14,8 +14,10 @@ import { RouterModule } from '@angular/router';
 })
 export class ListarSolicitudesComponent implements OnInit {
   solicitudes: Solicitudes[] = [];
-  @Output() editar = new EventEmitter<number>();
   searchTerm: string = '';
+
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrarSolicitud = new EventEmitter<number>();
 
   constructor(private solicitudesService: SolicitudesService) {}
 
@@ -31,7 +33,9 @@ export class ListarSolicitudesComponent implements OnInit {
   editarSolicitudes(id: number) {
     this.editar.emit(id); // Emit the ID of the user to be edited
   }
-
+  registrarSolicitudes() {
+    this.registrarSolicitud.emit(); // Emit an event to register a new user
+  }
   filteredSolicitudes(): Solicitudes[] {
     if (!this.searchTerm) {
       return this.solicitudes;

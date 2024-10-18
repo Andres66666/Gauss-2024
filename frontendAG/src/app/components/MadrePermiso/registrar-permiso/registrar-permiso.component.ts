@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,28 +19,33 @@ export class RegistrarPermisoComponent {
     descripcion: '',
     activo: true,
   };
-  successMessage: string = '';
-  errorMessage: string = '';
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarPermiso = new EventEmitter<void>();
+
   constructor(private permisoService: PermisoService) {}
 
   registrarPermiso(): void {
     this.permisoService.registrarPermiso(this.permiso).subscribe({
       next: () => {
-        this.successMessage = 'Permiso registrado exitosa mente';
         this.permiso = {
           id: 0,
           nombre: '',
           descripcion: '',
           activo: true,
         };
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        this.mensajeModal = 'Permiso registrado exitosa mente'; // Mensaje para el modal
+        this.manejarModal = true; // Mostrar el modal
       },
       error: (error) => {
-        this.errorMessage = 'Error al registrar el usuario';
-        console.error(error);
+        this.errorModal = 'Error al registrar el usuario';
+        this.manejarModal = true;
       },
     });
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarPermiso.emit(); // Emitir el evento para listar usuarios
   }
 }

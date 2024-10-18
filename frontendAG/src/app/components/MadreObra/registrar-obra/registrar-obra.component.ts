@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Obra } from '../models/obra';
 import { ObraService } from '../service/obra.service';
@@ -18,29 +18,32 @@ export class RegistrarObraComponent {
     ubicacionObra: '',
     estadoObra: true,
   };
-  successMessage: string = '';
-  errorMessage: string = '';
-
+  manejarModal: boolean = false;
+  mensajeModal: string = '';
+  errorModal: string = '';
+  @Output() listarObras = new EventEmitter<void>();
   constructor(private obraServise: ObraService) {}
 
   registrarObra(): void {
     this.obraServise.registrarObra(this.obra).subscribe({
       next: () => {
-        this.successMessage = 'Permiso registrado exitosa mente';
         this.obra = {
           id: 0,
           nombreObra: '',
           ubicacionObra: '',
           estadoObra: true,
         };
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        this.mensajeModal = 'Obra registrado exitosamente'; // Mensaje para el modal
+        this.manejarModal = true;
       },
       error: (error) => {
-        this.errorMessage = 'Error al registrar el usuario';
-        console.error(error);
+        this.errorModal = 'Error al registrar el Obra';
+        this.manejarModal = true;
       },
     });
+  }
+  manejarOk() {
+    this.manejarModal = false; // Cerrar el modal
+    this.listarObras.emit(); // Emitir el evento para listar usuarios
   }
 }
