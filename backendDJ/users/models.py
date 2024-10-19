@@ -82,7 +82,7 @@ class Equipos(models.Model):
         ('En uso', 'En uso'),
         ('En mantenimiento', 'En mantenimiento')
     ])
-    vidaUtil = models.CharField(max_length=20)  # años o horas
+    vidaUtil = models.CharField(max_length=20)  # años o horas  numero 
     fechaAdquiscion = models.DateField()
     almacen = models.ForeignKey(Almacenes, on_delete=models.CASCADE)
     imagenEquipos = models.FileField(upload_to='imagenes/')

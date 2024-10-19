@@ -24,6 +24,7 @@ export class RegistrarRolpermisoComponent {
   registrarForm: FormGroup;
   roles: Rol[] = [];
   permisos: Permiso[] = [];
+  selectedPermisos: number[] = [];
 
   manejarModal: boolean = false;
   mensajeModal: string = '';
@@ -39,7 +40,7 @@ export class RegistrarRolpermisoComponent {
   ) {
     this.registrarForm = this.fb.group({
       rol: ['', Validators.required],
-      permiso: ['', Validators.required],
+      //permiso: ['', Validators.required],
     });
   }
 
@@ -59,23 +60,42 @@ export class RegistrarRolpermisoComponent {
       this.permisos = data;
     });
   }
-
-  registrarRolPermiso() {
-    if (this.registrarForm.valid) {
-      this.rolPermisoService
-        .registrarRolPermiso(this.registrarForm.value)
-        .subscribe(
-          (response) => {
-            this.mensajeModal = 'Rol Permiso registrado exitosamente'; // Mensaje para el modal
-            this.manejarModal = true; // Mostrar el modal
-          },
-          (error) => {
-            this.mensajeModal = 'Error a la registrar Rol Permiso'; // Mensaje para el modal
-            this.manejarModal = true; // Mostrar el modal
-          }
-        );
+  // Método para manejar los cambios de los checkboxes
+  onCheckboxChange(e: any) {
+    const id = +e.target.value;
+    if (e.target.checked) {
+      this.selectedPermisos.push(id); // Agrega el permiso seleccionado
+    } else {
+      const index = this.selectedPermisos.indexOf(id);
+      if (index > -1) {
+        this.selectedPermisos.splice(index, 1); // Elimina el permiso deseleccionado
+      }
     }
   }
+
+  registrarRolPermiso() {
+    if (this.registrarForm.valid && this.selectedPermisos.length > 0) {
+      const rolPermisoData = {
+        rol: this.registrarForm.value.rol,
+        permisos: this.selectedPermisos,
+      };
+
+      this.rolPermisoService.registrarRolPermiso(rolPermisoData).subscribe(
+        (response) => {
+          this.mensajeModal = 'Rol y permisos registrados correctamente.';
+          this.manejarModal = true;
+        },
+        (error) => {
+          this.errorModal = 'Error al registrar el rol y permisos.';
+          this.manejarModal = true;
+        }
+      );
+    } else {
+      this.errorModal = 'Debe seleccionar un rol y al menos un permiso.';
+      this.manejarModal = true;
+    }
+  }
+
   manejarOk() {
     this.manejarModal = false; // Cerrar el modal
     this.listarRolPermiso.emit(); // Emitir el evento para listar usuarios

@@ -89,13 +89,40 @@
       </div>
     </div>
 
+    <!-- Campo para seleccionar tipo de responsable -->
+
+    <div class="form-group d-flex align-items-center">
+      <label for="tipoResponsable" class="me-2">Tipo de Responsable:</label>
+      <select
+        id="tipoResponsable"
+        class="form-control me-2"
+        formControlName="tipoResponsable"
+        (change)="onTipoResponsableChange($event)"
+        required
+      >
+        <option value="persona">Persona</option>
+        <option value="empresa">Empresa</option>
+      </select>
+
+      <!-- Mensaje de error para el tipo de responsable -->
+      <div
+        *ngIf="
+          registrarForm.get('tipoResponsable')?.invalid &&
+          registrarForm.get('tipoResponsable')?.touched
+        "
+        class="text-danger me-2"
+      >
+        Seleccionar un tipo de responsable es obligatorio.
+      </div>
+    </div>
+
     <!-- Campo para responsable del mantenimiento -->
-    <div class="form-group">
-      <label for="responsable">Responsable:</label>
+    <div class="form-group d-flex align-items-center">
+      <label for="responsable" class="me-2">Responsable:</label>
       <input
         id="responsable"
         type="text"
-        class="form-control"
+        class="form-control me-2"
         formControlName="responsable"
         placeholder="Ingrese el responsable del mantenimiento"
         required
@@ -110,6 +137,7 @@
         El responsable es obligatorio.
       </div>
     </div>
+
     <!-- Campo para seleccionar un equipo -->
     <div class="form-group">
       <label for="equipo" class="col-form-label">Seleccione un equipo:</label>

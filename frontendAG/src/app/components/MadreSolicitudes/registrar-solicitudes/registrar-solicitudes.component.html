@@ -2,7 +2,7 @@
   <h2>Registrar Solicitud</h2>
   <form [formGroup]="registrarForm" (ngSubmit)="registrarSolicitudes()">
     <!-- Campo para fecha de solicitud -->
-    <div class="form-group">
+    <div class="form-group d-flex flex-column align-items-start">
       <label for="fechaSolicitud">Fecha de solicitud:</label>
       <input
         id="fechaSolicitud"
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Campo para fecha de retorno estimada -->
-    <div class="form-group">
+    <div class="form-group d-flex flex-column align-items-start">
       <label for="fechaRetornoEstimada">Fecha de retorno estimada:</label>
       <input
         id="fechaRetornoEstimada"
@@ -45,32 +45,16 @@
       </div>
     </div>
 
-    <!-- Campo para fecha de retorno real -->
-    <div class="form-group">
-      <label for="fechaRetornoReal">Fecha de retorno real:</label>
-      <input
-        id="fechaRetornoReal"
-        type="date"
-        class="form-control"
-        formControlName="fechaRetornoReal"
-        placeholder="Ingrese la fecha de retorno real"
-        required
-      />
-      <div
-        *ngIf="
-          registrarForm.get('fechaRetornoReal')?.invalid &&
-          registrarForm.get('fechaRetornoReal')?.touched
-        "
-        class="text-danger"
-      >
-        La fecha de retorno real es obligatoria.
-      </div>
-    </div>
-
     <!-- Campo para seleccionar un equipo -->
-    <div class="form-group">
+    <div class="form-group d-flex flex-column align-items-start">
       <label for="equipo" class="col-form-label">Seleccione un equipo:</label>
-      <select id="equipo" class="form-select" formControlName="equipo" required>
+      <select
+        id="equipo"
+        class="form-select"
+        formControlName="equipo"
+        (change)="onEquipoChange($event)"
+        required
+      >
         <option value="">Seleccione un equipo</option>
         <option *ngFor="let equipo of equipos" [value]="equipo.id">
           {{ equipo.nombreEquipo }}
@@ -88,7 +72,7 @@
     </div>
 
     <!-- Campo para seleccionar una obra -->
-    <div class="form-group">
+    <div class="form-group d-flex flex-column align-items-start">
       <label for="obra" class="col-form-label">Seleccione una obra:</label>
       <select id="obra" class="form-select" formControlName="obra" required>
         <option value="">Seleccione una obra</option>
@@ -96,6 +80,9 @@
           {{ obra.nombreObra }}
         </option>
       </select>
+
+      <!-- Mostrar la ubicación de la obra seleccionada -->
+      <p *ngIf="ubicacionObra" class="mt-2">Ubicación: {{ ubicacionObra }}</p>
       <div
         *ngIf="
           registrarForm.get('obra')?.invalid &&
@@ -106,9 +93,8 @@
         Seleccionar una obra es obligatorio.
       </div>
     </div>
-
     <!-- Campo para seleccionar un usuario -->
-    <div class="form-group">
+    <div class="form-group d-flex flex-column align-items-start">
       <label for="usuario" class="col-form-label">Seleccione un usuario:</label>
       <select
         id="usuario"

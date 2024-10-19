@@ -14,10 +14,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class PermisoComponent implements OnInit {
   permisos: Permiso[] = [];
+  searchTerm: string = '';
+
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrarPermiso = new EventEmitter<number>(); // Emit an event when editing
-
-  searchTerm: string = ''; // Property for storing the search term
 
   constructor(private permisoService: PermisoService) {}
 
@@ -41,8 +41,12 @@ export class PermisoComponent implements OnInit {
     if (!this.searchTerm) {
       return this.permisos;
     }
-    return this.permisos.filter((permiso) =>
-      permiso.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+    return this.permisos.filter(
+      (permiso) =>
+        permiso.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        permiso.descripcion
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
     );
   }
   togglePermisoActivo(permiso: Permiso) {

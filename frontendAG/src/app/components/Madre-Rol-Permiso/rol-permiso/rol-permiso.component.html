@@ -1,10 +1,11 @@
 <div class="container">
   <h2 class="text-center">Lista de Relaciones Rol-Permiso</h2>
+
   <div class="mb-3 d-flex align-items-center">
     <input
       type="text"
       class="form-control"
-      placeholder="Buscar por Nombre de Rol"
+      placeholder="Buscar por Nombre de Rol o Nombre de Permiso"
       [(ngModel)]="searchTerm"
     />
     <button class="btn btn-success ms-2" (click)="registrarRolPermisos()">
@@ -17,14 +18,14 @@
       <tr>
         <th class="text-center">Rol</th>
         <th class="text-center">Permiso</th>
-        <th class="text-center">Accion</th>
+        <th class="text-center">Acción</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let rolePermiso of filteredRolPermiso()">
         <td class="text-start">{{ rolePermiso.rol.nombreRol }}</td>
         <td class="text-start">{{ rolePermiso.permiso.nombre }}</td>
-        <td>
+        <td class="text-center">
           <button
             class="btn btn-primary"
             (click)="editarRolPermiso(rolePermiso.id)"
@@ -35,4 +36,23 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= rolePermisos.length"
+    >
+      Siguiente
+    </button>
+  </div>
 </div>

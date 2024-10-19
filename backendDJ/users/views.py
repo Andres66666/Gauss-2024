@@ -204,10 +204,17 @@ class RolPermisoViewSet(viewsets.ModelViewSet):
     # Sobrescribir el método de creación si es necesario
     def create(self, request, *args, **kwargs):
         rol_id = request.data.get('rol')
-        permiso_id = request.data.get('permiso')
-        # Aquí puedes realizar validaciones o lógica adicional si es necesario
-        rolpermiso = RolPermisos.objects.create(rol_id=rol_id, permiso_id=permiso_id)
-        return Response(RolPermisoSerializer(rolpermiso).data, status=status.HTTP_201_CREATED)
+        permisos = request.data.get('permisos', [])  # Obtener el array de permisos
+
+        if not rol_id or not permisos:
+            return Response({'error': 'Faltan datos de rol o permisos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear una entrada de RolPermiso por cada permiso
+        for permiso_id in permisos:
+            RolPermisos.objects.create(rol_id=rol_id, permiso_id=permiso_id)
+
+        # Enviar una respuesta indicando que la creación fue exitosa
+        return Response({'message': 'RolPermisos creados correctamente'}, status=status.HTTP_201_CREATED)
 
 class ObrasViewSet(viewsets.ModelViewSet):
     queryset = Obras.objects.all()
@@ -337,6 +344,36 @@ class EquiposViewSet(viewsets.ModelViewSet):
 class MantenimientosViewSet(viewsets.ModelViewSet):
     queryset = Mantenimientos.objects.all()
     serializer_class = MantenimientosSerializer
+
+    def create(self, request, *args, **kwargs):
+        equipo_id = request.data.get('equipo')
+
+        # Verificar si el equipo ya está en mantenimiento
+        if Mantenimientos.objects.filter(equipo_id=equipo_id, estadoMantenimiento=True).exists():
+            return Response({'error': 'El equipo ya está en mantenimiento.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear el mantenimiento
+        try:
+            equipo = Equipos.objects.get(id=equipo_id)
+        except Equipos.DoesNotExist:
+            return Response({'error': 'Equipo no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        mantenimiento = Mantenimientos.objects.create(
+            fechaInicio=request.data.get('fechaInicio'),
+            fechaFin=request.data.get('fechaFin'),
+            estadoMantenimiento=True,  # En proceso
+            tipoMantenimiento=request.data.get('tipoMantenimiento'),
+            detalleMantenimiento=request.data.get('detalleMantenimiento'),
+            responsable=request.data.get('responsable'),
+            equipo=equipo
+        )
+
+        # Cambiar el estado del equipo a "En mantenimiento"
+        equipo.estadoUsoEquipo = 'En mantenimiento'
+        equipo.save()
+
+        return Response(MantenimientosSerializer(mantenimiento).data, status=status.HTTP_201_CREATED)
+
     def update(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
@@ -347,31 +384,9 @@ class MantenimientosViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs):
-        fechaInicio = request.data.get('fechaInicio')
-        fechaFin = request.data.get('fechaFin')
-        estadoMantenimiento = request.data.get('estadoMantenimiento')
-        tipoMantenimiento = request.data.get('tipoMantenimiento')
-        detalleMantenimiento = request.data.get('detalleMantenimiento')
-        responsable = request.data.get('responsable')
-        equipo_id = request.data.get('equipo')
+        return Response(serializer.data)
 
-        try:
-            equipo = Equipos.objects.get(id=equipo_id)
-        except Equipos.DoesNotExist:
-            return Response({'error': 'Equipo no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-        mantenimiento = Mantenimientos.objects.create(
-            fechaInicio=fechaInicio,
-            fechaFin=fechaFin,
-            estadoMantenimiento=estadoMantenimiento,
-            tipoMantenimiento=tipoMantenimiento,
-            detalleMantenimiento=detalleMantenimiento,
-            responsable=responsable,
-            equipo=equipo
-        )
-
-        return Response(MantenimientosSerializer(mantenimiento).data, status=status.HTTP_201_CREATED)
 
 class SolicitudesViewSet(viewsets.ModelViewSet):
     queryset = Solicitudes.objects.all()
@@ -394,7 +409,7 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         fechaSolicitud = request.data.get('fechaSolicitud')
         fechaRetornoEstimada = request.data.get('fechaRetornoEstimada')
-        fechaRetornoReal = request.data.get('fechaRetornoReal')
+        #fechaRetornoReal = request.data.get('fechaRetornoReal')
         equipo_id = request.data.get('equipo')
         obra_id = request.data.get('obra')
         usuario_id = request.data.get('usuario')
@@ -409,7 +424,7 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
         solicitud = Solicitudes.objects.create(
             fechaSolicitud=fechaSolicitud,
             fechaRetornoEstimada=fechaRetornoEstimada,
-            fechaRetornoReal=fechaRetornoReal,
+            #fechaRetornoReal=fechaRetornoReal,
             equipo=equipo,
             obra=obra,
             usuario=usuario

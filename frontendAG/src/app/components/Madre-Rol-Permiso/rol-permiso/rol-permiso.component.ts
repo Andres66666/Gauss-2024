@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { RolPermiso } from '../models/rol-permiso';
+import { Permiso, RolPermiso } from '../models/rol-permiso';
 import { RolPermisoService } from '../services/rol-permiso.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -27,10 +27,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class RolPermisoComponent implements OnInit {
   rolePermisos: RolPermiso[] = [];
+  permisos: Permiso[] = [];
+  searchTerm: string = '';
+
+  // Variables de paginación
+  page: number = 1;
+  pageSize: number = 10;
+  paginatedPermisos: Permiso[] = [];
+
   @Output() editar = new EventEmitter<number>();
   @Output() registrarRolPermiso = new EventEmitter<number>();
-
-  searchTerm: string = ''; // Property for storing the search term
 
   constructor(private rolPermisoService: RolPermisoService) {}
 
@@ -41,19 +47,31 @@ export class RolPermisoComponent implements OnInit {
   getRolePermisos(): void {
     this.rolPermisoService.getRolePermisos().subscribe((data) => {
       this.rolePermisos = data;
+      this.updatePaginatedPermisos();
       console.log(data);
     });
   }
   // metodo para realizar la busqueda por el nombre
+  // Método de filtrado con paginación aplicada
   filteredRolPermiso(): RolPermiso[] {
-    if (!this.searchTerm) {
-      return this.rolePermisos;
+    let filtered = this.rolePermisos;
+
+    if (this.searchTerm) {
+      filtered = this.rolePermisos.filter(
+        (rolePermiso) =>
+          rolePermiso.rol.nombreRol
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase()) ||
+          rolePermiso.permiso.nombre
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
+      );
     }
-    return this.rolePermisos.filter((rolePermiso) =>
-      rolePermiso.rol.nombreRol
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
-    );
+
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
+    ); // Mostramos solo la página actual
   }
   //medodo para jalar a la vista de editar permiso
   editarRolPermiso(id: number) {
@@ -61,5 +79,23 @@ export class RolPermisoComponent implements OnInit {
   }
   registrarRolPermisos() {
     this.registrarRolPermiso.emit(); // Emit an event to register a new user
+  }
+  // Métodos de paginación
+  updatePaginatedPermisos() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedPermisos = this.permisos.slice(start, end);
+  }
+
+  nextPage() {
+    this.page++;
+    this.updatePaginatedPermisos();
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedPermisos();
+    }
   }
 }

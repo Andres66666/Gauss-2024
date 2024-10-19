@@ -22,6 +22,10 @@ export class RegistrarMantenimientoComponent implements OnInit {
   equipos: Equipo[] = [];
   almacenes: Almacen[] = [];
   obras: Obra[] = [];
+  almacenSeleccionado: any;
+  obraSeleccionada: any;
+  tipoResponsable: string = 'persona'; // Valor por defecto
+
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
@@ -41,6 +45,7 @@ export class RegistrarMantenimientoComponent implements OnInit {
       equipo: ['', Validators.required],
       almacenId: [''],
       obraId: [''],
+      tipoResponsable: ['', Validators.required],
     });
   }
 
@@ -57,8 +62,10 @@ export class RegistrarMantenimientoComponent implements OnInit {
     });
   }
 
-  almacenSeleccionado: any;
-  obraSeleccionada: any;
+  onTipoResponsableChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.registrarForm.get('tipoResponsable')?.setValue(selectElement.value); // Actualiza el valor en el formulario
+  }
 
   seleccionarEquipo(equipoId: string) {
     const id = parseInt(equipoId, 10);
@@ -111,12 +118,20 @@ export class RegistrarMantenimientoComponent implements OnInit {
       const equipoControl = this.registrarForm.get('equipo');
 
       if (detalleMantenimientoControl && equipoControl) {
+        const tipoResponsable =
+          this.registrarForm.get('tipoResponsable')?.value;
+        const responsable = this.registrarForm.get('responsable')?.value;
+
+        // Formatear el responsable
+        const responsableFormateado = `${tipoResponsable}: ${responsable}`;
+
         const nuevoMantenimiento: Mantenimiento = {
           ...this.registrarForm.value,
           equipoId: parseInt(equipoControl.value),
-          almacenId: this.almacenSeleccionado,
-          obraId: this.obraSeleccionada,
+          almacenId: this.almacenSeleccionado, // Asegúrate de que esto sea el ID y no el nombre
+          obraId: this.obraSeleccionada, // Asegúrate de que esto sea el ID y no el nombre
           detalleMantenimiento: detalleMantenimientoControl.value,
+          responsable: responsableFormateado,
           estadoMantenimiento: true,
         };
 
@@ -135,6 +150,7 @@ export class RegistrarMantenimientoComponent implements OnInit {
       }
     }
   }
+
   manejarOk() {
     this.manejarModal = false; // Cerrar el modal
     this.listarMantenimiento.emit(); // Emitir el evento para listar usuarios

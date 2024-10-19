@@ -20,9 +20,16 @@ export class RolPermisoService {
   }
 
   // Registrar un nuevo rol-permiso
-  registrarRolPermiso(rolPermiso: RolPermiso): Observable<RolPermiso> {
+  /*   registrarRolPermiso(rolPermiso: RolPermiso): Observable<RolPermiso> {
+    return this.http.post<RolPermiso>(`${this.apiUrl}rol-permiso/`, rolPermiso);
+  } */
+  registrarRolPermiso(rolPermiso: {
+    rol: number;
+    permisos: number[];
+  }): Observable<RolPermiso> {
     return this.http.post<RolPermiso>(`${this.apiUrl}rol-permiso/`, rolPermiso);
   }
+
   editarRolPermiso(
     id: number,
     updatedRolPermiso: RolPermiso
