@@ -10,9 +10,13 @@
         name="nombre"
         class="form-control"
         required
+        (keypress)="preventNumbers($event)"
       />
       <div class="invalid-feedback">
         Por favor, ingrese un nombre del Permiso.
+      </div>
+      <div class="invalid-feedback" *ngIf="!validarNombre() && permiso.nombre">
+        El nombre solo puede contener letras y espacios.
       </div>
     </div>
 
@@ -30,7 +34,13 @@
       />
       <div class="invalid-feedback">Por favor, ingrese una descripcion.</div>
     </div>
-    <button type="submit" class="btn btn-primary w-100">Registrar</button>
+    <button
+      type="submit"
+      class="btn btn-primary w-100"
+      [disabled]="!camposValidos()"
+    >
+      Registrar
+    </button>
   </form>
 </div>
 

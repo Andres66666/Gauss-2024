@@ -1,7 +1,7 @@
 import { Permiso } from './../models/permiso';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -21,13 +21,29 @@ export class PermisoService {
   }
 
   registrarPermiso(permiso: Permiso): Observable<Permiso> {
-    return this.http.post<Permiso>(`${this.apiUrl}permiso/`, permiso);
+    return this.http
+      .post<Permiso>(`${this.apiUrl}permiso/`, permiso)
+      .pipe(catchError(this.handleError));
   }
   editarPermiso(id: number, permiso: Permiso): Observable<Permiso> {
-    return this.http.put<Permiso>(`${this.apiUrl}permiso/${id}/`, permiso);
+    return this.http
+      .put<Permiso>(`${this.apiUrl}permiso/${id}/`, permiso)
+      .pipe(catchError(this.handleError));
   }
   // Actualizar estado de un Permiso
   actualizarEstadoPermiso(id: number, activo: boolean): Observable<any> {
     return this.http.put(`${this.apiUrl}permiso/${id}/`, { activo: activo });
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 409) {
+      return throwError(
+        () => new Error('El nombre del permiso ya existe en la base de datos.')
+      );
+    } else {
+      return throwError(
+        () => new Error('Ocurrió un error al registrar el permiso.')
+      );
+    }
   }
 }

@@ -21,11 +21,21 @@ export class RegistrarRolComponent {
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
+  nombreInvalido: boolean = false; // Nueva variable para manejar la validación del nombre
 
   @Output() listarRol = new EventEmitter<void>();
 
   constructor(private rolService: RolService, private router: Router) {}
+  // Método para evitar que se ingresen números
+  preventNumbers(event: KeyboardEvent) {
+    const regex = /^[a-zA-Z\s]*$/;
+    const inputChar = String.fromCharCode(event.keyCode);
 
+    // Si el carácter no es una letra o espacio, evitamos que se ingrese
+    if (!regex.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
   registrarRol(): void {
     this.rolService.registrarRol(this.rol).subscribe({
       next: () => {
@@ -36,9 +46,14 @@ export class RegistrarRolComponent {
         };
         this.mensajeModal = 'Rol registrado exitosamente'; // Mensaje para el modal
         this.manejarModal = true; // Mostrar el modal
+        this.errorModal = ''; // Limpiar el error
       },
       error: (error) => {
-        this.errorModal = 'Error al registrar el rol';
+        if (error.message.includes('ya existe')) {
+          this.errorModal = 'Error: ' + error.message; // Mensaje de duplicado
+        } else {
+          this.errorModal = 'Error al registrar el rol';
+        }
         this.manejarModal = true;
       },
     });

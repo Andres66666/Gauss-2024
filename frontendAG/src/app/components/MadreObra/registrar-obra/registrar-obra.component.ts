@@ -25,6 +25,8 @@ export class RegistrarObraComponent {
   constructor(private obraServise: ObraService) {}
 
   registrarObra(): void {
+    // Forzar que siempre se registre como true
+    this.obra.estadoObra = true;
     this.obraServise.registrarObra(this.obra).subscribe({
       next: () => {
         this.obra = {

@@ -60,6 +60,16 @@ export class EditarRolComponent implements OnInit {
       activo: new FormControl(this.rol.activo),
     });
   }
+  // Método para evitar la entrada de números
+  preventNumbers(event: KeyboardEvent) {
+    const regex = /^[a-zA-Z\s]*$/;
+    const inputChar = String.fromCharCode(event.keyCode);
+
+    // Si no es una letra o espacio, prevenir la entrada
+    if (!regex.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
 
   submit() {
     if (this.form.invalid) {
@@ -74,7 +84,11 @@ export class EditarRolComponent implements OnInit {
         this.manejarModal = true;
       },
       error: (error) => {
-        this.errorModal = 'Error al actualizar el rol';
+        if (error.message.includes('ya existe')) {
+          this.errorModal = 'Error al editar: \n' + error.message; // Mensaje de duplicado
+        } else {
+          this.errorModal = 'Error al registrar el rol';
+        }
         this.manejarModal = true;
       },
     });

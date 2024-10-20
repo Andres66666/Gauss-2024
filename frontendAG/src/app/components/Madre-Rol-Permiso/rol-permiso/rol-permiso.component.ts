@@ -77,6 +77,7 @@ export class RolPermisoComponent implements OnInit {
   editarRolPermiso(id: number) {
     this.editar.emit(id);
   }
+  //medodo para jalar a la vista de registrar permiso
   registrarRolPermisos() {
     this.registrarRolPermiso.emit(); // Emit an event to register a new user
   }

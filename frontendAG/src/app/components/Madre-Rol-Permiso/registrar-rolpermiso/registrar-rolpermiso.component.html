@@ -86,7 +86,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>{{ errorModal }}</p>
+        <p [innerHTML]="errorModal"></p>
+        <br />
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" (click)="manejarOk()">

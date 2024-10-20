@@ -72,10 +72,23 @@ export class EditarPermisoComponent implements OnInit {
           this.manejarModal = true;
         },
         error: (error) => {
-          this.errorModal = 'Error al actualizar el permiso';
+          if (error.message.includes('ya existe')) {
+            this.errorModal = 'Error al editar: \n' + error.message; // Mensaje de duplicado
+          } else {
+            this.errorModal = 'Error al registrar el permiso';
+          }
           this.manejarModal = true;
         },
       });
+  }
+  preventNumbers(event: KeyboardEvent) {
+    const regex = /^[a-zA-Z\s]*$/;
+    const inputChar = String.fromCharCode(event.keyCode);
+
+    // Si el carácter no es una letra o espacio, evitamos que se ingrese
+    if (!regex.test(inputChar)) {
+      event.preventDefault();
+    }
   }
   manejarOk() {
     this.manejarModal = false; // Cerrar el modal

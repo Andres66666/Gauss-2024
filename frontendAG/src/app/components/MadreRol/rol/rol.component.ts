@@ -14,10 +14,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class RolComponent {
   roles: Rol[] = [];
-  @Output() editar = new EventEmitter<number>(); 
-  @Output() registrar_Rol = new EventEmitter<number>(); 
+  searchTerm: string = '';
 
-  searchTerm: string = ''; // Property for storing the search term
+  // Variables de paginación
+  page: number = 1;
+  pageSize: number = 10;
+  paginatedRoles: Rol[] = [];
+
+  @Output() editar = new EventEmitter<number>();
+  @Output() registrar_Rol = new EventEmitter<number>();
 
   constructor(private rolService: RolService, private router: Router) {}
 
@@ -28,29 +33,61 @@ export class RolComponent {
   getRoles() {
     this.rolService.getRoles().subscribe((data) => {
       this.roles = data;
-      console.log(data);
+      this.updatePaginatedRoles(); // Actualiza la paginación
     });
   }
+
+  // Método para editar rol
   editarRol(id: number) {
     this.editar.emit(id);
   }
+
+  // Método para registrar rol
   registrarRol() {
-    this.registrar_Rol.emit(); // Emit an event to register a new user
+    this.registrar_Rol.emit();
   }
 
+  // Método de filtrado con paginación aplicada
   filteredRol(): Rol[] {
-    if (!this.searchTerm) {
-      return this.roles;
+    let filtered = this.roles;
+
+    if (this.searchTerm) {
+      filtered = this.roles.filter((rol) =>
+        rol.nombreRol.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     }
-    return this.roles.filter((rol) =>
-      rol.nombreRol.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
+    ); // Mostramos solo la página actual
   }
+
+  // Métodos de paginación
+  updatePaginatedRoles() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedRoles = this.roles.slice(start, end);
+  }
+
+  nextPage() {
+    if (this.page * this.pageSize < this.roles.length) {
+      this.page++;
+      this.updatePaginatedRoles();
+    }
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedRoles();
+    }
+  }
+
+  // Método para cambiar el estado del rol
   toggleRolActivo(rol: Rol) {
-    // Invertir el estado de 'activo' del rol
     rol.activo = !rol.activo;
 
-    // Llamar a un servicio que actualice el estado del rol en el servidor
     this.rolService.editarRol(rol.id, { ...rol, activo: rol.activo }).subscribe(
       (response) => {
         console.log(`Rol ${rol.nombreRol} actualizado exitosamente.`);

@@ -86,27 +86,47 @@ export class EditarRolpermisoComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.rolPermiso) {
-      const updatedRolPermiso: RolPermiso = {
-        id: this.rolPermiso.id,
-        rol: {
-          id: this.rolPermiso.rol.id,
-          nombreRol: this.rolPermiso.rol.nombreRol,
-          activo: this.rolPermiso.rol.activo,
-        },
-        permiso: {
-          id: this.rolPermiso.permiso.id,
-          nombre: this.rolPermiso.permiso.nombre,
-          descripcion: this.rolPermiso.permiso.descripcion,
-          activo: this.rolPermiso.permiso.activo,
-        },
-      };
-      this.rolPermisoService
-        .editarRolPermiso(this.rolPermiso.id, updatedRolPermiso)
-        .subscribe(() => {
-          this.mensajeModal = 'Rol Permiso Actualizado con exito';
-          this.manejarModal = true;
-        });
+    // Verificar si el formulario es válido
+    if (this.form.valid) {
+      if (this.rolPermiso) {
+        // Crear un objeto actualizado de RolPermiso
+        const updatedRolPermiso: RolPermiso = {
+          id: this.rolPermiso.id,
+          rol: {
+            id: this.rolPermiso.rol.id,
+            nombreRol: this.rolPermiso.rol.nombreRol,
+            activo: this.rolPermiso.rol.activo,
+          },
+          permiso: {
+            id: this.rolPermiso.permiso.id,
+            nombre: this.rolPermiso.permiso.nombre,
+            descripcion: this.rolPermiso.permiso.descripcion,
+            activo: this.rolPermiso.permiso.activo,
+          },
+        };
+
+        // Llamar al servicio para editar el rol y permiso
+        this.rolPermisoService
+          .editarRolPermiso(this.rolPermiso.id, updatedRolPermiso)
+          .subscribe({
+            next: () => {
+              this.mensajeModal = 'Rol Permiso Actualizado con éxito';
+              this.manejarModal = true;
+            },
+            error: (error) => {
+              if (error.error && error.error.error) {
+                // Concatenar mensajes de error desde views.py
+                this.errorModal = error.error.error.join('<br>');
+              } else {
+                this.errorModal = 'Error al actualizar el rol y permisos.';
+              }
+              this.manejarModal = true;
+            },
+          });
+      }
+    } else {
+      this.errorModal = 'Por favor, completa todos los campos requeridos.';
+      this.manejarModal = true;
     }
   }
   manejarOk() {

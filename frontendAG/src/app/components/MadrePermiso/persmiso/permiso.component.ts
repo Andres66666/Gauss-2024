@@ -15,6 +15,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export class PermisoComponent implements OnInit {
   permisos: Permiso[] = [];
   searchTerm: string = '';
+  // Variables de paginación
+  page: number = 1;
+  pageSize: number = 10;
+  paginatedPermisos: Permiso[] = [];
 
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrarPermiso = new EventEmitter<number>(); // Emit an event when editing
@@ -28,6 +32,7 @@ export class PermisoComponent implements OnInit {
   getPermisos(): void {
     this.permisoService.getPermisos().subscribe((data) => {
       this.permisos = data;
+      this.updatePaginatedPermisos();
       console.log(data);
     });
   }
@@ -37,17 +42,44 @@ export class PermisoComponent implements OnInit {
   registrarPermisos() {
     this.registrarPermiso.emit(); // Emit an event to register a new user
   }
+  // Método para filtrar y paginar resultados
   filteredPermiso(): Permiso[] {
-    if (!this.searchTerm) {
-      return this.permisos;
+    let filtered = this.permisos;
+
+    if (this.searchTerm) {
+      filtered = this.permisos.filter(
+        (permiso) =>
+          permiso.nombre
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase()) ||
+          permiso.descripcion
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
+      );
     }
-    return this.permisos.filter(
-      (permiso) =>
-        permiso.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        permiso.descripcion
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
+
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
     );
+  }
+  // Método para actualizar la paginación
+  updatePaginatedPermisos() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedPermisos = this.permisos.slice(start, end);
+  }
+
+  nextPage() {
+    this.page++;
+    this.updatePaginatedPermisos();
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedPermisos();
+    }
   }
   togglePermisoActivo(permiso: Permiso) {
     // Invertir el estado de 'activo' del permiso

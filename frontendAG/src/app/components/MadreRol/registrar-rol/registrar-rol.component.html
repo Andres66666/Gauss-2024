@@ -10,8 +10,8 @@
         name="nombre"
         class="form-control"
         required
+        (keypress)="preventNumbers($event)"
       />
-      <div class="invalid-feedback">Por favor, ingrese un nombre del rol.</div>
     </div>
     <button type="submit" class="btn btn-primary w-100">Registrar</button>
   </form>

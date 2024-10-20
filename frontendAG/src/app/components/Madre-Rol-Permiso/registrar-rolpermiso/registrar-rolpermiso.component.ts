@@ -86,7 +86,12 @@ export class RegistrarRolpermisoComponent {
           this.manejarModal = true;
         },
         (error) => {
-          this.errorModal = 'Error al registrar el rol y permisos.';
+          if (error.error && error.error.error) {
+            // Concatenar mensajes de error des de viws.py
+            this.errorModal = error.error.error.join('<br>');
+          } else {
+            this.errorModal = 'Error al registrar el rol y permisos.';
+          }
           this.manejarModal = true;
         }
       );

@@ -69,6 +69,27 @@ class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permisos.objects.all()
     serializer_class = PermisoSerializer
 
+    def create(self, request, *args, **kwargs):
+        # Verifica si el nombre del permiso ya existe
+        nombre_permiso = request.data.get('nombre')
+        if Permisos.objects.filter(nombre=nombre_permiso).exists():
+            return Response(
+                {'error': 'El nombre del permiso ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        # Verifica si el nombre del permiso ya existe
+        nombre_permiso = request.data.get('nombre')
+        if Permisos.objects.filter(nombre=nombre_permiso).exists():
+            return Response(
+                {'error': 'El nombre del permiso ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuarios.objects.all()
@@ -166,48 +187,110 @@ class RolViewSet(viewsets.ModelViewSet):
     queryset = Roles.objects.all()
     serializer_class = RolSerializer
 
+    def create(self, request, *args, **kwargs):
+        # Verifica si el nombre del rol ya existe
+        nombre_rol = request.data.get('nombreRol')
+        if Roles.objects.filter(nombreRol=nombre_rol).exists():
+            return Response(
+                {'error': 'El nombre del rol ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        # Verifica si el nombre del rol ya existe
+        nombre_rol = request.data.get('nombreRol')
+        if Roles.objects.filter(nombreRol=nombre_rol).exists():
+            return Response(
+                {'error': 'El nombre del rol ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
+
 class UsuarioRolViewSet(viewsets.ModelViewSet):
     queryset = UsuarioRoles.objects.all()
     serializer_class = UsuarioRolSerializer
     
     def update(self, request, pk=None):
         instance = self.get_object()
+
+        # Obtener los IDs del usuario y rol desde los datos del request
+        usuario_id = request.data.get('usuario', {}).get('id', instance.usuario_id)
+        rol_id = request.data.get('rol', {}).get('id', instance.rol_id)
+
+        # Validar si el usuario ya tiene asignado ese rol, excluyendo la instancia actual
+        if UsuarioRoles.objects.filter(usuario_id=usuario_id, rol_id=rol_id).exclude(pk=instance.pk).exists():
+            return Response({'error': ['El usuario ya tiene este rol asignado']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Si pasa la validación, actualizar los datos de la instancia
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         self.perform_update(serializer)
-        instance.usuario_id = request.data.get('usuario', {}).get('id', instance.usuario_id)
-        instance.rol_id = request.data.get('rol', {}).get('id', instance.rol_id)
+        instance.usuario_id = usuario_id
+        instance.rol_id = rol_id
         instance.save()
+
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         usuario_id = request.data.get('usuario')
         rol_id = request.data.get('rol')
-        # Aquí puedes realizar validaciones o lógica adicional si es necesario
-        usuarirol = UsuarioRoles.objects.create(usuario_id=usuario_id, rol_id=rol_id)
-        return Response(UsuarioRolSerializer(usuarirol).data, status=status.HTTP_201_CREATED)
 
+        # Validar si el usuario ya tiene asignado ese rol
+        if UsuarioRoles.objects.filter(usuario_id=usuario_id, rol_id=rol_id).exists():
+            # Devuelve un mensaje de error como lista para ser concatenado en el frontend
+            return Response({'error': ['Error en la asignación, el usuario ya tiene este rol asignado']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear la relación usuario-rol
+        usuario_rol = UsuarioRoles.objects.create(usuario_id=usuario_id, rol_id=rol_id)
+        return Response(UsuarioRolSerializer(usuario_rol).data, status=status.HTTP_201_CREATED)
+    
 class RolPermisoViewSet(viewsets.ModelViewSet):
     queryset = RolPermisos.objects.all()
     serializer_class = RolPermisoSerializer
 
     def update(self, request, pk=None):
-        instance = self.get_object()
+        instance = self.get_object()  # Obtiene la instancia del objeto a actualizar
+        rol_id = request.data.get('rol', {}).get('id', instance.rol_id)
+        permiso_id = request.data.get('permiso', {}).get('id', instance.permiso_id)
+
+        # Verificar si el permiso ya está asignado al rol
+        if RolPermisos.objects.filter(rol_id=rol_id, permiso_id=permiso_id).exists():
+            return Response({'error': ['El rol ya tiene el permiso asignado.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Serializa los datos entrantes, permitiendo la actualización parcial
         serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        instance.rol_id = request.data.get('rol', {}).get('id', instance.rol_id)
-        instance.permiso_id = request.data.get('permiso', {}).get('id', instance.permiso_id)
-        instance.save()
-        return Response(serializer.data)
-    # Sobrescribir el método de creación si es necesario
+        serializer.is_valid(raise_exception=True)  # Valida los datos
+
+        # Actualiza los campos solo si la validación es exitosa
+        instance.rol_id = rol_id
+        instance.permiso_id = permiso_id
+        instance.save()  # Guarda la instancia actualizada
+
+        return Response(serializer.data)  # Devuelve la respuesta con los datos actualizados
+    
     def create(self, request, *args, **kwargs):
         rol_id = request.data.get('rol')
         permisos = request.data.get('permisos', [])  # Obtener el array de permisos
+        mensajes_error = []
 
         if not rol_id or not permisos:
             return Response({'error': 'Faltan datos de rol o permisos'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Verificar si el rol ya tiene permisos duplicados
+        for permiso_id in permisos:
+            if RolPermisos.objects.filter(rol_id=rol_id, permiso_id=permiso_id).exists():
+                # Obtener el nombre del permiso
+                permiso = Permisos.objects.get(id=permiso_id)
+                mensajes_error.append(f"El rol ya tiene el permiso: {permiso.nombre}")
+
+        # Si hay mensajes de error, devolver la respuesta con los mensajes
+        if mensajes_error:
+            return Response({'error': mensajes_error}, status=status.HTTP_400_BAD_REQUEST)
 
         # Crear una entrada de RolPermiso por cada permiso
         for permiso_id in permisos:

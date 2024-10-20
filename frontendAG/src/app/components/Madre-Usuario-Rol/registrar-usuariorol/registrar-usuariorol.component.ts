@@ -66,18 +66,25 @@ export class RegistrarUsuariorolComponent {
     if (this.registrarForm.valid) {
       this.usuarioRolService
         .registrarUsarioRol(this.registrarForm.value)
-        .subscribe(
-          (response) => {
-            this.mensajeModal = 'Usuario Rol registrado exitosamente'; // Mensaje para el modal
+        .subscribe({
+          next: () => {
+            // Mostrar el mensaje de éxito
+            this.mensajeModal = 'Usuario Rol Registrado con éxito';
             this.manejarModal = true;
           },
-          (error) => {
-            this.errorModal = 'Error al registrar el usuario rol';
+          error: (error) => {
+            if (error.error && error.error.error) {
+              // Mostrar mensaje de error desde el backend, ya que es una lista de strings
+              this.errorModal = error.error.error.join('<br>');
+            } else {
+              this.errorModal = 'Error al actualizar el usuario rol.';
+            }
             this.manejarModal = true;
-          }
-        );
+          },
+        });
     }
   }
+
   manejarOk() {
     this.manejarModal = false; // Cerrar el modal
     this.listarUsuarioRol.emit(); // Emitir el evento para listar usuarios

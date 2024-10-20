@@ -9,6 +9,7 @@
         id="nombreRol"
         formControlName="nombreRol"
         class="form-control"
+        (keypress)="preventNumbers($event)"
       />
       <div
         *ngIf="form.get('nombreRol')?.invalid && form.get('nombreRol')?.touched"

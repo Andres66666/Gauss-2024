@@ -9,6 +9,7 @@
         id="nombre"
         formControlName="nombre"
         class="form-control"
+        (keypress)="preventNumbers($event)"
       />
       <div
         *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched"
@@ -69,6 +70,34 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Error -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ errorModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="manejarOk()">
           OK
         </button>
       </div>

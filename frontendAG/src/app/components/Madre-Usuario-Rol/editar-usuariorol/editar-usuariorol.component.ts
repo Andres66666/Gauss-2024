@@ -122,14 +122,28 @@ export class EditarUsuariorolComponent implements OnInit {
       this.UsuarioRolService.editarUsuarioRol(
         this.usuarioRol.id,
         updatedUsuarioRol
-      ).subscribe(() => {
-        this.mensajeModal = 'Usuario Rol actualizado con éxito';
-        this.manejarModal = true;
+      ).subscribe({
+        next: () => {
+          this.mensajeModal = 'Usuario Rol Actualizado con éxito';
+          this.manejarModal = true;
+        },
+        error: (error) => {
+          if (error.error && error.error.error) {
+            // Concatenar mensajes de error desde views.py
+            this.errorModal = error.error.error.join('<br>');
+          } else {
+            this.errorModal = 'Error al actualizar el usuario rol.';
+          }
+          this.manejarModal = true;
+        },
       });
+    } else {
+      this.errorModal = 'Por favor, completa todos los campos requeridos.';
+      this.manejarModal = true;
     }
   }
   manejarOk() {
-    this.manejarModal = false; 
+    this.manejarModal = false;
     this.listarUsuarioRolEditado.emit();
   }
 }

@@ -20,7 +20,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let usuarioRol of filteredRolPermiso()">
+      <tr *ngFor="let usuarioRol of filteredUsuarioRol()">
         <td class="text-start">{{ usuarioRol.usuario.nombreUsuario }}</td>
         <td class="text-start">{{ usuarioRol.rol.nombreRol }}</td>
         <td>
@@ -34,4 +34,23 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= usuarioRoles.length"
+    >
+      Siguiente
+    </button>
+  </div>
 </div>
