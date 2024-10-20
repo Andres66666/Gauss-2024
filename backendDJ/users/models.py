@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
@@ -19,6 +20,8 @@ class Obras(models.Model):
     nombreObra = models.CharField(max_length=50)
     ubicacionObra = models.CharField(max_length=100)
     estadoObra = models.BooleanField(default=True)
+    fecha_creacion_obra = models.DateField(auto_now_add=True)
+    fecha_cierre_obra = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.nombreObra
@@ -67,7 +70,8 @@ class RolPermisos(models.Model):
 class Almacenes(models.Model):
     nombreAlmacen = models.CharField(max_length=50)
     estadoAlmacen = models.BooleanField(default=True)
-    obra = models.ForeignKey(Obras, on_delete=models.CASCADE)
+    obra = models.ForeignKey(Obras, on_delete=models.CASCADE, null=True, blank=True)
+    almacen_global = models.BooleanField(default=False)  # Indica si es un almacén global
 
     def __str__(self):
         return self.nombreAlmacen
@@ -114,3 +118,13 @@ class Solicitudes(models.Model):
     def __str__(self):
         return f'Solicitud {self.fechaSolicitud}'
 
+class HistorialTraspasosEquipos(models.Model):
+    equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE)
+    obra = models.ForeignKey(Obras, on_delete=models.CASCADE)
+    almacen_origen = models.ForeignKey(Almacenes, related_name='almacen_origen', on_delete=models.CASCADE)
+    almacen_destino = models.ForeignKey(Almacenes, related_name='almacen_destino', on_delete=models.CASCADE)
+    fecha_asignacion = models.DateTimeField(auto_now_add=True)
+    fecha_retiro = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f'Traspaso de {self.equipo} de {self.almacen_origen} a {self.almacen_destino}'

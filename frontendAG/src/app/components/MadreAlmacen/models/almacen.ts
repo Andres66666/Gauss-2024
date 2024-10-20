@@ -1,7 +1,7 @@
 export interface Almacen {
   id: number;
   nombreAlmacen: string;
-  estadoAlmacen: true;
+  estadoAlmacen: boolean;
   obra: Obra;
 }
 export interface Obra {

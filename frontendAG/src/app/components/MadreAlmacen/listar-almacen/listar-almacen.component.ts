@@ -13,11 +13,14 @@ import { Almacen } from '../models/almacen';
 })
 export class ListarAlmacenComponent implements OnInit {
   almacenes: Almacen[] = [];
+  searchTerm: string = '';
+
+  page: number = 1;
+  pageSize: number = 10;
+  paginateAlmacen: Almacen[] = [];
 
   @Output() editar = new EventEmitter<number>();
   @Output() registrarAlmacen = new EventEmitter<number>(); // Emit an event when editing
-
-  searchTerm: string = ''; // Property for storing the search term
 
   constructor(private almacenService: AlmacenService) {}
 
@@ -27,6 +30,7 @@ export class ListarAlmacenComponent implements OnInit {
   getAlmacen() {
     this.almacenService.getAlmacen().subscribe((data) => {
       this.almacenes = data;
+      this.updatePaginatedAlmacenes();
       console.log(data);
     });
   }
@@ -36,15 +40,62 @@ export class ListarAlmacenComponent implements OnInit {
   registrarAlmacenes() {
     this.registrarAlmacen.emit();
   }
-
   filteredAlmacen(): Almacen[] {
-    if (!this.searchTerm) {
-      return this.almacenes; // Return all users if no search term is provided
+    let filtered = this.almacenes;
+    if (this.searchTerm) {
+      filtered = this.almacenes.filter(
+        (almacen) =>
+          almacen.nombreAlmacen
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase()) ||
+          almacen.obra.nombreObra
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
+      );
     }
-    return this.almacenes.filter((almacen) =>
-      almacen.nombreAlmacen
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
-    ); // Filter users based on the search term
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
+    ); // Mostramos solo la página actual
+  }
+  // Métodos de paginación
+  updatePaginatedAlmacenes() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginateAlmacen = this.almacenes.slice(start, end);
+  }
+
+  nextPage() {
+    this.page++;
+    this.updatePaginatedAlmacenes();
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedAlmacenes();
+    }
+  }
+
+  togglePermisoActivo(almacen: Almacen) {
+    // Invertir el estado de 'activo' del permiso
+    almacen.estadoAlmacen = !almacen.estadoAlmacen;
+
+    // Llamar a un servicio que actualice el estado del permiso en el servidor
+    this.almacenService
+      .editarAlmacen(almacen.id, {
+        ...almacen,
+        estadoAlmacen: almacen.estadoAlmacen,
+      })
+      .subscribe(
+        (response) => {
+          console.log(
+            `Almacen ${almacen.nombreAlmacen} actualizado exitosamente.`
+          );
+        },
+        (error) => {
+          console.error('Error al actualizar el estado del almacen:', error);
+        }
+      );
   }
 }

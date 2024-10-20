@@ -31,4 +31,9 @@ export class EquiposService {
   getObras(): Observable<Obra[]> {
     return this.http.get<Obra[]>(`${this.apiUrl}obra/`);
   }
+
+  // equipos.service.ts
+  getAlmacenesPorObra(obraId: number): Observable<Almacen[]> {
+    return this.http.get<Almacen[]>(`${this.apiUrl}almacen/?obra=${obraId}`);
+  }
 }

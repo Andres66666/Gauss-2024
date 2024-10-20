@@ -13,7 +13,13 @@ import { EquiposService } from '../service/equipos.service';
 })
 export class ListarEquiposComponent implements OnInit {
   equipos: Equipo[] = [];
-  searchTerm: string = '';
+  searchNombre: string = ''; // Nuevo campo para el nombre
+  searchModelo: string = ''; // Nuevo campo para el modelo
+  searchMarca: string = ''; // Nuevo campo para la marca
+
+  page: number = 1;
+  pageSize: number = 3;
+  paginatedEquipo: Equipo[] = [];
 
   @Output() editar = new EventEmitter<number>();
   @Output() registrarEquipo = new EventEmitter<number>();
@@ -25,6 +31,7 @@ export class ListarEquiposComponent implements OnInit {
   getEquipo() {
     this.equiposService.getEquipo().subscribe((data) => {
       console.log(data); // Verifica que los datos del almacen estén llegando correctamente
+      this.updatePaginatedEquipo();
       this.equipos = data;
     });
   }
@@ -36,12 +43,61 @@ export class ListarEquiposComponent implements OnInit {
     this.registrarEquipo.emit();
   }
   filteredEquipo(): Equipo[] {
-    if (!this.searchTerm) {
-      return this.equipos; // Return all users if no search term is provided
+    let filtered = this.equipos;
+
+    // Filtrado basado en los tres campos
+    if (this.searchNombre) {
+      filtered = filtered.filter((equipo) =>
+        equipo.nombreEquipo
+          .toLowerCase()
+          .includes(this.searchNombre.toLowerCase())
+      );
+    }
+    if (this.searchModelo) {
+      filtered = filtered.filter((equipo) =>
+        equipo.modelo.toLowerCase().includes(this.searchModelo.toLowerCase())
+      );
+    }
+    if (this.searchMarca) {
+      filtered = filtered.filter((equipo) =>
+        equipo.marca.toLowerCase().includes(this.searchMarca.toLowerCase())
+      );
     }
 
-    return this.equipos.filter((equipo) =>
-      equipo.nombreEquipo.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
+    ); // Mostramos solo la página actual
+  }
+
+  // Métodos de paginación
+  updatePaginatedEquipo() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedEquipo = this.equipos.slice(start, end);
+  }
+
+  nextPage() {
+    this.page++;
+    this.updatePaginatedEquipo();
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedEquipo();
+    }
+  }
+  getColorByEstado(estado: string): string {
+    switch (estado) {
+      case 'Disponible':
+        return 'bg-success-light'; // Verde claro
+      case 'En uso':
+        return 'bg-danger-light'; // Rojo claro
+      case 'En mantenimiento':
+        return 'bg-warning-light'; // Amarillo claro
+      default:
+        return '';
+    }
   }
 }

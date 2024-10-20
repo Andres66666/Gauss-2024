@@ -40,8 +40,33 @@
           <button class="btn btn-primary" (click)="editarAlmacen(almacen.id)">
             Editar
           </button>
+          <button
+            class="btn"
+            [ngClass]="almacen.estadoAlmacen ? 'btn-danger' : 'btn-success'"
+            (click)="togglePermisoActivo(almacen)"
+          >
+            {{ almacen.estadoAlmacen ? "Desactivar" : "Activar" }}
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= almacenes.length"
+    >
+      Siguiente
+    </button>
+  </div>
 </div>

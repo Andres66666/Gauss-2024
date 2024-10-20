@@ -75,19 +75,28 @@
         placeholder="Ingrese la fecha de adquisición del equipo"
       />
     </div>
-
-    <!-- Campo para seleccionar un almacen -->
+    <!-- Selección de obra -->
     <div class="form-group d-flex flex-column align-items-start">
+      <label for="obra">Obra:</label>
+      <select id="obra" class="form-control" (change)="onObraChange($event)">
+        <option value="" disabled selected>-- Seleccione una obra --</option>
+        <option *ngFor="let obra of obras" [value]="obra.id">
+          {{ obra.nombreObra }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Selección de almacén filtrado por la obra -->
+    <div class="form-group d-flex flex-column align-items-start mt-3">
       <label for="almacen">Almacén:</label>
       <select id="almacen" class="form-control" formControlName="almacen">
-        <option value="" disabled selected>-- Seleccione un almacen --</option>
+        <option value="" disabled selected>-- Seleccione un almacén --</option>
         <option *ngFor="let almacen of almacenes" [value]="almacen.id">
           {{ almacen.nombreAlmacen }}
         </option>
       </select>
     </div>
 
-    <!-- Campo para cargar una imagen -->
     <!-- Campo para cargar una imagen -->
     <div class="mb-3 d-flex flex-column align-items-center">
       <label for="imagenEquipos">Cargar Imagen:</label>
@@ -96,14 +105,13 @@
         type="file"
         class="form-control"
         (change)="onFileChange($event)"
-        formControlName="imagenEquipos"
       />
       <div *ngIf="imagenPreview" class="mt-2">
         <img
-          *ngIf="registrarForm.get('imagenEquipos')?.value"
-          [ngStyle]="{ width: '100px', height: '100px' }"
           [src]="imagenPreview"
+          alt="Imagen previa"
           class="img-thumbnail"
+          width="200"
         />
       </div>
     </div>

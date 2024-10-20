@@ -1,0 +1,11 @@
+.bg-success-light {
+  background-color: rgba(76, 175, 80, 0.3); /* Verde claro */
+}
+
+.bg-danger-light {
+  background-color: rgba(244, 67, 54, 0.3); /* Rojo claro */
+}
+
+.bg-warning-light {
+  background-color: rgba(255, 193, 7, 0.3); /* Amarillo claro */
+}

@@ -303,6 +303,18 @@ class ObrasViewSet(viewsets.ModelViewSet):
     queryset = Obras.objects.all()
     serializer_class = ObrasSerializer
 
+    def update(self, request, *args, **kwargs):
+            partial = kwargs.pop('partial', False)  # Permitir actualizaciones parciales
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                print("Errores de validación:", serializer.errors)  # Imprimir errores
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class AlmacenesViewSet(viewsets.ModelViewSet):
     queryset = Almacenes.objects.all()
     serializer_class = AlmacenesSerializer
@@ -334,7 +346,11 @@ class AlmacenesViewSet(viewsets.ModelViewSet):
             obra_id=obra_id
         )
         return Response(AlmacenesSerializer(almacen).data, status=status.HTTP_201_CREATED)
-
+    def get_queryset(self):
+        obra_id = self.request.query_params.get('obra', None)
+        if obra_id is not None:
+            return self.queryset.filter(obra__id=obra_id)
+        return self.queryset
 class EquiposViewSet(viewsets.ModelViewSet):
     queryset = Equipos.objects.all()
     serializer_class = EquiposSerializer
@@ -423,7 +439,7 @@ class EquiposViewSet(viewsets.ModelViewSet):
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
         
-    
+        
 class MantenimientosViewSet(viewsets.ModelViewSet):
     queryset = Mantenimientos.objects.all()
     serializer_class = MantenimientosSerializer
@@ -514,3 +530,7 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
         )
 
         return Response(SolicitudesSerializer(solicitud).data, status=status.HTTP_201_CREATED)
+    
+class AlmacenGlobalViewSet(viewsets.ModelViewSet):
+    queryset = Almacenes.objects.filter(almacen_global=True)
+    serializer_class = AlmacenesSerializer

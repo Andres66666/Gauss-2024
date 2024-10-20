@@ -4,7 +4,7 @@ export interface Equipo {
   nombreEquipo: string;
   marca: string;
   modelo: string;
-  estadoEquipo: true;
+  estadoEquipo: boolean;
   estadoUsoEquipo: 'Disponible' | 'En uso' | 'En mantenimiento'; // Usando un tipo de unión para las opciones
   vidaUtil: string; // Puede ser 'años' o 'horas'
   fechaAdquiscion: string; // Usa string o Date según tu preferencia
@@ -15,12 +15,12 @@ export interface Equipo {
 export interface Almacen {
   id: number;
   nombreAlmacen: string;
-  estadoAlmacen: true;
+  estadoAlmacen: boolean;
   obra: Obra;
 }
 export interface Obra {
   id: number;
   nombreObra: string;
   ubicacionObra: string;
-  estadoObra: true;
+  estadoObra: boolean;
 }

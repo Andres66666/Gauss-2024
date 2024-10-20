@@ -5,7 +5,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Almacen, Equipo } from '../models/equipos';
+import { Almacen, Equipo, Obra } from '../models/equipos';
 import { EquiposService } from '../service/equipos.service';
 import { CommonModule } from '@angular/common';
 
@@ -18,12 +18,12 @@ import { CommonModule } from '@angular/common';
 })
 export class RegistrarEquiposComponent implements OnInit {
   registrarForm: FormGroup;
+  obras: Obra[] = []; // Lista de obras disponibles
   almacenes: Almacen[] = []; // Para almacenar los almacenes disponibles
 
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
-  imagenPreview: string | ArrayBuffer | null = null;
   @Output() listarEquipo = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private equiposService: EquiposService) {
@@ -35,19 +35,39 @@ export class RegistrarEquiposComponent implements OnInit {
       estadoUsoEquipo: [''],
       vidaUtil: [''],
       fechaAdquiscion: [''],
+      obra: [''], // Añadimos el campo para seleccionar la obra
       almacen: [''],
       imagenEquipos: [''],
     });
   }
 
   ngOnInit(): void {
-    this.loadAlmacenes(); // Cargar almacenes al iniciar el componente
+    // this.loadAlmacenes(); // Cargar almacenes al iniciar el componente
+    this.loadObras(); // Cargar las obras al iniciar el componente
   }
 
-  loadAlmacenes() {
+  /*   loadAlmacenes() {
     this.equiposService.getAlmacen().subscribe((data) => {
       this.almacenes = data;
     });
+  } */
+  loadObras() {
+    this.equiposService.getObras().subscribe((data) => {
+      this.obras = data; // Asignar la lista de obras
+    });
+  }
+  onObraChange(event: Event) {
+    const obraId = (event.target as HTMLSelectElement).value;
+    const obraIdNumber = Number(obraId); // Ensure it's a number
+
+    this.equiposService.getAlmacenesPorObra(obraIdNumber).subscribe(
+      (almacenes) => {
+        this.almacenes = almacenes; // Update the list of warehouses
+      },
+      (error) => {
+        console.error('Error al cargar los almacenes:', error);
+      }
+    );
   }
 
   registrarEquipos() {
@@ -94,6 +114,7 @@ export class RegistrarEquiposComponent implements OnInit {
     this.listarEquipo.emit(); // Emitir el evento para listar usuarios
   }
 
+  imagenPreview: string | ArrayBuffer | null = null;
   // Manejar la selección de archivo
   onFileChange(event: any): void {
     if (event.target.files.length > 0) {

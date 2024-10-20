@@ -42,10 +42,14 @@ export class UsuarioRolComponent implements OnInit {
     let filtered = this.usuarioRoles;
 
     if (this.searchTerm) {
-      filtered = this.usuarioRoles.filter((usuarioRol) =>
-        usuarioRol.usuario.nombreUsuario
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
+      filtered = this.usuarioRoles.filter(
+        (usuarioRol) =>
+          usuarioRol.usuario.nombreUsuario
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase()) ||
+          usuarioRol.rol.nombreRol
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
       );
     }
 

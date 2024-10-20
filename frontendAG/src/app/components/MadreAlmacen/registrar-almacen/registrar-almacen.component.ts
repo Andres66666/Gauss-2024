@@ -24,6 +24,7 @@ export class RegistrarAlmacenComponent {
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
+
   @Output() listarAlmacen = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private almacenService: AlmacenService) {

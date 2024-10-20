@@ -25,8 +25,10 @@ export class RegistrarObraComponent {
   constructor(private obraServise: ObraService) {}
 
   registrarObra(): void {
-    // Forzar que siempre se registre como true
-    this.obra.estadoObra = true;
+    this.obra.estadoObra = true; // Forzar que siempre se registre como true
+
+    console.log('Datos a enviar:', this.obra); // Log de los datos
+
     this.obraServise.registrarObra(this.obra).subscribe({
       next: () => {
         this.obra = {
@@ -34,12 +36,15 @@ export class RegistrarObraComponent {
           nombreObra: '',
           ubicacionObra: '',
           estadoObra: true,
+          fecha_creacion_obra: undefined, // opcional
+          fecha_cierre_obra: undefined, // opcional
         };
-        this.mensajeModal = 'Obra registrado exitosamente'; // Mensaje para el modal
+        this.mensajeModal = 'Obra registrada exitosamente';
         this.manejarModal = true;
       },
       error: (error) => {
-        this.errorModal = 'Error al registrar el Obra';
+        this.errorModal = 'Error al registrar la obra';
+        console.error('Error al registrar la obra:', error); // Log del error
         this.manejarModal = true;
       },
     });

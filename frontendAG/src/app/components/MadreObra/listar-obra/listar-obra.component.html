@@ -16,6 +16,8 @@
       <tr>
         <th class="text-center">Obra</th>
         <th class="text-center">Ubicacion de Obra</th>
+        <th class="text-center">Fecha creacion Obra</th>
+        <th class="text-center">Fecha cierre Obra</th>
         <th class="text-center">Estado</th>
         <th class="text-center">Accion</th>
       </tr>
@@ -30,6 +32,9 @@
       >
         <td class="text-start">{{ obra.nombreObra }}</td>
         <td class="text-start">{{ obra.ubicacionObra }}</td>
+        <td class="text-start">{{ obra.fecha_creacion_obra }}</td>
+        <td class="text-start">{{ obra.fecha_cierre_obra }}</td>
+
         <td>{{ obra.estadoObra ? "Activo" : "Inactivo" }}</td>
         <td>
           <button class="btn btn-primary" (click)="editarObra(obra.id)">
@@ -40,10 +45,83 @@
             [ngClass]="obra.estadoObra ? 'btn-danger' : 'btn-success'"
             (click)="toggleObraActivo(obra)"
           >
-            {{ obra.estadoObra ? "Desactivar" : "Activar" }}
+            {{ obra.estadoObra ? "Desactivar y cerrar obra" : "Activar" }}
           </button>
         </td>
       </tr>
     </tbody>
   </table>
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= obra.length"
+    >
+      Siguiente
+    </button>
+  </div>
+</div>
+<!-- Modal de Éxito -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && !errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Información</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ mensajeModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Error -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ errorModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

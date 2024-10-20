@@ -81,6 +81,8 @@ export class RolPermisoComponent implements OnInit {
   registrarRolPermisos() {
     this.registrarRolPermiso.emit(); // Emit an event to register a new user
   }
+
+  
   // Métodos de paginación
   updatePaginatedPermisos() {
     const start = (this.page - 1) * this.pageSize;

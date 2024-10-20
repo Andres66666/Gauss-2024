@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuarios, Roles, Permisos,UsuarioRoles, RolPermisos,Obras, Almacenes, Equipos, Mantenimientos, Solicitudes
+from .models import HistorialTraspasosEquipos, Usuarios, Roles, Permisos,UsuarioRoles, RolPermisos,Obras, Almacenes, Equipos, Mantenimientos, Solicitudes
 
 class LoginSerializer(serializers.Serializer):
     correo = serializers.EmailField(max_length=100, required=False, allow_null=True)
@@ -67,4 +67,14 @@ class SolicitudesSerializer(serializers.ModelSerializer):
     usuario = UsuarioSerializer(read_only=True)
     class Meta:
         model = Solicitudes
+        fields = '__all__'
+
+class HistorialTraspasosEquiposSerializer(serializers.ModelSerializer):
+    equipo = EquiposSerializer(read_only=True)  # Relación inversa a Equipos
+    obra = ObrasSerializer(read_only=True)  # Relación inversa a Obras
+    almacen_origen = AlmacenesSerializer(read_only=True)  # Relación inversa a Almacenes
+    almacen_destino = AlmacenesSerializer(read_only=True)  # Relación inversa a Almacenes
+
+    class Meta:
+        model = HistorialTraspasosEquipos
         fields = '__all__'
