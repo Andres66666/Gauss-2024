@@ -13,6 +13,7 @@ interface Usuario {
   activo: boolean; // Add this property to check if the user is active
   mensaje?: string;
   error?: string;
+  access?: string;
 }
 
 @Injectable({
@@ -35,6 +36,9 @@ export class AuthService {
       .post<Usuario>(`${this.apiUrl}login/`, body, { headers })
       .pipe(
         tap((usuario) => {
+          if (usuario.access) {
+            localStorage.setItem('token', usuario.access); // Almacenar el token
+          }
           localStorage.setItem('usuario', JSON.stringify(usuario)); // para mantener los datos cuando se recargue la pagina
           this.roles = usuario.roles;
           this.permisos = usuario.permisos;
@@ -44,23 +48,21 @@ export class AuthService {
         })
       );
   }
-  getCorreo(): string {
-    return this.correo; // Método para obtener el correo
-  }
-  getNombreUsuario(): string {
-    return this.nombreUsuario; // Método para obtener el nombre de usuario
-  }
-  getNombreCompleto(): string | null {
-    // Recupera el nombre completo almacenado en el localStorage
-    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-    return `${usuario.nombreUsuario} ${usuario.apellido}`;
+  // Método para obtener el token
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 
-  getRoles(): string[] {
-    return this.roles;
+  // Método para agregar el token a las cabeceras
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, // Agregar el token a las cabeceras
+    });
   }
-
-  getPermisos(): string[] {
-    return this.permisos;
+  getProtectedData(): Observable<any> {
+    const headers = this.getAuthHeaders(); // Obtener cabeceras con el token
+    return this.http.get<any>(`${this.apiUrl}protected-endpoint/`, { headers });
   }
 }

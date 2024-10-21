@@ -38,6 +38,7 @@ REST_FRAMEWORK ={
         'rest_framework.permissions.AllowAny',
         
     ],
+    # manejo de token
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),

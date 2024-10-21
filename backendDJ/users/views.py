@@ -23,6 +23,8 @@ import boto3
 from botocore.config import Config
 import json
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -40,6 +42,9 @@ class LoginView(APIView):
                 return Response({'error': 'No puedes iniciar sesión!!!. Comuníquese con el administrador. Gracias.'}, status=status.HTTP_403_FORBIDDEN)
             
             if check_password(password, usuario.password):
+                # Generación del token
+                refresh = RefreshToken.for_user(usuario)
+                #return Response({'token': usuario.token}, status=status.HTTP_200_OK)
                 # Obtener roles del usuario
                 usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
                 roles = [usuario_rol.rol.nombreRol for usuario_rol in usuario_roles]
@@ -52,6 +57,8 @@ class LoginView(APIView):
                 usuario_serializer = UsuarioSerializer(usuario)
                 return Response({
                     'mensaje': 'Login exitoso',
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
                     'usuario': usuario_serializer.data,
                     'nombreUsuario': usuario.nombreUsuario,
                     'apellido': usuario.apellido,
