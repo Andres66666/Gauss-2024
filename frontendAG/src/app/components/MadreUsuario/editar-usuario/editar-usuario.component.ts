@@ -60,9 +60,6 @@ export class EditarUsuarioComponent implements OnInit {
     } else {
       console.error('Usuario Id is null or undefined');
     }
-    this.ciSubject.pipe(debounceTime(500)).subscribe((ci) => {
-      this.validateCI(ci);
-    });
   }
 
   loadObras(): void {
@@ -77,7 +74,8 @@ export class EditarUsuarioComponent implements OnInit {
     this.usuarioService.getUserById(id).subscribe({
       next: (data) => {
         this.usuario = data;
-        this.processCI(this.usuario.ci);
+        this.ciNumero = this.usuario.ci;
+        this.departamentoAbreviatura = this.usuario.departamento;
         this.initializeForm();
         this.imagenPreview = this.usuario.imagen_url;
       },
@@ -111,7 +109,7 @@ export class EditarUsuarioComponent implements OnInit {
         Validators.required
       ),
       activo: new FormControl(this.usuario.activo),
-      obra: new FormControl(this.usuario.obra.id, Validators.required),
+      obra: new FormControl(this.usuario.obra?.id),
       imagen: new FormControl(null), // Inicializar el control de la imagen
     });
   }
@@ -136,9 +134,8 @@ export class EditarUsuarioComponent implements OnInit {
       updatedUsuario.append('apellido', this.form.value.apellido);
       updatedUsuario.append('telefono', this.form.value.telefono);
       updatedUsuario.append('correo', this.form.value.correo);
-      const ci = this.form.get('ci')?.value;
-      const departamento = this.form.get('departamento')?.value;
-      updatedUsuario.append('ci', `${ci} ${departamento}`); // Combinar CI y departamento
+      updatedUsuario.append('ci', this.form.value.ci);
+      updatedUsuario.append('departamento', this.form.value.departamento);
 
       updatedUsuario.append(
         'activo',
@@ -169,11 +166,17 @@ export class EditarUsuarioComponent implements OnInit {
             usuario.telefono === this.form.value.telefono &&
             usuario.id !== this.usuario.id
         );
+        const ciExiste = usuarios.find(
+          (usuario) =>
+            usuario.ci === this.form.value.ci && usuario.id !== this.usuario.id
+        );
 
         if (correoExiste) {
           this.errorMessage = 'El correo electrónico ya existe';
         } else if (telefonoExiste) {
           this.errorMessage = 'El teléfono ya existe';
+        } else if (ciExiste) {
+          this.errorMessage = 'El C.I. ya Existe';
         } else {
           // Editar usuario
           this.usuarioService
@@ -196,71 +199,18 @@ export class EditarUsuarioComponent implements OnInit {
     this.manejarModal = false; // Cerrar el modal
     this.listarUsuarioEditado.emit(); // Emitir el evento para listar usuarios
   }
-
-  private usuariosCargados = false;
-
-  onCIChange(ci: string) {
-    this.ciSubject.next(ci);
-  }
-  validateCI(ci: string) {
-    if (this.usuarioId === null) {
-      // Si es un nuevo registro
-      // Realizar la validación del CI
-      if (!this.usuariosCargados) {
-        this.usuariosCargados = true;
-        // Verificar si el CI ya existe en la base de datos
-        this.usuarioService.getUsuarios().subscribe((usuarios) => {
-          const usuarioConCI = usuarios.find((usuario) => usuario.ci === ci);
-          if (usuarioConCI) {
-            this.form.get('ci')?.setErrors({ 'ci-existe': true });
-          } else {
-            this.form.get('ci')?.setErrors(null);
-          }
-          this.usuariosCargados = false;
-        });
-      }
-    } else {
-      // Si es un usuario existente
-      const ci = this.form.get('ci')?.value;
-      const departamento = this.form.get('departamento')?.value;
-      const ciCompleto = `${ci} ${departamento}`;
-
-      if (
-        ciCompleto !== this.usuario.ci ||
-        departamento !== this.departamentoAbreviatura
-      ) {
-        // Si el CI o el departamento ha cambiado
-        // Realizar la validación del CI
-        if (!this.usuariosCargados) {
-          this.usuariosCargados = true;
-          // Verificar si el CI ya existe en la base de datos
-          this.usuarioService.getUsuarios().subscribe((usuarios) => {
-            const usuarioConCI = usuarios.find(
-              (usuario) =>
-                usuario.ci === ciCompleto && usuario.id !== this.usuario.id
-            );
-            if (usuarioConCI) {
-              this.form.get('ci')?.setErrors({ 'ci-existe': true });
-            } else {
-              this.form.get('ci')?.setErrors(null);
-            }
-            this.usuariosCargados = false;
-          });
-        }
-      } else {
-        // No realizar la validación del CI
-        this.form.get('ci')?.setErrors(null);
-      }
+  validateNum(event: KeyboardEvent) {
+    const inputChar = String.fromCharCode(event.keyCode);
+    // Aceptar solo números
+    if (!/^[0-9]$/.test(inputChar)) {
+      event.preventDefault();
     }
   }
-  processCI(ci: string) {
-    const ciParts = ci.split(' ');
-    if (ciParts.length === 2) {
-      this.ciNumero = ciParts[0];
-      this.departamentoAbreviatura = ciParts[1];
-    } else {
-      this.ciNumero = ci;
-      this.departamentoAbreviatura = '';
+  validateText(event: KeyboardEvent) {
+    const inputChar = String.fromCharCode(event.keyCode); 
+    // Validar si el carácter ingresado no es una letra ni un espacio
+    if (!/^[a-zA-Z ]+$/.test(inputChar)) {
+      event.preventDefault();
     }
   }
 }

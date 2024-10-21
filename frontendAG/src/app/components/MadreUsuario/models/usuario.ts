@@ -13,6 +13,7 @@ export interface Usuario {
   correo?: string;
   password?: string;
   ci: string;
+  departamento: string;
   fecha_creacion: Date;
   activo: boolean;
   obra: Obra;

@@ -1,3 +1,4 @@
+from urllib import request
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -64,6 +65,9 @@ class LoginView(APIView):
         except Usuarios.DoesNotExist:
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
 
+class AlmacenGlobalViewSet(viewsets.ModelViewSet):
+    queryset = Almacenes.objects.filter(almacen_global=True)
+    serializer_class = AlmacenesSerializer
 
 class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permisos.objects.all()
@@ -118,6 +122,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         instance.telefono = request.data.get('telefono', instance.telefono)
         instance.correo = request.data.get('correo', instance.correo)
         instance.ci = request.data.get('ci', instance.ci)
+        instance.departamento = request.data.get('departamento', instance.departamento)
+
         instance.activo = request.data.get('activo', instance.activo) == 'true'
 
         # Manejo del campo obra
@@ -139,15 +145,16 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         response_data['old_image_url'] = old_image_url
 
         return Response(response_data, status=status.HTTP_200_OK)
-
+    
     def create(self, request, *args, **kwargs):
         nombreUsuario = request.data.get('nombreUsuario')
         apellido = request.data.get('apellido')
         telefono = request.data.get('telefono')
         correo = request.data.get('correo')
         password = request.data.get('password')
-        ci = request.data.get('ci')
         obra_id = request.data.get('obra')
+        ci = request.data.get('ci')
+        departamento = request.data.get('departamento')
 
         # Subir la imagen a S3 si se proporciona
         imagen_url = None
@@ -163,7 +170,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             correo=correo,
             password=password,
             ci=ci,
-            obra_id=obra_id,
+            departamento=departamento,  # Guardar el departamento
+            obra_id=obra_id if obra_id else None,
             imagen_url=imagen_url  # Guardar la URL de la imagen en la base de datos
         )
         
@@ -182,6 +190,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return image_url
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
+    
 
 class RolViewSet(viewsets.ModelViewSet):
     queryset = Roles.objects.all()
@@ -314,7 +323,31 @@ class ObrasViewSet(viewsets.ModelViewSet):
             else:
                 print("Errores de validación:", serializer.errors)  # Imprimir errores
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def close_obra(self, request, pk=None):
+            """
+            Cierra una obra y devuelve los equipos al almacén global.
+            """
+            obra = self.get_object()
+            obra.estadoObra = False  # Cambiar el estado de la obra a cerrada
+            obra.save()
 
+            # Obtener el almacén global
+            almacen_global = Almacenes.objects.filter(almacen_global=True).first()
+            if almacen_global:
+                equipos = Equipos.objects.filter(almacen__obra=obra)
+                for equipo in equipos:
+                    # Registrar el traspaso de vuelta al almacén global
+                    HistorialTraspasosEquipos.objects.create(
+                        equipo=equipo,
+                        obra=obra,
+                        almacen_origen=equipo.almacen,
+                        almacen_destino=almacen_global,
+                    )
+                    # Actualizar el equipo para que apunte al almacén global
+                    equipo.almacen = almacen_global
+                    equipo.save()
+
+            return Response({'status': 'obra cerrada y equipos devueltos al almacén global'}, status=status.HTTP_200_OK)
 class AlmacenesViewSet(viewsets.ModelViewSet):
     queryset = Almacenes.objects.all()
     serializer_class = AlmacenesSerializer
@@ -422,6 +455,20 @@ class EquiposViewSet(viewsets.ModelViewSet):
             almacen_id=almacen_id,
             imagenEquipos_url=imagenEquipos_url
         )
+        # Crear un equipo en el almacén global
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        equipo = serializer.save()
+
+        # Registrar el traspaso al almacén global
+        almacen_global = Almacenes.objects.filter(almacen_global=True).first()
+        if almacen_global:
+            HistorialTraspasosEquipos.objects.create(
+                equipo=equipo,
+                obra=None,  # No asignado a ninguna obra aún
+                almacen_origen=almacen_global,
+                almacen_destino=almacen_global,
+            )
 
         return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
 
@@ -438,6 +485,30 @@ class EquiposViewSet(viewsets.ModelViewSet):
             return imagenEquipos_url
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
+    def assign_to_obra(self, request, pk=None):
+            """
+            Asigna un equipo a una obra y registra el traspaso.
+            """
+            equipo = self.get_object()
+            obra_id = request.data.get('obra_id')
+            obra = Obras.objects.get(id=obra_id)
+            nuevo_almacen = Almacenes.objects.filter(obra=obra).first()
+
+            if nuevo_almacen:
+                # Registrar el traspaso
+                HistorialTraspasosEquipos.objects.create(
+                    equipo=equipo,
+                    obra=obra,
+                    almacen_origen=equipo.almacen,
+                    almacen_destino=nuevo_almacen,
+                )
+                # Actualizar el equipo para que apunte al nuevo almacén
+                equipo.almacen = nuevo_almacen
+                equipo.save()
+
+                return Response({'status': 'equipo asignado a la obra'}, status=status.HTTP_200_OK)
+            return Response({'error': 'Almacén no encontrado para la obra'}, status=status.HTTP_404_NOT_FOUND)
+
         
         
 class MantenimientosViewSet(viewsets.ModelViewSet):
@@ -531,6 +602,3 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
 
         return Response(SolicitudesSerializer(solicitud).data, status=status.HTTP_201_CREATED)
     
-class AlmacenGlobalViewSet(viewsets.ModelViewSet):
-    queryset = Almacenes.objects.filter(almacen_global=True)
-    serializer_class = AlmacenesSerializer

@@ -33,9 +33,10 @@ class Usuarios(models.Model):
     correo = models.EmailField(max_length=100, unique=True, null=True, blank=True)
     password = models.CharField(max_length=255)
     ci = models.CharField(max_length=50, unique=True)
+    departamento = models.CharField(max_length=50)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
-    obra = models.ForeignKey(Obras, on_delete=models.CASCADE)
+    obra = models.ForeignKey(Obras, on_delete=models.CASCADE,null=True, blank=True)
     imagen = models.FileField(upload_to='imagenes/')
     imagen_url = models.URLField(max_length=500,null=True, blank=True)
 

@@ -15,6 +15,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export class UsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
 
+  searchnombreUsuario: string = ''; // Nuevo campo para el nombre
+  searchapellido: string = ''; // Nuevo campo para el modelo
+  searchcorreo: string = ''; // Nuevo campo para el modelo
+  searchci: string = ''; // Nuevo campo para la marca
+  searchdepartamento: string = ''; // Nuevo campo para la marca
+
+  page: number = 1;
+  pageSize: number = 6;
+  paginatedUsuario: Usuario[] = [];
+
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrar = new EventEmitter<number>(); // Emit an event when editing
 
@@ -30,6 +40,7 @@ export class UsuarioComponent implements OnInit {
     this.usuarioService.getUsuarios().subscribe((data) => {
       this.usuarios = data;
       this.ordenarUsuariosPorId();
+      this.updatePaginatedUsuario();
       console.log(data);
     });
   }
@@ -43,16 +54,65 @@ export class UsuarioComponent implements OnInit {
   }
 
   filteredUsuarios(): Usuario[] {
-    if (!this.searchTerm) {
-      return this.usuarios; // Return all users if no search term is provided
+    let filtered = this.usuarios;
+
+    // Filtrado basado en los tres campos
+    if (this.searchnombreUsuario) {
+      filtered = filtered.filter((usuario) =>
+        usuario.nombreUsuario
+          .toLowerCase()
+          .includes(this.searchnombreUsuario.toLowerCase())
+      );
+    }
+    if (this.searchapellido) {
+      filtered = filtered.filter((usuario) =>
+        usuario.apellido
+          .toLowerCase()
+          .includes(this.searchapellido.toLowerCase())
+      );
+    }
+    if (this.searchcorreo) {
+      filtered = filtered.filter((usuario) =>
+        usuario.correo?.toLowerCase().includes(this.searchcorreo.toLowerCase())
+      );
+    }
+    if (this.searchci) {
+      filtered = filtered.filter((usuario) =>
+        usuario.ci.toLowerCase().includes(this.searchci.toLowerCase())
+      );
+    }
+    if (this.searchdepartamento) {
+      filtered = filtered.filter((usuario) =>
+        usuario.departamento
+          .toLowerCase()
+          .includes(this.searchdepartamento.toLowerCase())
+      );
     }
 
-    return this.usuarios.filter((usuario) =>
-      usuario.nombreUsuario
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
-    ); // Filter users based on the search term
+    return filtered.slice(
+      (this.page - 1) * this.pageSize,
+      this.page * this.pageSize
+    ); // Mostramos solo la página actual
   }
+  // Métodos de paginación
+  updatePaginatedUsuario() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedUsuario = this.usuarios.slice(start, end);
+  }
+
+  nextPage() {
+    this.page++;
+    this.updatePaginatedUsuario();
+  }
+
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.updatePaginatedUsuario();
+    }
+  }
+
   toggleUsuarioActivo(usuario: any) {
     // Invertir el estado de 'activo' del usuario
     usuario.activo = !usuario.activo;
@@ -73,5 +133,11 @@ export class UsuarioComponent implements OnInit {
   }
   ordenarUsuariosPorId() {
     this.usuarios.sort((a, b) => a.id - b.id); // Ordenar por ID en orden ascendente
+  }
+  // Nueva función para obtener el nombre de la obra
+  getNombreObra(usuario: Usuario): string {
+    return usuario.obra && usuario.obra.nombreObra
+      ? usuario.obra.nombreObra
+      : 'Sin asignar';
   }
 }

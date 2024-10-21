@@ -2,12 +2,37 @@
   <h2 class="text-center">Lista de Usuarios</h2>
 
   <!-- Search Input -->
+  <label for="">Campos de busqueda</label><br />
   <div class="mb-3 d-flex align-items-center">
     <input
       type="text"
       class="form-control"
-      placeholder="Buscar por Nombre de Usuario"
-      [(ngModel)]="searchTerm"
+      placeholder="Ingrese Nombre"
+      [(ngModel)]="searchnombreUsuario"
+    />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingrese Apellido"
+      [(ngModel)]="searchapellido"
+    />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingrese Correo"
+      [(ngModel)]="searchcorreo"
+    />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingrese C.I."
+      [(ngModel)]="searchci"
+    />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingrese D.P."
+      [(ngModel)]="searchdepartamento"
     />
     <button class="btn btn-success ms-2" (click)="registrarUsuario()">
       Registrar
@@ -23,6 +48,7 @@
         <th class="text-center">Correo</th>
         <th class="text-center">Telefono</th>
         <th class="text-center">C.I.</th>
+        <th class="text-center">D.P.</th>
         <th class="text-center">Obra</th>
         <th class="text-center">Estado</th>
         <th class="text-center">Acciones</th>
@@ -49,7 +75,11 @@
         <td class="text-start">{{ usuario.correo }}</td>
         <td class="text-start">{{ usuario.telefono }}</td>
         <td class="text-start">{{ usuario.ci }}</td>
-        <td class="text-start">{{ usuario.obra.nombreObra }}</td>
+        <td class="text-start">{{ usuario.departamento }}</td>
+
+        <td class="text-start">
+          {{ getNombreObra(usuario) }}
+        </td>
         <td>{{ usuario.activo ? "Activo" : "Inactivo" }}</td>
         <td>
           <button class="btn btn-primary" (click)="editarUsuario(usuario.id)">
@@ -66,4 +96,22 @@
       </tr>
     </tbody>
   </table>
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= usuarios.length"
+    >
+      Siguiente
+    </button>
+  </div>
 </div>

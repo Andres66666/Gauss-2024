@@ -10,6 +10,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-registrar-usuario',
@@ -28,9 +29,10 @@ export class RegistrarUsuarioComponent {
 
   manejarModal: boolean = false;
   mensajeModal: string = '';
+  errorModal: string = '';
 
   @Output() listarUsuario = new EventEmitter<void>();
-  
+
   departmentAbbreviations = [
     'LP',
     'CB',
@@ -42,11 +44,14 @@ export class RegistrarUsuarioComponent {
     'BN',
     'PD',
   ];
+  // Array temporal para simular la base de datos
+  existingCIs: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.registrarForm = this.fb.group({
       nombreUsuario: [
@@ -85,7 +90,7 @@ export class RegistrarUsuarioComponent {
         ],
       ],
       departamento: ['', Validators.required], // Agregar este control
-      obra: ['', Validators.required], // Relación con una obra
+      obra: [''], // Relación con una obra
       imagen: [''], // Para cargar la imagen
     });
   }
@@ -115,9 +120,11 @@ export class RegistrarUsuarioComponent {
         'password',
         this.registrarForm.get('password')?.value || ''
       );
-      const ci = this.registrarForm.get('ci')?.value;
-      const departamento = this.registrarForm.get('departamento')?.value;
-      formData.append('ci', `${ci} ${departamento}`); // Combinar CI y departamento
+      formData.append('ci', this.registrarForm.get('ci')?.value); // Solo el número de CI
+      formData.append(
+        'departamento',
+        this.registrarForm.get('departamento')?.value
+      ); // Ahora separado
       formData.append('obra', this.registrarForm.get('obra')?.value);
       formData.append('fecha_creacion', new Date().toISOString()); // Fecha actual
       formData.append('activo', 'true'); // Por defecto activo
@@ -154,7 +161,7 @@ export class RegistrarUsuarioComponent {
             usuario.telefono === this.registrarForm.get('telefono')?.value
         );
         const ciExiste = usuarios.find(
-          (usuario) => usuario.ci === `${ci} ${departamento}` // Combinar CI y departamento
+          (usuario) => usuario.ci === this.registrarForm.get('ci')?.value // Solo el número de CI
         );
 
         if (correoExiste) {
@@ -177,7 +184,8 @@ export class RegistrarUsuarioComponent {
                 this.esExito = true; // Indicar éxito
               },
               (error) => {
-                console.error('Error al registrar usuario', error);
+                this.errorModal = 'Error al registrar usuario';
+                this.manejarModal = true;
               }
             );
         }
@@ -205,18 +213,11 @@ export class RegistrarUsuarioComponent {
     }
   }
   /* validaciones  */
-  validateNombreUsuario(event: KeyboardEvent) {
-    const inputChar = String.fromCharCode(event.keyCode); // Obtener el carácter ingresado
+  validateText(event: KeyboardEvent) {
+    const inputChar = String.fromCharCode(event.keyCode);
     // Validar si el carácter ingresado no es una letra ni un espacio
     if (!/^[a-zA-Z ]+$/.test(inputChar)) {
-      event.preventDefault(); // Evitar que el carácter se ingrese
-    }
-  }
-  validateApellido(event: KeyboardEvent) {
-    const inputChar = String.fromCharCode(event.keyCode); // Obtener el carácter ingresado
-    // Validar si el carácter ingresado no es una letra ni un espacio
-    if (!/^[a-zA-Z ]+$/.test(inputChar)) {
-      event.preventDefault(); // Evitar que el carácter se ingrese
+      event.preventDefault();
     }
   }
   validateTelefono(event: KeyboardEvent) {
@@ -246,21 +247,14 @@ export class RegistrarUsuarioComponent {
   validateCI(event: KeyboardEvent) {
     const inputChar = String.fromCharCode(event.keyCode); // Obtener el carácter ingresado
     const currentInput = (event.target as HTMLInputElement).value;
+
     // Aceptar solo números
     if (!/^[0-9]$/.test(inputChar)) {
       event.preventDefault(); // Evitar que se ingrese el carácter
     }
-    // Validar la longitud del CI
-    if (currentInput.length > 9) {
+    // Validar la longitud del CI (máximo 9 caracteres)
+    if (currentInput.length >= 9) {
       event.preventDefault(); // Evitar que se ingrese más de 9 caracteres
-    }
-  }
-
-  validateDepartamento(event: KeyboardEvent) {
-    const inputChar = String.fromCharCode(event.keyCode); // Obtener el carácter ingresado
-    // Aceptar solo letras mayúsculas
-    if (!/^[A-Z]+$/.test(inputChar)) {
-      event.preventDefault(); // Evitar que se ingrese el carácter
     }
   }
 }

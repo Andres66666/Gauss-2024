@@ -1,292 +1,308 @@
 <div class="container" style="padding-bottom: 50px">
   <h2>Registrar Usuario</h2>
-  <form [formGroup]="registrarForm" (ngSubmit)="registrarUsuario()">
-    <!-- Campo para nombre del usuario -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="nombreUsuario">Nombre:</label>
-      <input
-        id="nombreUsuario"
-        type="text"
-        class="form-control"
-        formControlName="nombreUsuario"
-        placeholder="Ingrese el nombre del usuario"
-        (keypress)="validateNombreUsuario($event)"
-        required
-      />
-      <div
-        *ngIf="
-          registrarForm.get('nombreUsuario')?.invalid &&
-          registrarForm.get('nombreUsuario')?.touched
-        "
-        class="text-danger"
-      >
-        <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['required']">
-          El nombre es obligatorio.
-        </div>
-        <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['pattern']">
-          Solo se permiten letras en el nombre.
-        </div>
-      </div>
-    </div>
-
-    <!-- Campo para apellido del usuario -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="apellido">Apellido:</label>
-      <input
-        id="apellido"
-        type="text"
-        class="form-control"
-        formControlName="apellido"
-        placeholder="Ingrese el apellido"
-        (keypress)="validateApellido($event)"
-        required
-      />
-      <div
-        *ngIf="
-          registrarForm.get('apellido')?.invalid &&
-          registrarForm.get('apellido')?.touched
-        "
-        class="text-danger"
-      >
-        <div *ngIf="registrarForm.get('apellido')?.errors?.['required']">
-          El apellido es obligatorio.
-        </div>
-        <div *ngIf="registrarForm.get('apellido')?.errors?.['pattern']">
-          Solo se permiten letras en el apellido.
+  <div class="d-flex align-items-center justify-content-between">
+    <form [formGroup]="registrarForm" (ngSubmit)="registrarUsuario()">
+      <!-- Campo para nombre del usuario -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="nombreUsuario">Nombre:</label>
+        <input
+          id="nombreUsuario"
+          type="text"
+          class="form-control"
+          formControlName="nombreUsuario"
+          placeholder="Ingrese el nombre del usuario"
+          (keypress)="validateText($event)"
+          required
+        />
+        <div
+          *ngIf="
+            registrarForm.get('nombreUsuario')?.invalid &&
+            registrarForm.get('nombreUsuario')?.touched
+          "
+          class="text-danger"
+        >
+          <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['required']">
+            El nombre es obligatorio.
+          </div>
+          <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['pattern']">
+            Solo se permiten letras en el nombre.
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Campo para teléfono del usuario -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="telefono">Teléfono:</label>
-      <input
-        id="telefono"
-        type="text"
-        class="form-control"
-        formControlName="telefono"
-        placeholder="Ingrese el número de teléfono"
-        (keypress)="validateTelefono($event)"
-        required
-      />
-      <!-- Mensaje de error: Teléfono obligatorio -->
-      <div
-        *ngIf="
+      <!-- Campo para apellido del usuario -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="apellido">Apellido:</label>
+        <input
+          id="apellido"
+          type="text"
+          class="form-control"
+          formControlName="apellido"
+          placeholder="Ingrese el apellido"
+          (keypress)="validateText($event)"
+          required
+        />
+        <div
+          *ngIf="
+            registrarForm.get('apellido')?.invalid &&
+            registrarForm.get('apellido')?.touched
+          "
+          class="text-danger"
+        >
+          <div *ngIf="registrarForm.get('apellido')?.errors?.['required']">
+            El apellido es obligatorio.
+          </div>
+          <div *ngIf="registrarForm.get('apellido')?.errors?.['pattern']">
+            Solo se permiten letras en el apellido.
+          </div>
+        </div>
+      </div>
+
+      <!-- Campo para teléfono del usuario -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="telefono">Teléfono:</label>
+        <input
+          id="telefono"
+          type="text"
+          class="form-control"
+          formControlName="telefono"
+          placeholder="Ingrese el número de teléfono"
+          (keypress)="validateTelefono($event)"
+          required
+        />
+        <!-- Mensaje de error: Teléfono obligatorio -->
+        <div
+          *ngIf="
     registrarForm.get('telefono')?.errors?.['required'] &&
     registrarForm.get('telefono')?.touched
   "
-        class="text-danger"
-      >
-        El teléfono es obligatorio.
-      </div>
+          class="text-danger"
+        >
+          El teléfono es obligatorio.
+        </div>
 
-      <!-- Mensaje de error: Teléfono debe comenzar con 6 o 7 -->
-      <div
-        *ngIf="
+        <!-- Mensaje de error: Teléfono debe comenzar con 6 o 7 -->
+        <div
+          *ngIf="
     registrarForm.get('telefono')?.errors?.['pattern'] &&
     registrarForm.get('telefono')?.touched
   "
-        class="text-danger"
-      >
-        El teléfono debe comenzar con 6 o 7.
-      </div>
+          class="text-danger"
+        >
+          El teléfono debe comenzar con 6 o 7.
+        </div>
 
-      <!-- Mensaje de error: Teléfono debe tener 8 dígitos -->
-      <div
-        *ngIf="
-          registrarForm.get('telefono')?.value.length !== 8 &&
-          registrarForm.get('telefono')?.touched
-        "
-        class="text-danger"
-      >
-        El teléfono debe tener exactamente 8 dígitos.
-      </div>
-    </div>
-
-    <!-- Campo para correo del usuario (opcional) -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="correo">Correo:</label>
-      <input
-        id="correo"
-        type="email"
-        class="form-control"
-        formControlName="correo"
-        placeholder="Ingrese el correo electrónico"
-      />
-      <!-- Mensaje de error: Correo obligatorio -->
-      <div
-        *ngIf="
-    registrarForm.get('correo')?.errors?.['required'] &&
-    registrarForm.get('correo')?.touched
-  "
-        class="text-danger"
-      >
-        El correo es obligatorio.
-      </div>
-
-      <!-- Mensaje de error: Formato de correo inválido -->
-      <div
-        *ngIf="
-    registrarForm.get('correo')?.errors?.['email'] &&
-    registrarForm.get('correo')?.touched
-  "
-        class="text-danger"
-      >
-        El formato del correo no es válido.
-      </div>
-    </div>
-
-    <!-- Campo para contraseña del usuario (opcional) -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="password">Contraseña:</label>
-      <div class="input-group">
-        <input
-          id="password"
-          [type]="isPasswordVisible ? 'text' : 'password'"
-          class="form-control"
-          formControlName="password"
-          placeholder="Ingrese una contraseña: Ejemplo/123"
-          (keypress)="validatePassword($event)"
-        />
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            (click)="togglePasswordVisibility()"
-          >
-            <i
-              class="fa"
-              [ngClass]="isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'"
-            ></i>
-          </button>
+        <!-- Mensaje de error: Teléfono debe tener 8 dígitos -->
+        <div
+          *ngIf="
+            registrarForm.get('telefono')?.value.length !== 8 &&
+            registrarForm.get('telefono')?.touched
+          "
+          class="text-danger"
+        >
+          El teléfono debe tener exactamente 8 dígitos.
         </div>
       </div>
 
-      <!-- Mensaje de error: Contraseña obligatoria -->
-      <div
-        *ngIf="
+      <!-- Campo para correo del usuario (opcional) -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="correo">Correo:</label>
+        <input
+          id="correo"
+          type="email"
+          class="form-control"
+          formControlName="correo"
+          placeholder="Ingrese el correo electrónico"
+        />
+        <!-- Mensaje de error: Correo obligatorio -->
+        <div
+          *ngIf="
+    registrarForm.get('correo')?.errors?.['required'] &&
+    registrarForm.get('correo')?.touched
+  "
+          class="text-danger"
+        >
+          El correo es obligatorio.
+        </div>
+
+        <!-- Mensaje de error: Formato de correo inválido -->
+        <div
+          *ngIf="
+    registrarForm.get('correo')?.errors?.['email'] &&
+    registrarForm.get('correo')?.touched
+  "
+          class="text-danger"
+        >
+          El formato del correo no es válido.
+        </div>
+      </div>
+
+      <!-- Campo para contraseña del usuario (opcional) -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="password">Contraseña:</label>
+        <div class="input-group">
+          <input
+            id="password"
+            [type]="isPasswordVisible ? 'text' : 'password'"
+            class="form-control"
+            formControlName="password"
+            placeholder="Ingrese una contraseña: Ejemplo/123"
+            (keypress)="validatePassword($event)"
+          />
+          <div class="input-group-append">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="togglePasswordVisibility()"
+            >
+              <i
+                class="fa"
+                [ngClass]="isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'"
+              ></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mensaje de error: Contraseña obligatoria -->
+        <div
+          *ngIf="
           registrarForm.get('password')?.errors?.['required'] &&
           registrarForm.get('password')?.touched
         "
-        class="text-danger"
-      >
-        La contraseña es obligatoria.
-      </div>
+          class="text-danger"
+        >
+          La contraseña es obligatoria.
+        </div>
 
-      <!-- Mensaje de error: Longitud mínima -->
-      <div
-        *ngIf="
+        <!-- Mensaje de error: Longitud mínima -->
+        <div
+          *ngIf="
           registrarForm.get('password')?.errors?.['minlength'] &&
           registrarForm.get('password')?.touched
         "
-        class="text-danger"
-      >
-        La contraseña debe tener al menos 8 caracteres.
-      </div>
+          class="text-danger"
+        >
+          La contraseña debe tener al menos 8 caracteres.
+        </div>
 
-      <!-- Mensaje de error: Formato incorrecto -->
-      <div
-        *ngIf="
+        <!-- Mensaje de error: Formato incorrecto -->
+        <div
+          *ngIf="
           registrarForm.get('password')?.errors?.['pattern'] &&
           registrarForm.get('password')?.touched
         "
-        class="text-danger"
-      >
-        La contraseña debe contener al menos una letra mayúscula, una letra
-        minúscula, un número y un carácter especial.
-      </div>
-    </div>
-    <!-- Campo para CI (cédula de identidad) -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="ci">Cédula de Identidad (CI):</label>
-      <div class="d-flex align-items-center">
-        <input
-          id="ci"
-          type="number"
-          class="form-control"
-          formControlName="ci"
-          placeholder="Ingrese el CI (Ej: 12345678)"
-          (keypress)="validateCI($event)"
-          required
-        />
-        <select
-          id="departamento"
-          class="form-control"
-          formControlName="departamento"
-          required
+          class="text-danger"
         >
-          <option value="" disabled selected>
-            -- Seleccione un departamento --
-          </option>
-          <option
-            *ngFor="let departamento of departmentAbbreviations"
-            [value]="departamento"
-          >
-            {{ departamento }}
+          La contraseña debe contener al menos una letra mayúscula, una letra
+          minúscula, un número y un carácter especial.
+        </div>
+      </div>
+      <!-- Contenedor para CI y Departamento -->
+      <div class="d-flex justify-content-between">
+        <!-- Contenedor flex para alinear horizontalmente -->
+
+        <!-- Campo para CI (cédula de identidad) -->
+        <div class="form-group me-3">
+          <!-- Margen a la derecha -->
+          <label for="ci">Cédula de Identidad (CI):</label>
+          <div class="d-flex align-items-center">
+            <!-- Contenedor flex para CI y mensaje -->
+            <input
+              id="ci"
+              type="text"
+              class="form-control me-2"
+              formControlName="ci"
+              placeholder="Ej: 12345678"
+              (keypress)="validateCI($event)"
+              required
+            />
+            <div
+              *ngIf="registrarForm.get('ci')?.errors?.['required'] && registrarForm.get('ci')?.touched"
+              class="text-danger"
+            >
+              Ingrese CI
+            </div>
+          </div>
+        </div>
+
+        <!-- Campo para departamento -->
+        <div class="form-group">
+          <!-- Sin margen a la derecha para el último elemento -->
+          <label for="departamento">Departamento:</label>
+          <div class="d-flex align-items-center">
+            <!-- Contenedor flex para Departamento y mensaje -->
+            <select
+              id="departamento"
+              class="form-control me-2"
+              formControlName="departamento"
+              required
+            >
+              <option value="" disabled selected>D.P.</option>
+              <option
+                *ngFor="let departamento of departmentAbbreviations"
+                [value]="departamento"
+              >
+                {{ departamento }}
+              </option>
+            </select>
+            <div
+              *ngIf="registrarForm.get('departamento')?.errors?.['required'] && registrarForm.get('departamento')?.touched"
+              class="text-danger"
+            >
+              Departamento es obligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Campo para seleccionar una obra -->
+      <div class="form-group d-flex flex-column align-items-start">
+        <label for="obra">Seleccione una obra:</label>
+        <select id="obra" class="form-control" formControlName="obra">
+          <option value="" disabled selected>-- Seleccione una obra --</option>
+          <option *ngFor="let obra of obras" [value]="obra.id">
+            {{ obra.nombreObra }}
           </option>
         </select>
+        <div
+          *ngIf="
+            registrarForm.get('obra')?.invalid &&
+            registrarForm.get('obra')?.touched
+          "
+          class="text-danger"
+        >
+          Seleccionar una obra es obligatorio.
+        </div>
       </div>
-      <div
-        *ngIf="
-          (registrarForm.get('ci')?.invalid &&
-            registrarForm.get('ci')?.touched) ||
-          (registrarForm.get('departamento')?.invalid &&
-            registrarForm.get('departamento')?.touched)
-        "
-        class="text-danger"
-      >
-        El CI y el departamento son obligatorios.
-      </div>
-    </div>
 
-    <!-- Campo para seleccionar una obra -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="obra">Seleccione una obra:</label>
-      <select id="obra" class="form-control" formControlName="obra" required>
-        <option value="" disabled selected>-- Seleccione una obra --</option>
-        <option *ngFor="let obra of obras" [value]="obra.id">
-          {{ obra.nombreObra }}
-        </option>
-      </select>
-      <div
-        *ngIf="
-          registrarForm.get('obra')?.invalid &&
-          registrarForm.get('obra')?.touched
-        "
-        class="text-danger"
-      >
-        Seleccionar una obra es obligatorio.
-      </div>
-    </div>
-
-    <!-- Campo para cargar una imagen -->
-    <div class="mb-3 d-flex flex-column align-items-center">
-      <label for="imagen">Cargar Imagen:</label>
-      <input
-        id="imagen"
-        type="file"
-        class="form-control"
-        (change)="onFileChange($event)"
-      />
-      <div *ngIf="imagenPreview" class="mt-2">
-        <img
-          [src]="imagenPreview"
-          alt="Imagen previa"
-          class="img-thumbnail"
-          width="100"
+      <!-- Campo para cargar una imagen -->
+      <div class="mb-3 d-flex flex-column align-items-start">
+        <label for="imagen">Cargar Imagen:</label>
+        <input
+          id="imagen"
+          type="file"
+          class="form-control"
+          (change)="onFileChange($event)"
         />
       </div>
-    </div>
 
-    <!-- Botón de registro -->
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="!registrarForm.valid"
-    >
-      Registrar Usuario
-    </button>
-  </form>
+      <!-- Botón de registro -->
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!registrarForm.valid"
+      >
+        Registrar Usuario
+      </button>
+    </form>
+    <div *ngIf="imagenPreview" class="mt-2 ms-3">
+      <img
+        [src]="imagenPreview"
+        alt="Imagen previa"
+        class="img-thumbnail"
+        width="400"
+      />
+    </div>
+  </div>
   <!-- Mensaje de alerta -->
   <div
     *ngIf="mensaje"
@@ -296,13 +312,12 @@
     {{ mensaje }}
   </div>
 </div>
-
-<!-- Modal -->
+<!-- Modal de Éxito -->
 <div
   class="modal"
   tabindex="-1"
   role="dialog"
-  *ngIf="manejarModal"
+  *ngIf="manejarModal && !errorModal"
   style="display: block"
 >
   <div class="modal-dialog" role="document">
@@ -315,10 +330,37 @@
       </div>
       <div class="modal-body">
         <p>{{ mensajeModal }}</p>
-        <!-- Mensaje que se muestra en el modal -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="manejarOk()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Error -->
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  *ngIf="manejarModal && errorModal"
+  style="display: block"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button type="button" class="close" (click)="manejarModal = false">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ errorModal }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="manejarOk()">
           OK
         </button>
       </div>

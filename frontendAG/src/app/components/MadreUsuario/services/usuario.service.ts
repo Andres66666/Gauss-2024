@@ -44,9 +44,19 @@ export class UsuarioService {
   }
 
   /* esto es por si las duidas nomas  */
-  getUsuarioByCI(ci: string): Observable<Usuario | null> {
+  /*   getUsuarioByCI(ci: string): Observable<Usuario | null> {
     return this.getUsuarios().pipe(
       map((usuarios) => usuarios.find((usuario) => usuario.ci === ci) || null)
+    );
+  } */
+  // En UsuarioService
+  getUsuarioByCI(ci: string): Observable<Usuario | null> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}usuario/?ci=${ci}`).pipe(
+      map((usuarios) => (usuarios.length > 0 ? usuarios[0] : null)),
+      catchError((error) => {
+        console.error('Error al verificar CI:', error);
+        return throwError(error);
+      })
     );
   }
 }
