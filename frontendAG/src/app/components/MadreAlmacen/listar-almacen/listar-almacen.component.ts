@@ -39,6 +39,7 @@ export class ListarAlmacenComponent implements OnInit {
   }
   registrarAlmacenes() {
     this.registrarAlmacen.emit();
+    this.getAlmacen(); // Refresh the list after registration
   }
   filteredAlmacen(): Almacen[] {
     let filtered = this.almacenes;

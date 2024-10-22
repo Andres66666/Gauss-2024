@@ -330,10 +330,14 @@
       </div>
       <div class="modal-body">
         <img
-          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right.png"
+          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right1.png"
           alt=""
+          class="d-flex"
+          style="margin: 0 auto; width: 40px; height: 50px"
         />
-        <p>{{ mensajeModal }}</p>
+        <div style="text-align: center; margin-top: 10px">
+          <p>{{ mensajeModal }}</p>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="manejarOk()">
