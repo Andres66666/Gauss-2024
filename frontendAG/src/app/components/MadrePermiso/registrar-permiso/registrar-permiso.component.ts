@@ -35,7 +35,7 @@ export class RegistrarPermisoComponent {
           descripcion: '',
           activo: true,
         };
-        this.mensajeModal = 'Permiso registrado exitosa mente'; // Mensaje para el modal
+        this.mensajeModal = 'Permiso registrado exitosamente'; // Mensaje para el modal
         this.manejarModal = true; // Mostrar el modal
         this.errorModal = ''; // Limpiar el error
       },

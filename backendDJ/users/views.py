@@ -462,21 +462,7 @@ class EquiposViewSet(viewsets.ModelViewSet):
             almacen_id=almacen_id,
             imagenEquipos_url=imagenEquipos_url
         )
-        # Crear un equipo en el almacén global
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        equipo = serializer.save()
-
-        # Registrar el traspaso al almacén global
-        almacen_global = Almacenes.objects.filter(almacen_global=True).first()
-        if almacen_global:
-            HistorialTraspasosEquipos.objects.create(
-                equipo=equipo,
-                obra=None,  # No asignado a ninguna obra aún
-                almacen_origen=almacen_global,
-                almacen_destino=almacen_global,
-            )
-
+        
         return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
 
     def upload_image_to_s4(self, file):
@@ -492,29 +478,7 @@ class EquiposViewSet(viewsets.ModelViewSet):
             return imagenEquipos_url
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
-    def assign_to_obra(self, request, pk=None):
-            """
-            Asigna un equipo a una obra y registra el traspaso.
-            """
-            equipo = self.get_object()
-            obra_id = request.data.get('obra_id')
-            obra = Obras.objects.get(id=obra_id)
-            nuevo_almacen = Almacenes.objects.filter(obra=obra).first()
-
-            if nuevo_almacen:
-                # Registrar el traspaso
-                HistorialTraspasosEquipos.objects.create(
-                    equipo=equipo,
-                    obra=obra,
-                    almacen_origen=equipo.almacen,
-                    almacen_destino=nuevo_almacen,
-                )
-                # Actualizar el equipo para que apunte al nuevo almacén
-                equipo.almacen = nuevo_almacen
-                equipo.save()
-
-                return Response({'status': 'equipo asignado a la obra'}, status=status.HTTP_200_OK)
-            return Response({'error': 'Almacén no encontrado para la obra'}, status=status.HTTP_404_NOT_FOUND)
+    
 
         
         

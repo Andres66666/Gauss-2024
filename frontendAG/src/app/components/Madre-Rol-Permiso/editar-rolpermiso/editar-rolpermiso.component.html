@@ -45,8 +45,16 @@
           <span>&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <p>{{ mensajeModal }}</p>
+      <div class="d-flex align-items-center justify-content-between">
+        <img
+          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right1.png"
+          alt=""
+          style="width: 90px; height: 50px; margin-right: 5px"
+        />
+        <div class="flex-grow-1 text-center">
+          <p style="margin: 0">{{ mensajeModal }}</p>
+          <!-- Elimina el margen del párrafo -->
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="manejarOk()">
@@ -73,9 +81,16 @@
           <span>&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <p>{{ errorModal }}</p>
-        <!--  <p [innerHTML]="errorModal"></p> -->
+      <div class="d-flex align-items-center justify-content-between">
+        <img
+          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/wrong.png"
+          alt=""
+          style="width: 50px; height: 50px; margin-right: 5px"
+        />
+        <div class="flex-grow-1 text-center">
+          <p style="margin: 0">{{ errorModal }}</p>
+          <!-- Elimina el margen del párrafo -->
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" (click)="manejarOk()">
