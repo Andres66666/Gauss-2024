@@ -4,6 +4,7 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { Almacen, Equipo, Obra } from '../models/equipos';
 import { EquiposService } from '../service/equipos.service';
@@ -29,12 +30,12 @@ export class RegistrarEquiposComponent implements OnInit {
   constructor(private fb: FormBuilder, private equiposService: EquiposService) {
     // Inicializar el formulario con los controles necesarios
     this.registrarForm = this.fb.group({
-      nombreEquipo: [''],
-      marca: [''],
-      modelo: [''],
-      estadoUsoEquipo: [''],
-      vidaUtil: [''],
-      fechaAdquiscion: [''],
+      nombreEquipo: ['', Validators.required],
+      marca: ['', Validators.required],
+      modelo: ['', Validators.required],
+      estadoUsoEquipo: ['', Validators.required],
+      vidaUtil: ['', Validators.required],
+      fechaAdquiscion: ['', Validators.required],
       obra: [''], // Añadimos el campo para seleccionar la obra
       almacen: [''],
       imagenEquipos: [''],
@@ -46,11 +47,11 @@ export class RegistrarEquiposComponent implements OnInit {
     this.loadObras(); // Cargar las obras al iniciar el componente
   }
 
-  /*   loadAlmacenes() {
+  loadAlmacenes() {
     this.equiposService.getAlmacen().subscribe((data) => {
       this.almacenes = data;
     });
-  } */
+  }
   loadObras() {
     this.equiposService.getObras().subscribe((data) => {
       this.obras = data; // Asignar la lista de obras
@@ -90,6 +91,7 @@ export class RegistrarEquiposComponent implements OnInit {
       this.registrarForm.get('fechaAdquiscion')?.value
     );
     formData.append('almacen', this.registrarForm.get('almacen')?.value);
+
     formData.append(
       'imagenEquipos',
       this.registrarForm.get('imagenEquipos')?.value

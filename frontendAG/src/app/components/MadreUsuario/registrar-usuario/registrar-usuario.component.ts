@@ -24,8 +24,8 @@ export class RegistrarUsuarioComponent {
   obras: Obra[] = [];
   submitted = false;
 
-  mensaje: string = '';
   esExito: boolean = false;
+  mensaje: string = '';
 
   manejarModal: boolean = false;
   mensajeModal: string = '';
@@ -155,7 +155,6 @@ export class RegistrarUsuarioComponent {
           (usuario) =>
             usuario.correo === this.registrarForm.get('correo')?.value
         );
-
         const telefonoExiste = usuarios.find(
           (usuario) =>
             usuario.telefono === this.registrarForm.get('telefono')?.value

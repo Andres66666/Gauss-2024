@@ -30,6 +30,7 @@ export class SolicitudesService {
   createSolicitudes(solicitudes: Solicitudes): Observable<Solicitudes> {
     return this.http.post<Solicitudes>(`${this.apiUrl}solicitud/`, solicitudes);
   }
+  
   editarSolicitudes(
     id: number,
     solicitudes: Solicitudes
