@@ -16,7 +16,7 @@ export class ListarAlmacenComponent implements OnInit {
   searchTerm: string = '';
 
   page: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 5;
   paginateAlmacen: Almacen[] = [];
 
   @Output() editar = new EventEmitter<number>();
@@ -64,7 +64,6 @@ export class ListarAlmacenComponent implements OnInit {
     const end = start + this.pageSize;
     this.paginateAlmacen = this.almacenes.slice(start, end);
   }
-
   nextPage() {
     this.page++;
     this.updatePaginatedAlmacenes();
