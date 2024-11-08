@@ -82,11 +82,12 @@
     >
       Anterior
     </button>
-    <span>Página {{ page }}</span>
+    <!--   // CAMBIO PAG -->
+    <span>Página {{ page }} de {{ totalPages }}</span>
     <button
       class="btn btn-secondary"
       (click)="nextPage()"
-      [disabled]="page * pageSize >= equipos.length"
+      [disabled]="page >= totalPages"
     >
       Siguiente
     </button>

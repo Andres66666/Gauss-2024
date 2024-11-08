@@ -18,8 +18,10 @@ export class ListarEquiposComponent implements OnInit {
   searchMarca: string = ''; // Nuevo campo para la marca
 
   page: number = 1;
-  pageSize: number = 3;
+  pageSize: number = 3; // cantidad items
   paginatedEquipo: Equipo[] = [];
+  // CAMBIO PAG
+  totalPages: number = 1;
 
   @Output() editar = new EventEmitter<number>();
   @Output() registrarEquipo = new EventEmitter<number>();
@@ -31,8 +33,8 @@ export class ListarEquiposComponent implements OnInit {
   getEquipo() {
     this.equiposService.getEquipo().subscribe((data) => {
       console.log(data); // Verifica que los datos del almacen estén llegando correctamente
-      this.updatePaginatedEquipo();
       this.equipos = data;
+      this.updatePaginatedEquipo();
     });
   }
 
@@ -63,23 +65,26 @@ export class ListarEquiposComponent implements OnInit {
         equipo.marca.toLowerCase().includes(this.searchMarca.toLowerCase())
       );
     }
+    // CAMBIO PAG
+    // Calcula y actualiza totalPages en función del número de elementos filtrados
+    this.totalPages = Math.ceil(filtered.length / this.pageSize);
 
+    // Muestra solo los elementos de la página actual
     return filtered.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
-    ); // Mostramos solo la página actual
+    );
   }
-
-  // Métodos de paginación
+  // CAMBIO PAG
   updatePaginatedEquipo() {
-    const start = (this.page - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.paginatedEquipo = this.equipos.slice(start, end);
+    this.paginatedEquipo = this.filteredEquipo();
   }
-
+  // CAMBIO PAG
   nextPage() {
-    this.page++;
-    this.updatePaginatedEquipo();
+    if (this.page < this.totalPages) {
+      this.page++;
+      this.updatePaginatedEquipo();
+    }
   }
 
   previousPage() {
@@ -88,14 +93,15 @@ export class ListarEquiposComponent implements OnInit {
       this.updatePaginatedEquipo();
     }
   }
+
   getColorByEstado(estado: string): string {
     switch (estado) {
       case 'Disponible':
-        return 'bg-success-light'; // Verde claro
+        return 'bg-success-light';
       case 'En uso':
-        return 'bg-danger-light'; // Rojo claro
+        return 'bg-danger-light';
       case 'En mantenimiento':
-        return 'bg-warning-light'; // Amarillo claro
+        return 'bg-warning-light';
       default:
         return '';
     }
