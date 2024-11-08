@@ -1,0 +1,90 @@
+<h1>Lista de Equipos</h1>
+<div class="container mt-4">
+  <!-- Campo de búsqueda -->
+  <div class="mb-3 d-flex align-items-center">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingresa el nombre de equipo"
+      [(ngModel)]="searchNombre"
+    />
+    <br />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingresa el modelo de equipo"
+      [(ngModel)]="searchModelo"
+    />
+    <br />
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Ingresa la marca del equipo"
+      [(ngModel)]="searchMarca"
+    />
+  </div>
+
+  <!-- Listado de equipos en tarjetas -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div *ngFor="let equipo of filteredEquipo()" class="col-md-4 mb-3">
+          <div
+            class="card"
+            [ngClass]="getColorByEstado(equipo.estadoUsoEquipo)"
+            style="height: 400px"
+          >
+            <div
+              class="card-body d-flex flex-column align-items-center justify-content-between"
+            >
+              <h5 class="card-title text-center">{{ equipo.nombreEquipo }}</h5>
+              <img
+                *ngIf="equipo.imagenEquipos_url"
+                [src]="equipo.imagenEquipos_url"
+                alt="Foto de Perfil"
+                class="img-fluid mb-2"
+                style="width: 100px; height: 100px"
+              />
+              <p class="card-text text-start">
+                <strong>Marca:</strong> {{ equipo.marca }}<br />
+                <strong>Modelo:</strong> {{ equipo.modelo }}<br />
+                <strong>Estado:</strong> {{ equipo.estadoUsoEquipo }}<br />
+                <strong>Vida Útil:</strong> {{ equipo.vidaUtil }}<br />
+                <strong>Fecha de Adquisición:</strong>
+                {{ equipo.fechaAdquiscion | date : "dd/MM/yyyy" }}<br />
+                <strong>Obra:</strong> {{ equipo.almacen.obra.nombreObra
+                }}<br />
+                <strong>Almacén:</strong> {{ equipo.almacen.nombreAlmacen
+                }}<br />
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button
+      class="btn btn-secondary"
+      (click)="previousPage()"
+      [disabled]="page === 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn btn-secondary"
+      (click)="nextPage()"
+      [disabled]="page * pageSize >= equipos.length"
+    >
+      Siguiente
+    </button>
+  </div>
+
+  <!-- Mensaje cuando no se encuentran equipos -->
+  <div *ngIf="filteredEquipo().length === 0" class="alert alert-info">
+    No se encontraron equipos que coincidan con la búsqueda.
+  </div>
+</div>

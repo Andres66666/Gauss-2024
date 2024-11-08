@@ -36,6 +36,7 @@ import { EditarMantenimientoComponent } from '../MadreManteniminiento/editar-man
 import { RegistrarSolicitudesComponent } from '../MadreSolicitudes/registrar-solicitudes/registrar-solicitudes.component';
 import { ListarSolicitudesComponent } from '../MadreSolicitudes/listar-solicitudes/listar-solicitudes.component';
 import { EditarSolicitudesComponent } from '../MadreSolicitudes/editar-solicitudes/editar-solicitudes.component';
+import { ListarEquiposOComponent } from "../MadreEquipo/listar-equipos-o/listar-equipos-o.component";
 
 @Component({
   selector: 'app-index',
@@ -74,7 +75,8 @@ import { EditarSolicitudesComponent } from '../MadreSolicitudes/editar-solicitud
     RegistrarSolicitudesComponent,
     ListarSolicitudesComponent,
     EditarSolicitudesComponent,
-  ],
+    ListarEquiposOComponent
+],
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.css'], // Corrected 'styleUrl' to 'styleUrls'
 })

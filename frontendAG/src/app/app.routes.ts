@@ -32,6 +32,7 @@ import { ListarMantenimientoComponent } from './components/MadreManteniminiento/
 import { RegistrarSolicitudesComponent } from './components/MadreSolicitudes/registrar-solicitudes/registrar-solicitudes.component';
 import { EditarSolicitudesComponent } from './components/MadreSolicitudes/editar-solicitudes/editar-solicitudes.component';
 import { ListarSolicitudesComponent } from './components/MadreSolicitudes/listar-solicitudes/listar-solicitudes.component';
+import { ListarEquiposOComponent } from './components/MadreEquipo/listar-equipos-o/listar-equipos-o.component';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   /* { path: '', redirectTo: '/login', pathMatch: 'full' }, */
@@ -78,10 +79,11 @@ export const routes: Routes = [
   { path: 'editar-mantenimiento/:id', component: EditarMantenimientoComponent },
   { path: 'listar-mantenimiento', component: ListarMantenimientoComponent },
 
-  
   { path: 'registrar-solicitud', component: RegistrarSolicitudesComponent },
   { path: 'editar-solicitud/:id', component: EditarSolicitudesComponent },
   { path: 'listar-solicitud', component: ListarSolicitudesComponent },
+
+  { path: 'listar-equipo-O', component: ListarEquiposOComponent },
 
   { path: '**', redirectTo: '' },
 ];
