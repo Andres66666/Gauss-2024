@@ -1,0 +1,38 @@
+<div class="container mt-4">
+  <h2 class="text-center">Generación de Reportes</h2>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label for="reportType">Tipo de Reporte:</label>
+      <select
+        id="reportType"
+        class="form-select"
+        (change)="onReportTypeChange($event)"
+      >
+        <option value="">Seleccione un tipo de reporte</option>
+        <option value="usuarios">Usuarios</option>
+        <option value="equipos">Equipos</option>
+        <option value="mantenimientos">Mantenimientos</option>
+        <option value="obras">Obras</option>
+      </select>
+    </div>
+
+    <!--     <div class="col-md-4 mb-3">
+      <button class="btn btn-primary">Generar Reporte</button>
+    </div> -->
+
+    <div class="col-md-12">
+      <ng-container *ngIf="selectedReportType === 'usuarios'">
+        <app-generacion-reportes-usuarios />
+      </ng-container>
+      <ng-container *ngIf="selectedReportType === 'equipos'">
+        <app-generacion-reportes-equipos />
+      </ng-container>
+      <ng-container *ngIf="selectedReportType === 'mantenimientos'">
+        <app-generacion-reportes-mantenimientos />
+      </ng-container>
+      <ng-container *ngIf="selectedReportType === 'obras'">
+        <app-generacion-reportes-obras />
+      </ng-container>
+    </div>
+  </div>
+</div>

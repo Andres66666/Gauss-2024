@@ -37,6 +37,7 @@ import { RegistrarSolicitudesComponent } from '../MadreSolicitudes/registrar-sol
 import { ListarSolicitudesComponent } from '../MadreSolicitudes/listar-solicitudes/listar-solicitudes.component';
 import { EditarSolicitudesComponent } from '../MadreSolicitudes/editar-solicitudes/editar-solicitudes.component';
 import { ListarEquiposOComponent } from "../MadreEquipo/listar-equipos-o/listar-equipos-o.component";
+import { GeneracionReportesComponent } from "../Reportes/generacion-reportes/generacion-reportes.component";
 
 @Component({
   selector: 'app-index',
@@ -75,7 +76,8 @@ import { ListarEquiposOComponent } from "../MadreEquipo/listar-equipos-o/listar-
     RegistrarSolicitudesComponent,
     ListarSolicitudesComponent,
     EditarSolicitudesComponent,
-    ListarEquiposOComponent
+    ListarEquiposOComponent,
+    GeneracionReportesComponent
 ],
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.css'], // Corrected 'styleUrl' to 'styleUrls'

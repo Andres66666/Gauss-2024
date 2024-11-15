@@ -1,0 +1,95 @@
+<div class="container">
+  <h2 class="text-center">Lista de Usuarios</h2>
+
+  <!-- Search Input -->
+  <label for="">Campos de búsqueda</label><br />
+  <div class="mb-3 d-flex align-items-center">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Ingrese Nombre"
+      [(ngModel)]="searchnombreUsuario"
+      (ngModelChange)="filterUsuarios()"
+    />
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Ingrese Apellido"
+      [(ngModel)]="searchapellido"
+      (ngModelChange)="filterUsuarios()"
+    />
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Ingrese D.P."
+      [(ngModel)]="searchdepartamento"
+      (ngModelChange)="filterUsuarios()"
+    />
+    <input
+      type="date"
+      class="form-control me-2"
+      placeholder="Fecha de Inicio"
+      [(ngModel)]="searchFechaInicio"
+      (ngModelChange)="filterUsuarios()"
+    />
+    <input
+      type="date"
+      class="form-control me-2"
+      placeholder="Fecha de Fin"
+      [(ngModel)]="searchFechaFin"
+      (ngModelChange)="filterUsuarios()"
+    />
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Obra"
+      [(ngModel)]="searchObra"
+      (ngModelChange)="filterUsuarios()"
+    />
+  </div>
+
+  <div class="col-md-4 mb-3">
+    <button class="btn btn-primary" id="btn-generar-pdf" (click)="generarPDF()">
+      Generar Reporte
+    </button>
+  </div>
+  <div id="tabla-usuarios">
+    <div>
+      <h1>Reporte de Usuarios</h1>
+    </div>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th class="text-center">Fecha Creación</th>
+          <th class="text-center">Nombre</th>
+          <th class="text-center">Apellido</th>
+          <th class="text-center">Correo</th>
+          <th class="text-center">Teléfono</th>
+          <th class="text-center">C.I.</th>
+          <th class="text-center">D.P.</th>
+          <th class="text-center">Obra</th>
+          <th class="text-center">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let usuario of filteredUsuarios"
+          [ngClass]="{
+            'table-danger': !usuario.activo,
+            'table-success': usuario.activo
+          }"
+        >
+          <td class="text-start">{{ usuario.fecha_creacion }}</td>
+          <td class="text-start">{{ usuario.nombreUsuario }}</td>
+          <td class="text-start">{{ usuario.apellido }}</td>
+          <td class="text-start">{{ usuario.correo }}</td>
+          <td class="text-start">{{ usuario.telefono }}</td>
+          <td class="text-start">{{ usuario.ci }}</td>
+          <td class="text-start">{{ usuario.departamento }}</td>
+          <td class="text-start">{{ getNombreObra(usuario) }}</td>
+          <td>{{ usuario.activo ? "Activo" : "Inactivo" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -33,6 +33,11 @@ import { RegistrarSolicitudesComponent } from './components/MadreSolicitudes/reg
 import { EditarSolicitudesComponent } from './components/MadreSolicitudes/editar-solicitudes/editar-solicitudes.component';
 import { ListarSolicitudesComponent } from './components/MadreSolicitudes/listar-solicitudes/listar-solicitudes.component';
 import { ListarEquiposOComponent } from './components/MadreEquipo/listar-equipos-o/listar-equipos-o.component';
+import { GeneracionReportesComponent } from './components/Reportes/generacion-reportes/generacion-reportes.component';
+import { GeneracionReportesUsuariosComponent } from './components/Reportes/generacion-reportes-usuarios/generacion-reportes-usuarios.component';
+import { GeneracionReportesEquiposComponent } from './components/Reportes/generacion-reportes-equipos/generacion-reportes-equipos.component';
+import { GeneracionReportesMantenimientosComponent } from './components/Reportes/generacion-reportes-mantenimientos/generacion-reportes-mantenimientos.component';
+import { GeneracionReportesObrasComponent } from './components/Reportes/generacion-reportes-obras/generacion-reportes-obras.component';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   /* { path: '', redirectTo: '/login', pathMatch: 'full' }, */
@@ -84,6 +89,25 @@ export const routes: Routes = [
   { path: 'listar-solicitud', component: ListarSolicitudesComponent },
 
   { path: 'listar-equipo-O', component: ListarEquiposOComponent },
+
+  /* esta es la seccion de reportes  */
+  { path: 'generacion-reportes', component: GeneracionReportesComponent },
+  {
+    path: 'generacion-reportes-usuarios',
+    component: GeneracionReportesUsuariosComponent,
+  },
+  {
+    path: 'generacion-reportes-equipos',
+    component: GeneracionReportesEquiposComponent,
+  },
+  {
+    path: 'generacion-reportes-mantenimientos',
+    component: GeneracionReportesMantenimientosComponent,
+  },
+  {
+    path: 'generacion-reportes-obras',
+    component: GeneracionReportesObrasComponent,
+  },
 
   { path: '**', redirectTo: '' },
 ];
