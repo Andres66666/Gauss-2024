@@ -27,3 +27,11 @@
   align-items: center;
   justify-content: center;
 }
+
+.form-container {
+  background-color: #f8f9fa; /* Fondo claro */
+  padding: 20px;
+  border: 1px solid #dee2e6; /* Borde gris claro */
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}

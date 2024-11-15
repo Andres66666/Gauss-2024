@@ -1,1 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+/* Aplica Montserrat a todo el cuerpo de la página */
+body {
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400; /* Cambia el peso según lo necesario */
+    font-style: normal;
+  }

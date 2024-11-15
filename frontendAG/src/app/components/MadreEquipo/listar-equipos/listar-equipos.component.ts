@@ -18,7 +18,7 @@ export class ListarEquiposComponent implements OnInit {
   searchMarca: string = ''; // Nuevo campo para la marca
 
   page: number = 1;
-  pageSize: number = 3; // cantidad items
+  pageSize: number = 6; // cantidad items
   paginatedEquipo: Equipo[] = [];
   // CAMBIO PAG
   totalPages: number = 1;

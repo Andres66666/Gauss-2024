@@ -18,7 +18,7 @@ export class ListarEquiposOComponent {
   searchMarca: string = ''; // Nuevo campo para la marca
 
   page: number = 1;
-  pageSize: number = 3;
+  pageSize: number = 6;
   paginatedEquipo: Equipo[] = [];
 
   constructor(private equiposService: EquiposService) {}
