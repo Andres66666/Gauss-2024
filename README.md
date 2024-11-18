@@ -165,3 +165,57 @@ ng serve
 
 ## Creacion y configuracion de la base datos
 
+
+
+<table>
+  <tr>
+    <td><h1>Implementacion de PDF</h1></td>
+    <td><img
+        src="https://png.pngtree.com/png-vector/20231116/ourmid/pngtree-pdf-icon-doc-png-image_10541408.png"
+        width="100"
+        height="100"
+        alt="PDF Icon"
+      /></td>
+  </tr>
+</table>
+
+## Instalar jspdf y html2canvas
+```bash
+# Ejecutar el proyecto en el Frontend
+npm install html2canvas --save
+npm install jspdf
+
+```
+
+## implementacion
+
+
+```bash
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+ generarPDF() {
+    const DATA: any = document.getElementById('tabla-detalle-venta');
+    html2canvas(DATA).then(canvas => {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 190; // Ajustar al ancho de la página A4
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 10;
+
+      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      doc.save('DetalleVenta.pdf');
+    });
+  }
+```
+
