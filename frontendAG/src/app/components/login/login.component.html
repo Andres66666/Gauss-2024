@@ -9,18 +9,24 @@
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col col-xl-10">
-        <div class="card" style="border-radius: 1rem; display: flex;">
+        <div class="card" style="border-radius: 1rem; display: flex">
           <div class="row g-0">
             <div class="col-md-6 col-lg-5 d-none d-md-block">
               <img
                 src="https://i.pinimg.com/736x/ee/7f/86/ee7f8649af3509ea64da7d2e5417866e.jpg"
                 alt="login form"
                 class="img-fluid"
-                style="border-radius: 1rem 0 0 1rem; height: 100%; object-fit: cover;"
+                style="
+                  border-radius: 1rem 0 0 1rem;
+                  height: 100%;
+                  object-fit: cover;
+                "
               />
             </div>
-            <div class="col-md-6 col-lg-7 d-flex align-items-center justify-content-center">
-              <div class="card-body p-4 p-lg-5 text-black" style="width: 100%;">
+            <div
+              class="col-md-6 col-lg-7 d-flex align-items-center justify-content-center"
+            >
+              <div class="card-body p-4 p-lg-5 text-black" style="width: 100%">
                 <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
                   <div class="d-flex flex-column align-items-center mb-2 pb-1">
                     <img
@@ -29,7 +35,9 @@
                       class="img-fluid mb-2"
                       style="width: 80px; height: 80px"
                     />
-                    <h5 class="fw-normal mb-3" style="letter-spacing: 1px">Iniciar Sesión</h5>
+                    <h5 class="fw-normal mb-3" style="letter-spacing: 1px">
+                      Iniciar Sesión
+                    </h5>
                   </div>
 
                   <div class="form-outline mb-3">
@@ -100,10 +108,16 @@
                     </button>
                   </div>
 
-                  <p *ngIf="mensaje" class="text-success text-center">{{ mensaje }}</p>
-                  <p *ngIf="error" class="text-danger text-center">{{ error }}</p>
+                  <p *ngIf="mensaje" class="text-success text-center">
+                    {{ mensaje }}
+                  </p>
+                  <p *ngIf="error" class="text-danger text-center">
+                    {{ error }}
+                  </p>
 
-                  <a class="small text-muted" href="#!">¿Olvidaste tu contraseña?</a>
+                  <a class="small text-muted" href="#!"
+                    >¿Olvidaste tu contraseña?</a
+                  >
                 </form>
               </div>
             </div>
