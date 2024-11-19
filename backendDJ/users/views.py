@@ -7,18 +7,19 @@ from django.contrib.auth.hashers import check_password
 
 from .serializers import (
     AlmacenesSerializer,
+    AlmacenGlobalSerializer,
     EquiposSerializer,
     MantenimientosSerializer,
     ObrasSerializer,
     RolPermisoSerializer,
     LoginSerializer,
-    SolicitudesSerializer,
+    UsoSolicitudesEquiposSerializer,
     UsuarioSerializer,
     RolSerializer,
     PermisoSerializer,
     UsuarioRolSerializer,
 )
-from .models import Obras, Almacenes, Equipos, Mantenimientos, Solicitudes, Usuarios, Roles, Permisos, UsuarioRoles, RolPermisos
+from .models import Obras, Almacenes,AlmacenGlobal, Equipos, Mantenimientos, UsoSolicitudesEquipos, Usuarios, Roles, Permisos, UsuarioRoles, RolPermisos
 import boto3
 from botocore.config import Config
 import json
@@ -72,9 +73,32 @@ class LoginView(APIView):
         except Usuarios.DoesNotExist:
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
 
-class AlmacenGlobalViewSet(viewsets.ModelViewSet):
-    queryset = Almacenes.objects.filter(almacen_global=True)
-    serializer_class = AlmacenesSerializer
+class RolViewSet(viewsets.ModelViewSet):
+    queryset = Roles.objects.all()
+    serializer_class = RolSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Verifica si el nombre del rol ya existe
+        nombre_rol = request.data.get('nombreRol')
+        if Roles.objects.filter(nombreRol=nombre_rol).exists():
+            return Response(
+                {'error': 'El nombre del rol ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        # Verifica si el nombre del rol ya existe
+        nombre_rol = request.data.get('nombreRol')
+        if Roles.objects.filter(nombreRol=nombre_rol).exists():
+            return Response(
+                {'error': 'El nombre del rol ya existe en la base de datos.'},
+                status=status.HTTP_409_CONFLICT
+            )
+        # Si no existe, llama al método de creación de la clase base
+        return super().create(request, *args, **kwargs)
+
 
 class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permisos.objects.all()
@@ -101,6 +125,7 @@ class PermisoViewSet(viewsets.ModelViewSet):
             )
         # Si no existe, llama al método de creación de la clase base
         return super().create(request, *args, **kwargs)
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuarios.objects.all()
@@ -197,33 +222,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return image_url
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
-    
 
-class RolViewSet(viewsets.ModelViewSet):
-    queryset = Roles.objects.all()
-    serializer_class = RolSerializer
-
-    def create(self, request, *args, **kwargs):
-        # Verifica si el nombre del rol ya existe
-        nombre_rol = request.data.get('nombreRol')
-        if Roles.objects.filter(nombreRol=nombre_rol).exists():
-            return Response(
-                {'error': 'El nombre del rol ya existe en la base de datos.'},
-                status=status.HTTP_409_CONFLICT
-            )
-        # Si no existe, llama al método de creación de la clase base
-        return super().create(request, *args, **kwargs)
-    
-    def update(self, request, *args, **kwargs):
-        # Verifica si el nombre del rol ya existe
-        nombre_rol = request.data.get('nombreRol')
-        if Roles.objects.filter(nombreRol=nombre_rol).exists():
-            return Response(
-                {'error': 'El nombre del rol ya existe en la base de datos.'},
-                status=status.HTTP_409_CONFLICT
-            )
-        # Si no existe, llama al método de creación de la clase base
-        return super().create(request, *args, **kwargs)
 
 class UsuarioRolViewSet(viewsets.ModelViewSet):
     queryset = UsuarioRoles.objects.all()
@@ -263,7 +262,8 @@ class UsuarioRolViewSet(viewsets.ModelViewSet):
         # Crear la relación usuario-rol
         usuario_rol = UsuarioRoles.objects.create(usuario_id=usuario_id, rol_id=rol_id)
         return Response(UsuarioRolSerializer(usuario_rol).data, status=status.HTTP_201_CREATED)
-    
+
+
 class RolPermisoViewSet(viewsets.ModelViewSet):
     queryset = RolPermisos.objects.all()
     serializer_class = RolPermisoSerializer
@@ -315,6 +315,7 @@ class RolPermisoViewSet(viewsets.ModelViewSet):
         # Enviar una respuesta indicando que la creación fue exitosa
         return Response({'message': 'RolPermisos creados correctamente'}, status=status.HTTP_201_CREATED)
 
+
 class ObrasViewSet(viewsets.ModelViewSet):
     queryset = Obras.objects.all()
     serializer_class = ObrasSerializer
@@ -355,6 +356,8 @@ class ObrasViewSet(viewsets.ModelViewSet):
                     equipo.save()
 
             return Response({'status': 'obra cerrada y equipos devueltos al almacén global'}, status=status.HTTP_200_OK)
+
+
 class AlmacenesViewSet(viewsets.ModelViewSet):
     queryset = Almacenes.objects.all()
     serializer_class = AlmacenesSerializer
@@ -391,6 +394,12 @@ class AlmacenesViewSet(viewsets.ModelViewSet):
         if obra_id is not None:
             return self.queryset.filter(obra__id=obra_id)
         return self.queryset
+
+class AlmacenGlobalViewSet(viewsets.ModelViewSet):
+    queryset = AlmacenGlobal.objects.all()
+    serializer_class = AlmacenGlobalSerializer
+
+
 class EquiposViewSet(viewsets.ModelViewSet):
     queryset = Equipos.objects.all()
     serializer_class = EquiposSerializer
@@ -480,8 +489,6 @@ class EquiposViewSet(viewsets.ModelViewSet):
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
     
 
-        
-        
 class MantenimientosViewSet(viewsets.ModelViewSet):
     queryset = Mantenimientos.objects.all()
     serializer_class = MantenimientosSerializer
@@ -528,19 +535,20 @@ class MantenimientosViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 class SolicitudesViewSet(viewsets.ModelViewSet):
-    queryset = Solicitudes.objects.all()
-    serializer_class = SolicitudesSerializer
+    queryset = UsoSolicitudesEquipos.objects.all()
+    serializer_class = UsoSolicitudesEquiposSerializer  # Cambiado a UsoSolicitudesEquiposSerializer
 
     def update(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        instance.fechaSolicitud = request.data.get('fechaSolicitud', instance.fechaSolicitud)
-        instance.fechaRetornoEstimada = request.data.get('fechaRetornoEstimada', instance.fechaRetornoEstimada)
-        instance.fechaRetornoReal = request.data.get('fechaRetornoReal', instance.fechaRetornoReal)
+
+        # Actualizar los campos utilizando el serializer
+        instance.fecha_solicitud = request.data.get('fecha_solicitud', instance.fecha_solicitud)
+        instance.fecha_retorno_estimada = request.data.get('fecha_retorno_estimada', instance.fecha_retorno_estimada)
+        instance.fecha_retorno_real = request.data.get('fecha_retorno_real', instance.fecha_retorno_real)
         instance.equipo_id = request.data.get('equipo', {}).get('id', instance.equipo_id)
         instance.obra_id = request.data.get('obra', {}).get('id', instance.obra_id)
         instance.usuario_id = request.data.get('usuario', {}).get('id', instance.usuario_id)
@@ -548,9 +556,8 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        fechaSolicitud = request.data.get('fechaSolicitud')
-        fechaRetornoEstimada = request.data.get('fechaRetornoEstimada')
-        #fechaRetornoReal = request.data.get('fechaRetornoReal')
+        fechaSolicitud = request.data.get('fechaSolicitud')  # Cambiado a 'fechaSolicitud'
+        fechaRetornoEstimada = request.data.get('fechaRetornoEstimada')  # Cambiado a 'fechaRetornoEstimada'
         equipo_id = request.data.get('equipo')
         obra_id = request.data.get('obra')
         usuario_id = request.data.get('usuario')
@@ -562,14 +569,12 @@ class SolicitudesViewSet(viewsets.ModelViewSet):
         except (Equipos.DoesNotExist, Obras.DoesNotExist, Usuarios.DoesNotExist):
             return Response({'error': 'Equipo, obra o usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-        solicitud = Solicitudes.objects.create(
-            fechaSolicitud=fechaSolicitud,
-            fechaRetornoEstimada=fechaRetornoEstimada,
-            #fechaRetornoReal=fechaRetornoReal,
+        solicitud = UsoSolicitudesEquipos.objects.create(  # Cambiado a UsoSolicitudesEquipos
+            fecha_solicitud=fechaSolicitud,  # Cambiado a 'fecha_solicitud'
+            fecha_retorno_estimada=fechaRetornoEstimada,  # Cambiado a 'fecha_retorno_estimada'
             equipo=equipo,
             obra=obra,
             usuario=usuario
         )
 
-        return Response(SolicitudesSerializer(solicitud).data, status=status.HTTP_201_CREATED)
-    
+        return Response(UsoSolicitudesEquiposSerializer(solicitud).data, status=status.HTTP_201_CREATED)
