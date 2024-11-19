@@ -226,6 +226,6 @@ class HistorialTraspasosEquipos(models.Model):
     def __str__(self):
         return f'Traspaso de {self.equipo} de {self.almacen_origen} a {self.almacen_destino} el {self.fecha_traspaso}'
 
-class Mierda(models.Model):
+class porffas(models.Model):
     equipoM = models.ForeignKey(Equipos, on_delete=models.CASCADE)
     obra_origenM = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_origen')
