@@ -219,3 +219,7 @@ import html2canvas from 'html2canvas';
   }
 ```
 
+este comando es es para actualizar los cambios de git 
+git pull
+
+
