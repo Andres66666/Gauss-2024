@@ -17,6 +17,7 @@ export interface Equipo {
   numFallasReportdas: number; // Número de fallas reportadas
   almacen: Almacen; // Relación con el almacén específico
   almacen_global?: AlmacenGlobal; // Relación opcional con el almacén global
+  almacen1_global?: AlmacenGlobal; // Relación opcional con el almacén global
 }
 
 export interface Almacen {
