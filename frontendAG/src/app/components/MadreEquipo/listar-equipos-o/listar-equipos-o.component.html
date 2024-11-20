@@ -31,7 +31,7 @@
         <div *ngFor="let equipo of filteredEquipo()" class="col-md-4 mb-3">
           <div
             class="card"
-            [ngClass]="getColorByEstado(equipo.estadoUsoEquipo)"
+            [ngClass]="getColorByEstado(equipo.estadoDisponibilidad)"
             style="height: 400px"
           >
             <div
@@ -46,16 +46,18 @@
                 style="width: 100px; height: 100px"
               />
               <p class="card-text text-start">
-                <strong>Marca:</strong> {{ equipo.marca }}<br />
-                <strong>Modelo:</strong> {{ equipo.modelo }}<br />
-                <strong>Estado:</strong> {{ equipo.estadoUsoEquipo }}<br />
-                <strong>Vida Útil:</strong> {{ equipo.vidaUtil }}<br />
+                <strong>Marca:</strong> {{ equipo.marcaEquipo }}<br />
+                <strong>Modelo:</strong> {{ equipo.modeloEquipo }}<br />
+                <strong>Estado:</strong> {{ equipo.estadoDisponibilidad }}<br />
+                <strong>Vida Útil:</strong> {{ equipo.vidaUtilEquipo }}<br />
                 <strong>Fecha de Adquisición:</strong>
                 {{ equipo.fechaAdquiscion | date : "dd/MM/yyyy" }}<br />
                 <strong>Obra:</strong> {{ equipo.almacen.obra.nombreObra
                 }}<br />
                 <strong>Almacén:</strong> {{ equipo.almacen.nombreAlmacen
                 }}<br />
+                <strong>Horas de Uso:</strong> {{ equipo.horasUso }}<br />
+                <strong>Edad del Equipo:</strong> {{ equipo.edadEquipo }}<br />
               </p>
             </div>
           </div>

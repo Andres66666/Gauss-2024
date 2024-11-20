@@ -14,35 +14,38 @@ import { Almacen } from '../models/almacen';
 export class ListarAlmacenComponent implements OnInit {
   almacenes: Almacen[] = [];
   searchTerm: string = '';
-
+  // Variables de paginación
   page: number = 1;
-  pageSize: number = 5;
-  paginateAlmacen: Almacen[] = [];
+  pageSize: number = 10;
 
-  @Output() editar = new EventEmitter<number>();
-  @Output() registrarAlmacen = new EventEmitter<number>(); // Emit an event when editing
+  @Output() editarAlmacenes = new EventEmitter<number>(); // Emit an event when editing
+  @Output() registrarAlmacen = new EventEmitter<void>(); // Emit an event when registering
 
   constructor(private almacenService: AlmacenService) {}
 
   ngOnInit(): void {
-    this.getAlmacen();
+    this.getAlmacenes();
   }
-  getAlmacen() {
+
+  getAlmacenes(): void {
     this.almacenService.getAlmacen().subscribe((data) => {
       this.almacenes = data;
-      this.updatePaginatedAlmacenes();
-      console.log(data);
+      console.log('Almacenes:', this.almacenes); // Verifica que los datos se reciban correctamente
     });
   }
+
   editarAlmacen(id: number) {
-    this.editar.emit(id); // Emit the ID of the user to be edited
+    this.editarAlmacenes.emit(id);
   }
+
   registrarAlmacenes() {
-    this.registrarAlmacen.emit();
-    this.getAlmacen(); // Refresh the list after registration
+    this.registrarAlmacen.emit(); // Emit an event to register a new almacen
   }
-  filteredAlmacen(): Almacen[] {
+
+  // Método para filtrar y paginar resultados
+  filteredAlmacenes(): Almacen[] {
     let filtered = this.almacenes;
+
     if (this.searchTerm) {
       filtered = this.almacenes.filter(
         (almacen) =>
@@ -54,47 +57,46 @@ export class ListarAlmacenComponent implements OnInit {
             .includes(this.searchTerm.toLowerCase())
       );
     }
+
     return filtered.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
-    ); // Mostramos solo la página actual
+    );
   }
-  // Métodos de paginación
-  updatePaginatedAlmacenes() {
-    const start = (this.page - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.paginateAlmacen = this.almacenes.slice(start, end);
-  }
+
+  // Método para actualizar la paginación
   nextPage() {
     this.page++;
-    this.updatePaginatedAlmacenes();
   }
 
   previousPage() {
     if (this.page > 1) {
       this.page--;
-      this.updatePaginatedAlmacenes();
     }
   }
 
-  togglePermisoActivo(almacen: Almacen) {
-    // Invertir el estado de 'activo' del permiso
-    almacen.estadoAlmacen = !almacen.estadoAlmacen;
+  toggleAlmacenActivo(almacen: Almacen) {
+    // Invertir el estado de 'activo' del almacen
+    const nuevoEstado = !almacen.estadoAlmacen;
 
-    // Llamar a un servicio que actualice el estado del permiso en el servidor
+    // Llamar a un servicio que actualice el estado del almacen en el servidor
     this.almacenService
       .editarAlmacen(almacen.id, {
         ...almacen,
-        estadoAlmacen: almacen.estadoAlmacen,
+        estadoAlmacen: nuevoEstado,
       })
       .subscribe(
         (response) => {
           console.log(
-            `Almacen ${almacen.nombreAlmacen} actualizado exitosamente.`
+            `Almacen ${almacen.nombreAlmacen} actualizado exitosamente.`,
+            response
           );
+          // Actualizar el estado local del almacen
+          almacen.estadoAlmacen = nuevoEstado;
         },
         (error) => {
           console.error('Error al actualizar el estado del almacen:', error);
+          // Aquí podrías mostrar un mensaje al usuario si es necesario
         }
       );
   }

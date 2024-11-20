@@ -12,7 +12,7 @@ from .views import (
     MantenimientosViewSet,
     SolicitudesViewSet,
     LoginView,
-    AlmacenGlobalViewSet,
+    
 )
 from . import views
 
@@ -28,7 +28,6 @@ router.register(r'almacen',  AlmacenesViewSet)
 router.register(r'equipo',  EquiposViewSet)
 router.register(r'mantenimiento',  MantenimientosViewSet)
 router.register(r'solicitud',  SolicitudesViewSet)
-router.register(r'almacen-global', AlmacenGlobalViewSet, basename='almacen-global')  # Ruta para el almacén global
 
 urlpatterns = [
     path('', include(router.urls)),

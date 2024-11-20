@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import (
     Roles,
     Permisos,
-    AlmacenGlobal,
     Obras,
     Almacenes,
     Equipos,
@@ -24,11 +23,6 @@ class PermisoSerializer(serializers.ModelSerializer):
         model = Permisos
         fields = '__all__'
 
-class AlmacenGlobalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AlmacenGlobal
-        fields = '__all__'
-
 class ObrasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Obras
@@ -43,8 +37,6 @@ class AlmacenesSerializer(serializers.ModelSerializer):
 
 class EquiposSerializer(serializers.ModelSerializer):
     almacen = AlmacenesSerializer(read_only=True)
-    almacen_global = serializers.PrimaryKeyRelatedField(queryset=AlmacenGlobal.objects.all(), required=False)
-
     class Meta:
         model = Equipos
         fields = '__all__'

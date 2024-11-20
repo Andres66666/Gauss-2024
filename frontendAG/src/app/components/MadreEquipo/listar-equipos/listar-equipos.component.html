@@ -34,7 +34,7 @@
         <div *ngFor="let equipo of filteredEquipo()" class="col-md-4 mb-3">
           <div
             class="card"
-            [ngClass]="getColorByEstado(equipo.estadoUsoEquipo)"
+            [ngClass]="getColorByEstado(equipo.estadoDisponibilidad)"
             style="height: 400px"
           >
             <div
@@ -49,10 +49,10 @@
                 style="width: 100px; height: 100px"
               />
               <p class="card-text text-start">
-                <strong>Marca:</strong> {{ equipo.marca }}<br />
-                <strong>Modelo:</strong> {{ equipo.modelo }}<br />
-                <strong>Estado:</strong> {{ equipo.estadoUsoEquipo }}<br />
-                <strong>Vida Útil:</strong> {{ equipo.vidaUtil }}<br />
+                <strong>Marca:</strong> {{ equipo.marcaEquipo }}<br />
+                <strong>Modelo:</strong> {{ equipo.modeloEquipo }}<br />
+                <strong>Estado:</strong> {{ equipo.estadoDisponibilidad }}<br />
+                <strong>Vida Útil:</strong> {{ equipo.vidaUtilEquipo }}<br />
                 <strong>Fecha de Adquisición:</strong>
                 {{ equipo.fechaAdquiscion | date : "dd/MM/yyyy" }}<br />
                 <strong>Obra:</strong> {{ equipo.almacen.obra.nombreObra
@@ -82,7 +82,6 @@
     >
       Anterior
     </button>
-    <!--   // CAMBIO PAG -->
     <span>Página {{ page }} de {{ totalPages }}</span>
     <button
       class="btn btn-secondary"

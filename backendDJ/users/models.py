@@ -32,22 +32,8 @@ class Obras(models.Model):
         self.save()
 
         almacenes = Almacenes.objects.filter(obra=self)
-        almacen_global = AlmacenGlobal.objects.first()  # Suponiendo que solo hay uno
-        if not almacen_global:
-            raise ValueError("No existe un Almacén Global definido.")
-        
         for almacen in almacenes:
-            equipos = Equipos.objects.filter(almacen=almacen)
-            for equipo in equipos:
-                HistorialTraspasosEquipos.objects.create(
-                    equipo=equipo,
-                    obra_origen=self,
-                    obra_destino=None,
-                    almacen_origen=almacen,
-                    almacen_destino=almacen_global,
-                )
-                equipo.almacen = almacen_global
-                equipo.save()
+            almacen.cerrar_almacen()
     
 class Almacenes(models.Model):
     nombreAlmacen = models.CharField(max_length=50)
@@ -58,21 +44,13 @@ class Almacenes(models.Model):
         self.estadoAlmacen = False
         self.save()
 
-        almacen_global = AlmacenGlobal.objects.first()  # Suponiendo que solo hay uno
         equipos = Equipos.objects.filter(almacen=self)
         for equipo in equipos:
-            equipo.almacen = almacen_global
+            equipo.estadoDisponibilidad = "no disponible"  # Ajustar estado según las reglas de negocio
             equipo.save()
 
     def __str__(self):
         return self.nombreAlmacen
-    
-class AlmacenGlobal(models.Model):
-    nombreAlmacen = models.CharField(max_length=50, default="Almacén Global")
-    estadoAlmacen = models.BooleanField(default=True)  # Indica si el almacén está activo
-
-    def __str__(self):
-        return self.nombreAlmacen  
 
 class Usuarios(models.Model):
     nombreUsuario = models.CharField(max_length=50)
@@ -94,7 +72,6 @@ class Usuarios(models.Model):
 
     def __str__(self):
         return self.nombreUsuario
-
 
 class UsuarioRoles(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
@@ -132,7 +109,6 @@ class Equipos(models.Model):
     numFallasReportdas = models.PositiveIntegerField(default=0)
 
     almacen = models.ForeignKey(Almacenes, on_delete=models.CASCADE) 
-    almacen_global = models.ForeignKey(AlmacenGlobal, on_delete=models.SET_NULL, null=True, blank=True)  # Almacén global   
     def __str__(self):
         return self.nombreEquipo
     
@@ -213,19 +189,13 @@ class UsoSolicitudesEquipos(models.Model):
                 self.equipo.save()
         super().save(*args, **kwargs)
 
-
 class HistorialTraspasosEquipos(models.Model):
     equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE)
-    obra_origen = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_origen')
-    obra_destino = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_destino', null=True, blank=True )
+    obra_origen = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_origen', null=True, blank=True)
+    obra_destino = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_destino', null=True, blank=True)
     almacen_origen = models.ForeignKey(Almacenes, related_name='almacen_origen', on_delete=models.CASCADE)
     almacen_destino = models.ForeignKey(Almacenes, related_name='almacen_destino', on_delete=models.CASCADE)
     fecha_traspaso = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
         return f'Traspaso de {self.equipo} de {self.almacen_origen} a {self.almacen_destino} el {self.fecha_traspaso}'
-
-class porffas(models.Model):
-    equipoM = models.ForeignKey(Equipos, on_delete=models.CASCADE)
-    obra_origenM = models.ForeignKey(Obras, on_delete=models.CASCADE, related_name='traspasos_origen')

@@ -1,6 +1,18 @@
 <div class="container" style="padding-bottom: 50px">
   <h2>Registrar Equipo</h2>
   <form [formGroup]="registrarForm" (ngSubmit)="registrarEquipos()">
+    <!-- Campo para código del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="codigoEquipo">Código:</label>
+      <input
+        id="codigoEquipo"
+        type="text"
+        class="form-control"
+        formControlName="codigoEquipo"
+        placeholder="Ingrese el código del equipo"
+      />
+    </div>
+
     <!-- Campo para nombre del equipo -->
     <div class="form-group d-flex flex-column align-items-start">
       <label for="nombreEquipo">Nombre:</label>
@@ -15,35 +27,35 @@
 
     <!-- Campo para marca del equipo -->
     <div class="form-group d-flex flex-column align-items-start">
-      <label for="marca">Marca:</label>
+      <label for="marcaEquipo">Marca:</label>
       <input
-        id="marca"
+        id="marcaEquipo"
         type="text"
         class="form-control"
-        formControlName="marca"
+        formControlName="marcaEquipo"
         placeholder="Ingrese la marca del equipo"
       />
     </div>
 
     <!-- Campo para modelo del equipo -->
     <div class="form-group d-flex flex-column align-items-start">
-      <label for="modelo">Modelo:</label>
+      <label for="modeloEquipo">Modelo:</label>
       <input
-        id="modelo"
+        id="modeloEquipo"
         type="text"
         class="form-control"
-        formControlName="modelo"
+        formControlName="modeloEquipo"
         placeholder="Ingrese el modelo del equipo"
       />
     </div>
 
-    <!-- Campo para estado de uso del equipo -->
+    <!-- Campo para estado de disponibilidad del equipo -->
     <div class="form-group d-flex flex-column align-items-start">
-      <label for="estadoUsoEquipo">Estado de Uso:</label>
+      <label for="estadoDisponibilidad">Estado de Disponibilidad:</label>
       <select
-        id="estadoUsoEquipo"
+        id="estadoDisponibilidad"
         class="form-control"
-        formControlName="estadoUsoEquipo"
+        formControlName="estadoDisponibilidad"
       >
         <option value="" disabled selected>-- Seleccione un estado --</option>
         <option value="Disponible">Disponible</option>
@@ -54,12 +66,12 @@
 
     <!-- Campo para vida útil del equipo -->
     <div class="form-group d-flex flex-column align-items-start">
-      <label for="vidaUtil">Vida Útil:</label>
+      <label for="vidaUtilEquipo">Vida Útil:</label>
       <input
-        id="vidaUtil"
+        id="vidaUtilEquipo"
         type="text"
         class="form-control"
-        formControlName="vidaUtil"
+        formControlName="vidaUtilEquipo"
         placeholder="Ingrese la vida útil del equipo"
       />
     </div>
@@ -72,9 +84,33 @@
         type="date"
         class="form-control"
         formControlName="fechaAdquiscion"
-        placeholder="Ingrese la fecha de adquisición del equipo"
       />
     </div>
+
+    <!-- Campo para horas de uso del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="horasUso">Horas de Uso:</label>
+      <input
+        id="horasUso"
+        type="number"
+        class="form-control"
+        formControlName="horasUso"
+        placeholder="Ingrese las horas de uso del equipo"
+      />
+    </div>
+
+    <!-- Campo para edad del equipo -->
+    <div class="form-group d-flex flex-column align-items-start">
+      <label for="edadEquipo">Edad del Equipo:</label>
+      <input
+        id="edadEquipo"
+        type="text"
+        class="form-control"
+        formControlName="edadEquipo"
+        placeholder="Ingrese la edad del equipo"
+      />
+    </div>
+
     <!-- Selección de obra -->
     <div class="form-group d-flex flex-column align-items-start">
       <label for="obra">Obra:</label>
@@ -115,6 +151,7 @@
         />
       </div>
     </div>
+
     <!-- Botón de registro -->
     <button
       type="submit"
@@ -150,7 +187,6 @@
         />
         <div class="flex-grow-1 text-center">
           <p style="margin: 0">{{ mensajeModal }}</p>
-          <!-- Elimina el margen del párrafo -->
         </div>
       </div>
       <div class="modal-footer">
@@ -186,7 +222,6 @@
         />
         <div class="flex-grow-1 text-center">
           <p style="margin: 0">{{ errorModal }}</p>
-          <!-- Elimina el margen del párrafo -->
         </div>
       </div>
       <div class="modal-footer">

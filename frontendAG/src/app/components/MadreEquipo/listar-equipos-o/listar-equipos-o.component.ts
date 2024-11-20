@@ -9,29 +9,32 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './listar-equipos-o.component.html',
-  styleUrl: './listar-equipos-o.component.css',
+  styleUrls: ['./listar-equipos-o.component.css'],
 })
 export class ListarEquiposOComponent {
   equipos: Equipo[] = [];
-  searchNombre: string = ''; // Nuevo campo para el nombre
-  searchModelo: string = ''; // Nuevo campo para el modelo
-  searchMarca: string = ''; // Nuevo campo para la marca
+  searchNombre: string = ''; // Campo para buscar por nombre
+  searchModelo: string = ''; // Campo para buscar por modelo
+  searchMarca: string = ''; // Campo para buscar por marca
 
-  page: number = 1;
-  pageSize: number = 6;
-  paginatedEquipo: Equipo[] = [];
+  page: number = 1; // Página actual
+  pageSize: number = 6; // Tamaño de la página
+  paginatedEquipo: Equipo[] = []; // Equipos paginados
 
   constructor(private equiposService: EquiposService) {}
+
   ngOnInit(): void {
     this.getEquipo();
   }
+
   getEquipo() {
     this.equiposService.getEquipo().subscribe((data) => {
-      console.log(data); // Verifica que los datos del almacen estén llegando correctamente
-      this.updatePaginatedEquipo();
+      console.log(data); // Verifica que los datos del equipo estén llegando correctamente
       this.equipos = data;
+      this.updatePaginatedEquipo(); // Actualiza la paginación después de obtener los datos
     });
   }
+
   filteredEquipo(): Equipo[] {
     let filtered = this.equipos;
 
@@ -45,12 +48,16 @@ export class ListarEquiposOComponent {
     }
     if (this.searchModelo) {
       filtered = filtered.filter((equipo) =>
-        equipo.modelo.toLowerCase().includes(this.searchModelo.toLowerCase())
+        equipo.modeloEquipo
+          .toLowerCase()
+          .includes(this.searchModelo.toLowerCase())
       );
     }
     if (this.searchMarca) {
       filtered = filtered.filter((equipo) =>
-        equipo.marca.toLowerCase().includes(this.searchMarca.toLowerCase())
+        equipo.marcaEquipo
+          .toLowerCase()
+          .includes(this.searchMarca.toLowerCase())
       );
     }
 
@@ -78,6 +85,7 @@ export class ListarEquiposOComponent {
       this.updatePaginatedEquipo();
     }
   }
+
   getColorByEstado(estado: string): string {
     switch (estado) {
       case 'Disponible':

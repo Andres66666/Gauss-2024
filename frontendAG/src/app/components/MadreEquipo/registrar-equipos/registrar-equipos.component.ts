@@ -30,20 +30,23 @@ export class RegistrarEquiposComponent implements OnInit {
   constructor(private fb: FormBuilder, private equiposService: EquiposService) {
     // Inicializar el formulario con los controles necesarios
     this.registrarForm = this.fb.group({
+      codigoEquipo: ['', Validators.required],
       nombreEquipo: ['', Validators.required],
-      marca: ['', Validators.required],
-      modelo: ['', Validators.required],
-      estadoUsoEquipo: ['', Validators.required],
-      vidaUtil: ['', Validators.required],
+      marcaEquipo: ['', Validators.required],
+      modeloEquipo: ['', Validators.required],
+      estadoDisponibilidad: ['', Validators.required],
+      vidaUtilEquipo: ['', Validators.required],
       fechaAdquiscion: ['', Validators.required],
-      obra: [''], // Añadimos el campo para seleccionar la obra
-      almacen: [''],
+      horasUso: [0, [Validators.required, Validators.min(0)]],
+      edadEquipo: ['', Validators.required],
+      almacen: ['', Validators.required],
+      almacen_global: [''], // Nuevo campo para el almacén global (opcional)
+      cantMantCorrectivos: [0, Validators.min(0)], // Nuevo campo
+      numFallasReportdas: [0, Validators.min(0)], // Nuevo campo
       imagenEquipos: [''],
     });
   }
-
   ngOnInit(): void {
-    // this.loadAlmacenes(); // Cargar almacenes al iniciar el componente
     this.loadObras(); // Cargar las obras al iniciar el componente
   }
 
@@ -52,18 +55,20 @@ export class RegistrarEquiposComponent implements OnInit {
       this.almacenes = data;
     });
   }
+
   loadObras() {
     this.equiposService.getObras().subscribe((data) => {
       this.obras = data; // Asignar la lista de obras
     });
   }
+
   onObraChange(event: Event) {
     const obraId = (event.target as HTMLSelectElement).value;
-    const obraIdNumber = Number(obraId); // Ensure it's a number
+    const obraIdNumber = Number(obraId); // Asegurarse de que sea un número
 
     this.equiposService.getAlmacenesPorObra(obraIdNumber).subscribe(
       (almacenes) => {
-        this.almacenes = almacenes; // Update the list of warehouses
+        this.almacenes = almacenes; // Actualizar la lista de almacenes
       },
       (error) => {
         console.error('Error al cargar los almacenes:', error);
@@ -76,21 +81,63 @@ export class RegistrarEquiposComponent implements OnInit {
 
     // Añadir cada campo del formulario al formData
     formData.append(
+      'codigoEquipo',
+      this.registrarForm.get('codigoEquipo')?.value
+    );
+    formData.append(
       'nombreEquipo',
       this.registrarForm.get('nombreEquipo')?.value
     );
-    formData.append('marca', this.registrarForm.get('marca')?.value);
-    formData.append('modelo', this.registrarForm.get('modelo')?.value);
     formData.append(
-      'estadoUsoEquipo',
-      this.registrarForm.get('estadoUsoEquipo')?.value
+      'marcaEquipo',
+      this.registrarForm.get('marcaEquipo')?.value
     );
-    formData.append('vidaUtil', this.registrarForm.get('vidaUtil')?.value);
+    formData.append(
+      'modeloEquipo',
+      this.registrarForm.get('modeloEquipo')?.value
+    );
+    formData.append(
+      'estadoDisponibilidad',
+      this.registrarForm.get('estadoDisponibilidad')?.value
+    );
+    formData.append(
+      'vidaUtilEquipo',
+      this.registrarForm.get('vidaUtilEquipo')?.value
+    );
     formData.append(
       'fechaAdquiscion',
       this.registrarForm.get('fechaAdquiscion')?.value
     );
-    formData.append('almacen', this.registrarForm.get('almacen')?.value);
+    formData.append(
+      'horasUso',
+      this.registrarForm.get('horasUso')?.value.toString()
+    ); // Convertir a string
+    formData.append('edadEquipo', this.registrarForm.get('edadEquipo')?.value);
+
+    // Asegúrate de que el almacén esté seleccionado
+    const almacenId = this.registrarForm.get('almacen')?.value;
+    if (!almacenId) {
+      this.errorModal = 'Por favor, seleccione un almacén.';
+      this.manejarModal = true;
+      return; // Detener la ejecución si no hay almacén seleccionado
+    }
+    formData.append('almacen', almacenId);
+
+    // Asegúrate de que el almacén global esté seleccionado si aplica
+    const almacenGlobalId = this.registrarForm.get('almacen_global')?.value;
+    if (almacenGlobalId) {
+      formData.append('almacen_global', almacenGlobalId);
+    }
+
+    // Campos adicionales
+    formData.append(
+      'cantMantCorrectivos',
+      this.registrarForm.get('cantMantCorrectivos')?.value || '0'
+    ); // Default 0
+    formData.append(
+      'numFallasReportdas',
+      this.registrarForm.get('numFallasReportdas')?.value || '0'
+    ); // Default 0
 
     formData.append(
       'imagenEquipos',
@@ -104,6 +151,7 @@ export class RegistrarEquiposComponent implements OnInit {
         (response) => {
           this.mensajeModal = 'Equipo registrado exitosamente';
           this.manejarModal = true;
+          this.registrarForm.reset(); // Opcional: Reiniciar el formulario después de un registro exitoso
         },
         (error) => {
           this.errorModal = 'Error al registrar el equipo';
@@ -111,9 +159,10 @@ export class RegistrarEquiposComponent implements OnInit {
         }
       );
   }
+
   manejarOk() {
     this.manejarModal = false; // Cerrar el modal
-    this.listarEquipo.emit(); // Emitir el evento para listar usuarios
+    this.listarEquipo.emit(); // Emitir el evento para listar equipos
   }
 
   imagenPreview: string | ArrayBuffer | null = null;

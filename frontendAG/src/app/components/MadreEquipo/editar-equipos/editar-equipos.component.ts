@@ -56,7 +56,7 @@ export class EditarEquiposComponent implements OnInit {
       next: (data) => {
         this.equipo = data;
         this.initializeForm();
-        this.imagenPreview = this.equipo.imagenEquipos_url; // Mostrar imagen antigua
+        // Mostrar imagen antigua
       },
     });
   }
@@ -67,13 +67,16 @@ export class EditarEquiposComponent implements OnInit {
         this.equipo.nombreEquipo,
         Validators.required
       ),
-      marca: new FormControl(this.equipo.marca, Validators.required),
-      modelo: new FormControl(this.equipo.modelo, Validators.required),
+      marca: new FormControl(this.equipo.marcaEquipo, Validators.required),
+      modelo: new FormControl(this.equipo.modeloEquipo, Validators.required),
       estadoUsoEquipo: new FormControl(
-        this.equipo.estadoUsoEquipo,
+        this.equipo.estadoDisponibilidad,
         Validators.required
       ),
-      vidaUtil: new FormControl(this.equipo.vidaUtil, Validators.required),
+      vidaUtil: new FormControl(
+        this.equipo.vidaUtilEquipo,
+        Validators.required
+      ),
       fechaAdquiscion: new FormControl(
         this.equipo.fechaAdquiscion,
         Validators.required

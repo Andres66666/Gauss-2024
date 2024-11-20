@@ -7,7 +7,6 @@ from django.contrib.auth.hashers import check_password
 
 from .serializers import (
     AlmacenesSerializer,
-    AlmacenGlobalSerializer,
     EquiposSerializer,
     MantenimientosSerializer,
     ObrasSerializer,
@@ -19,7 +18,7 @@ from .serializers import (
     PermisoSerializer,
     UsuarioRolSerializer,
 )
-from .models import Obras, Almacenes,AlmacenGlobal, Equipos, Mantenimientos, UsoSolicitudesEquipos, Usuarios, Roles, Permisos, UsuarioRoles, RolPermisos
+from .models import Obras, Almacenes, Equipos, Mantenimientos, UsoSolicitudesEquipos, Usuarios, Roles, Permisos, UsuarioRoles, RolPermisos
 import boto3
 from botocore.config import Config
 import json
@@ -99,7 +98,6 @@ class RolViewSet(viewsets.ModelViewSet):
         # Si no existe, llama al método de creación de la clase base
         return super().create(request, *args, **kwargs)
 
-
 class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permisos.objects.all()
     serializer_class = PermisoSerializer
@@ -115,16 +113,21 @@ class PermisoViewSet(viewsets.ModelViewSet):
         # Si no existe, llama al método de creación de la clase base
         return super().create(request, *args, **kwargs)
     
+
     def update(self, request, *args, **kwargs):
-        # Verifica si el nombre del permiso ya existe
+        # Obtener el permiso que se está actualizando
+        permiso = self.get_object()
+        
+        # Verifica si el nombre del permiso está siendo cambiado
         nombre_permiso = request.data.get('nombre')
-        if Permisos.objects.filter(nombre=nombre_permiso).exists():
+        if nombre_permiso and Permisos.objects.filter(nombre=nombre_permiso).exclude(id=permiso.id).exists():
             return Response(
                 {'error': 'El nombre del permiso ya existe en la base de datos.'},
                 status=status.HTTP_409_CONFLICT
             )
-        # Si no existe, llama al método de creación de la clase base
-        return super().create(request, *args, **kwargs)
+        
+        # Si no hay conflictos, llama al método de actualización de la clase base
+        return super().update(request, *args, **kwargs)
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -362,117 +365,104 @@ class AlmacenesViewSet(viewsets.ModelViewSet):
     queryset = Almacenes.objects.all()
     serializer_class = AlmacenesSerializer
 
-    def update(self, request, pk=None):
-        instance = self.get_object()  # Obtener el usuario actual por su ID (pk)
-        # Serializar los datos proporcionados por la solicitud
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)  # Validar datos
 
-        # Realizar la actualización
-        self.perform_update(serializer)
-        # En caso de actualizar campos específicos (usuario_id, rol_id), no es necesario si es un usuario normal
-        instance.nombreAlmacen = request.data.get('nombreAlmacen', instance.nombreAlmacen)
-        instance.obra_id = request.data.get('obra', {}).get('id', instance.obra_id)
-
-        # Guardar cambios
-        instance.save()
-
-        return Response(serializer.data)
-    
     def create(self, request, *args, **kwargs):
         nombreAlmacen = request.data.get('nombreAlmacen')
         obra_id = request.data.get('obra')
-        
-        # Aquí puedes realizar validaciones o lógica adicional si es necesario
+
+        # Validar que se proporcionen los campos requeridos
+        if not nombreAlmacen or not obra_id:
+            return Response(
+                {"error": "nombreAlmacen y obra son campos requeridos."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Crear el nuevo almacén
         almacen = Almacenes.objects.create(
             nombreAlmacen=nombreAlmacen,
             obra_id=obra_id
         )
         return Response(AlmacenesSerializer(almacen).data, status=status.HTTP_201_CREATED)
-    def get_queryset(self):
-        obra_id = self.request.query_params.get('obra', None)
-        if obra_id is not None:
-            return self.queryset.filter(obra__id=obra_id)
-        return self.queryset
+    def update(self, request, pk=None):
+        instance = self.get_object()  # Obtener el almacén actual por su ID (pk)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)  # Validar datos
 
-class AlmacenGlobalViewSet(viewsets.ModelViewSet):
-    queryset = AlmacenGlobal.objects.all()
-    serializer_class = AlmacenGlobalSerializer
+        # Actualizar campos específicos
+        instance.nombreAlmacen = serializer.validated_data.get('nombreAlmacen', instance.nombreAlmacen)
+        obra_id = serializer.validated_data.get('obra', {}).get('id')
+        if obra_id is not None:
+            instance.obra_id = obra_id
+
+        # Actualizar el estado del almacén
+        estado_almacen = serializer.validated_data.get('estadoAlmacen')
+        if estado_almacen is not None:
+            instance.estadoAlmacen = estado_almacen
+
+        # Guardar cambios
+        instance.save()
+        return Response(serializer.data)
 
 
 class EquiposViewSet(viewsets.ModelViewSet):
     queryset = Equipos.objects.all()
     serializer_class = EquiposSerializer
-
-    def update(self, request, pk=None):
-        instance = self.get_object()
-        old_image_url = instance.imagenEquipos_url
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        # Actualizar la imagen si se proporciona una nueva
-        if 'imagenEquipos' in request.FILES:
-            file = request.FILES['imagenEquipos']
-            s3_url = self.upload_image_to_s4(file)
-            instance.imagenEquipos_url = s3_url 
-
-        # Actualizar los campos restantes, usando los valores actuales si no se proporcionan nuevos
-        instance.nombreEquipo = request.data.get('nombreEquipo', instance.nombreEquipo)
-        instance.marca = request.data.get('marca', instance.marca)
-        instance.modelo = request.data.get('modelo', instance.modelo)
-        instance.estadoEquipo = request.data.get('estadoEquipo', instance.estadoEquipo)== 'true'
-        instance.estadoUsoEquipo = request.data.get('estadoUsoEquipo', instance.estadoUsoEquipo)
-        instance.vidaUtil = request.data.get('vidaUtil', instance.vidaUtil)
-        instance.fechaAdquiscion = request.data.get('fechaAdquiscion', instance.fechaAdquiscion)
-
-        # Manejo del campo almacen
-        almacen_data = request.data.get('almacen')
-        if isinstance(almacen_data, str):
-            almacen_data = json.loads(almacen_data)
-
-        # Asignar almacen_id de manera segura
-        if isinstance(almacen_data, dict) and 'id' in almacen_data:
-            instance.almacen_id = almacen_data['id']
-        elif almacen_data:
-            instance.almacen_id = almacen_data
-
-        # Guardar la instancia actualizada
-        instance.save()
-
-        # Retornar la imagen antigua junto con los datos actualizados
-        response_data = serializer.data
-        response_data['old_image_url'] = old_image_url
-
-        return Response(response_data, status=status.HTTP_200_OK)
     # Método para crear un equipo
     def create(self, request, *args, **kwargs):
-        nombreEquipo = request.data.get('nombreEquipo')
-        marca = request.data.get('marca')
-        modelo = request.data.get('modelo')
-        estadoUsoEquipo = request.data.get('estadoUsoEquipo')
-        vidaUtil = request.data.get('vidaUtil')
-        fechaAdquiscion = request.data.get('fechaAdquiscion')
-        almacen_id = request.data.get('almacen')
+        # Obtener datos del cuerpo de la solicitud
+        data = request.data
+
+        # Validar campos requeridos
+        required_fields = [
+            'codigoEquipo', 'nombreEquipo', 'marcaEquipo', 'modeloEquipo',
+            'estadoEquipo', 'estadoDisponibilidad', 'vidaUtilEquipo',
+            'fechaAdquiscion', 'fechaFabricacion', 'almacen'
+        ]
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return Response(
+                {"error": f"Campos faltantes: {', '.join(missing_fields)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Manejo de datos adicionales con valores predeterminados
+        horasUso = data.get('horasUso', 0)
+        edadEquipo = data.get('edadEquipo', None)
 
         # Subir la imagen a S3 si se proporciona
         imagenEquipos_url = None
         if 'imagenEquipos' in request.FILES:
             file = request.FILES['imagenEquipos']
-            imagenEquipos_url = self.upload_image_to_s4(file)
+            try:
+                imagenEquipos_url = self.upload_image_to_s3(file)
+            except Exception as e:
+                return Response(
+                    {"error": f"Error al subir la imagen: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
-        # Crear el equipo
-        equipo = Equipos.objects.create(
-            nombreEquipo=nombreEquipo,
-            marca=marca,
-            modelo=modelo,
-            estadoUsoEquipo=estadoUsoEquipo,
-            vidaUtil=vidaUtil,
-            fechaAdquiscion=fechaAdquiscion,
-            almacen_id=almacen_id,
-            imagenEquipos_url=imagenEquipos_url
-        )
-        
-        return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
+        # Crear el equipo en la base de datos
+        try:
+            equipo = Equipos.objects.create(
+                codigoEquipo=data['codigoEquipo'],
+                nombreEquipo=data['nombreEquipo'],
+                marcaEquipo=data['marcaEquipo'],
+                modeloEquipo=data['modeloEquipo'],
+                estadoEquipo=data['estadoEquipo'],
+                estadoDisponibilidad=data['estadoDisponibilidad'],
+                vidaUtilEquipo=data['vidaUtilEquipo'],
+                fechaAdquiscion=data['fechaAdquiscion'],
+                fechaFabricacion=data['fechaFabricacion'],
+                horasUso=horasUso,
+                edadEquipo=edadEquipo,
+                almacen_id=data['almacen'],  # almacen_id es necesario para establecer la relación
+                imagenEquipos_url=imagenEquipos_url
+            )
+            return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {"error": f"Error al crear el equipo: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def upload_image_to_s4(self, file):
         s3_client = boto3.client('s3',

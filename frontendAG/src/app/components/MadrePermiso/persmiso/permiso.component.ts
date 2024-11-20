@@ -83,17 +83,23 @@ export class PermisoComponent implements OnInit {
   }
   togglePermisoActivo(permiso: Permiso) {
     // Invertir el estado de 'activo' del permiso
-    permiso.activo = !permiso.activo;
+    const nuevoEstado = !permiso.activo;
 
     // Llamar a un servicio que actualice el estado del permiso en el servidor
     this.permisoService
-      .editarPermiso(permiso.id, { ...permiso, activo: permiso.activo })
+      .editarPermiso(permiso.id, { ...permiso, activo: nuevoEstado })
       .subscribe(
         (response) => {
-          console.log(`Permiso ${permiso.nombre} actualizado exitosamente.`);
+          console.log(
+            `Permiso ${permiso.nombre} actualizado exitosamente.`,
+            response
+          );
+          // Actualizar el estado local del permiso
+          permiso.activo = nuevoEstado;
         },
         (error) => {
           console.error('Error al actualizar el estado del permiso:', error);
+          // Aquí podrías mostrar un mensaje al usuario si es necesario
         }
       );
   }

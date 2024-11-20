@@ -1,6 +1,6 @@
 import { Almacen, Obra } from './../models/almacen';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -16,11 +16,15 @@ import { AlmacenService } from '../service/almacen.service';
   templateUrl: './editar-almacen.component.html',
   styleUrl: './editar-almacen.component.css',
 })
-export class EditarAlmacenComponent {
-  almacenes!: Almacen;
+export class EditarAlmacenComponent implements OnInit {
+  almacen: Almacen = {
+    id: 0,
+    nombreAlmacen: '',
+    estadoAlmacen: true,
+    obra: { id: 0, nombreObra: '', estadoObra: true, ubicacionObra: '' },
+  };
   obras: Obra[] = [];
   form!: FormGroup;
-
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
@@ -35,9 +39,10 @@ export class EditarAlmacenComponent {
     if (this.almacenId !== null) {
       this.loadAlmacenData(this.almacenId);
     } else {
-      console.error('usuarioId is null or undefined');
+      console.error('almacenId is null or undefined');
     }
   }
+
   loadObras(): void {
     this.almacenService.getObras().subscribe({
       next: (obra) => {
@@ -45,11 +50,15 @@ export class EditarAlmacenComponent {
       },
     });
   }
+
   loadAlmacenData(id: number) {
     this.almacenService.getAlmacenById(id).subscribe({
       next: (data) => {
-        this.almacenes = data;
-        this.initializeForm();
+        this.almacen = data;
+        this.initializeForm(); // Inicializa el formulario después de cargar los datos
+      },
+      error: (error) => {
+        console.error('Error al cargar el almacén:', error);
       },
     });
   }
@@ -57,42 +66,54 @@ export class EditarAlmacenComponent {
   initializeForm() {
     this.form = new FormGroup({
       nombreAlmacen: new FormControl(
-        this.almacenes.nombreAlmacen,
+        this.almacen.nombreAlmacen,
         Validators.required
       ),
-      estadoAlmacen: new FormControl(this.almacenes.estadoAlmacen),
-      obra: new FormControl(this.almacenes.obra.id, Validators.required),
+      estadoAlmacen: new FormControl(this.almacen.estadoAlmacen),
+      obra: new FormControl(this.almacen.obra.id, Validators.required),
     });
   }
-  onSubmit(): void {
-    if (this.form.valid) {
-      const updatedAlmacen: Almacen = {
-        id: this.almacenes.id,
-        nombreAlmacen: this.form.value.nombreAlmacen,
-        estadoAlmacen: this.form.value.estadoAlmacen,
-        obra: {
-          id: this.form.value.obra,
-          nombreObra: this.almacenes.obra.nombreObra,
-          estadoObra: this.almacenes.obra.estadoObra,
-          ubicacionObra: this.almacenes.obra.ubicacionObra,
-        },
-      };
-      this.almacenService
-        .editarAlmacen(this.almacenes.id, updatedAlmacen)
-        .subscribe({
-          next: () => {
-            this.mensajeModal = 'Almacen actualizado con éxito';
-            this.manejarModal = true;
-          },
-          error: (err) => {
-            this.errorModal = 'Error al actualizar el Almacen';
-            this.manejarModal = true;
-          },
-        });
+
+  submit() {
+    if (this.form.invalid) {
+      return;
     }
+
+    const updatedAlmacen: Almacen = {
+      id: this.almacen.id,
+      nombreAlmacen: this.form.value.nombreAlmacen,
+      estadoAlmacen: this.form.value.estadoAlmacen,
+      obra: {
+        id: this.form.value.obra,
+        nombreObra:
+          this.obras.find((obra) => obra.id === this.form.value.obra)
+            ?.nombreObra || '', // Obtener el nombre de la obra
+        estadoObra:
+          this.obras.find((obra) => obra.id === this.form.value.obra)
+            ?.estadoObra || true, // Obtener el estado de la obra
+        ubicacionObra:
+          this.obras.find((obra) => obra.id === this.form.value.obra)
+            ?.ubicacionObra || '', // Obtener la ubicación de la obra
+      },
+    };
+
+    this.almacenService
+      .editarAlmacen(this.almacen.id, updatedAlmacen)
+      .subscribe({
+        next: () => {
+          this.mensajeModal = 'Almacén actualizado con éxito';
+          this.manejarModal = true;
+          this.listarAlmacenEditado.emit(); // Emitir evento para refrescar la lista
+        },
+        error: (error) => {
+          this.errorModal = 'Error al actualizar el Almacén';
+          this.manejarModal = true;
+        },
+      });
   }
+
   manejarOk() {
-    this.manejarModal = false;
-    this.listarAlmacenEditado.emit();
+    this.manejarModal = false; // Cerrar el modal
+    this.listarAlmacenEditado.emit(); // Emitir el evento para listar almacenes
   }
 }

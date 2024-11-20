@@ -45,7 +45,10 @@ export class EditarPermisoComponent implements OnInit {
     this.permisoService.getPermisoById(id).subscribe({
       next: (data) => {
         this.permiso = data;
-        this.initializerFrom();
+        this.initializerFrom(); // Inicializa el formulario después de cargar los datos
+      },
+      error: (error) => {
+        console.error('Error al cargar el permiso:', error);
       },
     });
   }
@@ -70,13 +73,10 @@ export class EditarPermisoComponent implements OnInit {
           console.log(data);
           this.mensajeModal = 'Permiso actualizado con éxito';
           this.manejarModal = true;
+          this.listarPermisoEditado.emit(); // Emitir evento para refrescar la lista
         },
         error: (error) => {
-          if (error.message.includes('ya existe')) {
-            this.errorModal = 'Error al editar: \n' + error.message; // Mensaje de duplicado
-          } else {
-            this.errorModal = 'Error al registrar el permiso';
-          }
+          this.errorModal = error.message; // Mostrar el mensaje de error
           this.manejarModal = true;
         },
       });
