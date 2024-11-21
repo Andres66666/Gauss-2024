@@ -49,36 +49,21 @@ class LoginView(APIView):
             if not usuario.activo:
                 return Response({'error': 'No puedes iniciar sesión!!!. Comuníquese con el administrador. Gracias.'}, status=status.HTTP_403_FORBIDDEN)
             
-<<<<<<< HEAD
-            # Get all roles associated with the user
-=======
             # Obtener todos los roles asociados con el usuario
->>>>>>> 1a053b18599138371ead399f66ab2689b8e74233
             usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
             if not usuario_roles:
                 return Response({'error': 'El usuario no tiene roles asignados.'}, status=status.HTTP_403_FORBIDDEN)
 
-<<<<<<< HEAD
-            # Check if all roles are deactivated
-=======
             # Verificar si todos los roles están desactivados
->>>>>>> 1a053b18599138371ead399f66ab2689b8e74233
             active_roles = [usuario_rol.rol for usuario_rol in usuario_roles if usuario_rol.rol.activo]
             if not active_roles:
                 return Response({'error': 'El rol asignado al usuario está desactivado. No puedes iniciar sesión.'}, status=status.HTTP_403_FORBIDDEN)
 
-<<<<<<< HEAD
-=======
             # Verificar la contraseña
->>>>>>> 1a053b18599138371ead399f66ab2689b8e74233
             if check_password(password, usuario.password):
                 # Generación del token JWT
                 refresh = RefreshToken.for_user(usuario)
-<<<<<<< HEAD
-                #return Response({'token': usuario.token}, status=status.HTTP_200_OK)
-=======
                 access_token = str(refresh.access_token)
->>>>>>> 1a053b18599138371ead399f66ab2689b8e74233
 
                 # Obtener nombres de roles activos del usuario
                 roles = [rol.nombreRol for rol in active_roles]
