@@ -1,108 +1,117 @@
 <div class="container" style="padding-bottom: 50px">
   <h2>Registrar Usuario</h2>
   <div class="form-container">
-    <div class="d-flex align-items-center justify-content-between">
-      <form [formGroup]="registrarForm" (ngSubmit)="registrarUsuario()">
-        <!-- Campo para nombre del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="nombreUsuario">Nombre:</label>
-          <input
-            id="nombreUsuario"
-            type="text"
-            class="form-control"
-            formControlName="nombreUsuario"
-            placeholder="Ingrese el nombre del usuario"
-            (keypress)="validateText($event)"
-            required
-          />
+    <form [formGroup]="registrarForm" (ngSubmit)="registrarUsuario()">
+      <div class="row">
+        <!-- Imagen -->
+        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
           <div
-            *ngIf="
-              registrarForm.get('nombreUsuario')?.invalid &&
-              registrarForm.get('nombreUsuario')?.touched
-            "
-            class="text-danger"
+            class="upload-box"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+            (click)="triggerFileInput()"
           >
-            <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['required']">
-              El nombre es obligatorio.
+            <input
+              id="imagen"
+              type="file"
+              class="d-none"
+              (change)="onFileChange($event)"
+              #fileInput
+            />
+            <ng-container *ngIf="imagenPreview; else placeholder">
+              <img
+                [src]="imagenPreview"
+                alt="Imagen previa"
+                class="img-preview"
+              />
+            </ng-container>
+            <ng-template #placeholder>
+              <div class="placeholder-content">
+                <i class="fa fa-upload upload-icon"></i>
+                <p class="placeholder-text">Foto Usuario</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Nombre y Apellido -->
+        <div class="col-12 col-md-9">
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label for="nombreUsuario">Nombre</label>
+              <input
+                id="nombreUsuario"
+                type="text"
+                class="form-control"
+                formControlName="nombreUsuario"
+                placeholder="Ingrese el nombre del usuario"
+                (keypress)="validateText($event)"
+                required
+              />
+              <div
+                *ngIf="
+                  registrarForm.get('nombreUsuario')?.invalid &&
+                  registrarForm.get('nombreUsuario')?.touched
+                "
+                class="text-danger"
+              >
+                <div
+                  *ngIf="
+                    registrarForm.get('nombreUsuario')?.errors?.['required']
+                  "
+                >
+                  El nombre es obligatorio.
+                </div>
+                <div
+                  *ngIf="
+                    registrarForm.get('nombreUsuario')?.errors?.['pattern']
+                  "
+                >
+                  Solo se permiten letras en el nombre.
+                </div>
+              </div>
             </div>
-            <div *ngIf="registrarForm.get('nombreUsuario')?.errors?.['pattern']">
-              Solo se permiten letras en el nombre.
+
+            <div class="col-12">
+              <label for="apellido">Apellido</label>
+              <input
+                id="apellido"
+                type="text"
+                class="form-control"
+                formControlName="apellido"
+                placeholder="Ingrese el apellido"
+                (keypress)="validateText($event)"
+                required
+              />
+              <div
+                *ngIf="
+                  registrarForm.get('apellido')?.invalid &&
+                  registrarForm.get('apellido')?.touched
+                "
+                class="text-danger"
+              >
+                <div
+                  *ngIf="
+                    registrarForm.get('apellido')?.errors?.['required']
+                  "
+                >
+                  El apellido es obligatorio.
+                </div>
+                <div
+                  *ngIf="
+                    registrarForm.get('apellido')?.errors?.['pattern']
+                  "
+                >
+                  Solo se permiten letras en el apellido.
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Campo para apellido del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="apellido">Apellido:</label>
-          <input
-            id="apellido"
-            type="text"
-            class="form-control"
-            formControlName="apellido"
-            placeholder="Ingrese el apellido"
-            (keypress)="validateText($event)"
-            required
-          />
-          <div
-            *ngIf="
-              registrarForm.get('apellido')?.invalid &&
-              registrarForm.get('apellido')?.touched
-            "
-            class="text-danger"
-          >
-            <div *ngIf="registrarForm.get('apellido')?.errors?.['required']">
-              El apellido es obligatorio.
-            </div>
-            <div *ngIf="registrarForm.get('apellido')?.errors?.['pattern']">
-              Solo se permiten letras en el apellido.
-            </div>
-          </div>
-        </div>
-
-        <!-- Campo para teléfono del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="telefono">Teléfono:</label>
-          <input
-            id="telefono"
-            type="text"
-            class="form-control"
-            formControlName="telefono"
-            placeholder="Ingrese el número de teléfono"
-            (keypress)="validateTelefono($event)"
-            required
-          />
-          <div
-            *ngIf="
-              registrarForm.get('telefono')?.errors?.['required'] &&
-              registrarForm.get('telefono')?.touched
-            "
-            class="text-danger"
-          >
-            El teléfono es obligatorio.
-          </div>
-          <div
-            *ngIf="
-              registrarForm.get('telefono')?.errors?.['pattern'] &&
-              registrarForm.get('telefono')?.touched
-            "
-            class="text-danger"
-          >
-            El teléfono debe comenzar con 6 o 7.
-          </div>
-          <div
-            *ngIf="
-              registrarForm.get('telefono')?.value.length !== 8 &&
-              registrarForm.get('telefono')?.touched
-            "
-            class="text-danger"
-          >
-            El teléfono debe tener exactamente 8 dígitos.
-          </div>
-        </div>
-
-        <!-- Campo para correo del usuario (opcional) -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="correo">Correo:</label>
+        <!-- Correo -->
+        <div class="col-12 mb-3">
+          <label for="correo">Correo</label>
           <input
             id="correo"
             type="email"
@@ -130,90 +139,36 @@
           </div>
         </div>
 
-        <!-- Campo para contraseña del usuario (opcional) -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="password">Contraseña:</label>
-          <div class="input-group">
-            <input
-              id="password"
-              [type]="isPasswordVisible ? 'text' : 'password'"
-              class="form-control"
-              formControlName="password"
-              placeholder="Ingrese una contraseña: Ejemplo/123"
-              (keypress)="validatePassword($event)"
-            />
-            <div class="input-group-append">
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                (click)="togglePasswordVisibility()"
-              >
-                <i
-                  class="fa"
-                  [ngClass]="isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'"
-                ></i>
-              </button>
-            </div>
-          </div>
-          <div
-            *ngIf="
-              registrarForm.get('password')?.errors?.['required'] &&
-              registrarForm.get('password')?.touched
-            "
-            class="text-danger"
-          >
-            La contraseña es obligatoria.
-          </div>
-          <div
-            *ngIf="
-              registrarForm.get('password')?.errors?.['minlength'] &&
-              registrarForm.get('password')?.touched
-            "
-            class="text-danger"
-          >
-            La contraseña debe tener al menos 8 caracteres.
-          </div>
-          <div
-            *ngIf="
-              registrarForm.get('password')?.errors?.['pattern'] &&
-              registrarForm.get('password')?.touched
-            "
-            class="text-danger"
-          >
-            La contraseña debe contener al menos una letra mayúscula, una letra
-            minúscula, un número y un carácter especial.
-          </div>
-        </div>
-
-        <!-- Contenedor para CI y Departamento -->
-        <div class="d-flex justify-content-between">
-          <div class="form-group me-3">
-            <label for="ci">Cédula de Identidad (CI):</label>
-            <div class="d-flex align-items-center">
+        <!-- CI y Extensión -->
+        <div class="col-12 mb-3">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="ci">Cédula de Identidad (CI)</label>
               <input
                 id="ci"
                 type="text"
-                class="form-control me-2"
+                class="form-control"
                 formControlName="ci"
                 placeholder="Ej: 12345678"
                 (keypress)="validateCI($event)"
                 required
               />
               <div
-                *ngIf="registrarForm.get('ci')?.errors?.['required'] && registrarForm.get('ci')?.touched"
+                *ngIf="
+                  registrarForm.get('ci')?.errors?.['required'] &&
+                  registrarForm.get('ci')?.touched
+                "
                 class="text-danger"
               >
-                Ingrese CI
+                Ingrese CI.
               </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="departamento">Departamento:</label>
-            <div class="d-flex align-items-center">
+            <div class="col-md-6">
+              <label for="departamento">Ext.</label>
               <select
                 id="departamento"
-                class="form-control me-2"
+                class="form-control"
                 formControlName="departamento"
                 required
               >
@@ -226,18 +181,120 @@
                 </option>
               </select>
               <div
-                *ngIf="registrarForm.get('departamento')?.errors?.['required'] && registrarForm.get('departamento')?.touched"
+                *ngIf="
+                  registrarForm.get('departamento')?.errors?.['required'] &&
+                  registrarForm.get('departamento')?.touched
+                "
                 class="text-danger"
               >
-                Departamento es obligatorio
+                Seleccione un departamento.
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Campo para seleccionar una obra -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="obra">Seleccione una obra:</label>
+        <!-- Teléfono y Contraseña -->
+        <div class="col-12 mb-3">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="telefono">Teléfono</label>
+              <input
+                id="telefono"
+                type="text"
+                class="form-control"
+                formControlName="telefono"
+                placeholder="Ingrese el número de teléfono"
+                (keypress)="validateTelefono($event)"
+                required
+              />
+              <div
+                *ngIf="
+                  registrarForm.get('telefono')?.errors?.['required'] &&
+                  registrarForm.get('telefono')?.touched
+                "
+                class="text-danger"
+              >
+                El teléfono es obligatorio.
+              </div>
+              <div
+                *ngIf="
+                  registrarForm.get('telefono')?.errors?.['pattern'] &&
+                  registrarForm.get('telefono')?.touched
+                "
+                class="text-danger"
+              >
+                El teléfono debe comenzar con 6 o 7.
+              </div>
+              <div
+                *ngIf="
+                  registrarForm.get('telefono')?.value.length !== 8 &&
+                  registrarForm.get('telefono')?.touched
+                "
+                class="text-danger"
+              >
+                El teléfono debe tener exactamente 8 dígitos.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="password">Contraseña</label>
+              <div class="input-group">
+                <input
+                  id="password"
+                  [type]="isPasswordVisible ? 'text' : 'password'"
+                  class="form-control"
+                  formControlName="password"
+                  placeholder="Ingrese una contraseña: Ejemplo/123"
+                  (keypress)="validatePassword($event)"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    <i
+                      class="fa"
+                      [ngClass]="isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+              <div
+                *ngIf="
+                  registrarForm.get('password')?.errors?.['required'] &&
+                  registrarForm.get('password')?.touched
+                "
+                class="text-danger"
+              >
+                La contraseña es obligatoria.
+              </div>
+              <div
+                *ngIf="
+                  registrarForm.get('password')?.errors?.['minlength'] &&
+                  registrarForm.get('password')?.touched
+                "
+                class="text-danger"
+              >
+                La contraseña debe tener al menos 8 caracteres.
+              </div>
+              <div
+                *ngIf="
+                  registrarForm.get('password')?.errors?.['pattern'] &&
+                  registrarForm.get('password')?.touched
+                "
+                class="text-danger"
+              >
+                La contraseña debe contener al menos una letra mayúscula, una letra
+                minúscula, un número y un carácter especial.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selección de Obra -->
+        <div class="col-12 mb-3">
+          <label for="obra">Seleccione una obra</label>
           <select id="obra" class="form-control" formControlName="obra">
             <option value="" disabled selected>-- Seleccione una obra --</option>
             <option *ngFor="let obra of obras" [value]="obra.id">
@@ -251,50 +308,33 @@
             "
             class="text-danger"
           >
-            Seleccionar una obra es obligatorio.
+            Seleccione una obra.
           </div>
         </div>
 
-        <!-- Campo para cargar una imagen -->
-        <div class="mb-3 d-flex flex-column align-items-start">
-          <label for="imagen">Cargar Imagen:</label>
-          <input
-            id="imagen"
-            type="file"
-            class="form-control"
-            (change)="onFileChange($event)"
-          />
+        <!-- Botón de Registro -->
+        <div class="col-12">
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            [disabled]="!registrarForm.valid"
+          >
+            Registrar Usuario
+          </button>
         </div>
-
-        <!-- Botón de registro -->
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="!registrarForm.valid"
-        >
-          Registrar Usuario
-        </button>
-      </form>
-
-      <div *ngIf="imagenPreview" class="mt-2 ms-3">
-        <img
-          [src]="imagenPreview"
-          alt="Imagen previa"
-          class="img-thumbnail"
-          width="400"
-        />
       </div>
-    </div>
-
-    <!-- Mensaje de alerta -->
-    <div
-      *ngIf="mensaje"
-      class="alert"
-      [ngClass]="{ 'alert-success': esExito, 'alert-danger': !esExito }"
-    >
-      {{ mensaje }}
-    </div>
+    </form>
   </div>
+
+  <!-- Mensaje de alerta -->
+  <div
+    *ngIf="mensaje"
+    class="alert"
+    [ngClass]="{ 'alert-success': esExito, 'alert-danger': !esExito }"
+  >
+    {{ mensaje }}
+  </div>
+</div>
 
   <!-- Modal de Éxito -->
   <div
@@ -303,7 +343,7 @@
     role="dialog"
     *ngIf="manejarModal && !errorModal"
     style="display: block"
-  >
+    >
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -363,4 +403,6 @@
       </div>
     </div>
   </div>
-</div>
+
+
+

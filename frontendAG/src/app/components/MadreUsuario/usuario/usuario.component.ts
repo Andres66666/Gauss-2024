@@ -25,6 +25,9 @@ export class UsuarioComponent implements OnInit {
   pageSize: number = 6;
   paginatedUsuario: Usuario[] = [];
 
+  sortKey: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   @Output() editar = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrar = new EventEmitter<number>(); // Emit an event when editing
 
@@ -140,4 +143,55 @@ export class UsuarioComponent implements OnInit {
       ? usuario.obra.nombreObra
       : 'Sin asignar';
   }
+
+  sortTable(column: string) {
+    if (this.sortKey === column) {
+      // Toggle sort direction if already sorting by this column
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Otherwise, start sorting by this column
+      this.sortKey = column;
+      this.sortDirection = 'asc';
+    }
+  }
+  
+  getSortIcon(column: string): string {
+    if (this.sortKey === column) {
+      return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    }
+    return 'fas fa-sort';
+  }
+  
+  sortedUsuarios(): Usuario[] {
+    if (!this.sortKey) {
+      return this.filteredUsuarios();
+    }
+    return [...this.filteredUsuarios()].sort((a, b) => {
+      // Ensure TypeScript knows sortKey is a key of Usuario
+      const key = this.sortKey as keyof Usuario;
+  
+      let valA = a[key];
+      let valB = b[key];
+  
+      // Handle null or undefined values
+      if (valA === null || valA === undefined) valA = '';
+      if (valB === null || valB === undefined) valB = '';
+  
+      // If values are numbers, compare numerically
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+      }
+  
+      // Convert values to strings for string comparison
+      valA = String(valA).toLowerCase();
+      valB = String(valB).toLowerCase();
+  
+      // String comparison
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  
+
 }

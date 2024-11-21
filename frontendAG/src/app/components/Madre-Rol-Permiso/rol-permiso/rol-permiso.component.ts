@@ -32,7 +32,7 @@ export class RolPermisoComponent implements OnInit {
 
   // Variables de paginación
   page: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 7;
   paginatedPermisos: Permiso[] = [];
 
   @Output() editar = new EventEmitter<number>();

@@ -84,9 +84,9 @@ export class RegistrarUsuarioComponent {
         '',
         [
           Validators.required,
-          Validators.pattern('[0-9]{8,9}'),
-          Validators.minLength(8),
-          Validators.maxLength(9),
+          Validators.pattern('[0-9]{7,8}'),
+          Validators.minLength(7),
+          Validators.maxLength(8),
         ],
       ],
       departamento: ['', Validators.required], // Agregar este control
@@ -130,24 +130,12 @@ export class RegistrarUsuarioComponent {
       formData.append('activo', 'true'); // Por defecto activo
 
       // Si se seleccionó una imagen, añadirla a formData
+      // Check if an image is uploaded
       const imagenInput = this.registrarForm.get('imagen')?.value;
       if (imagenInput) {
-        // Validar el tamaño de la imagen
-        if (imagenInput.size > 1024 * 1024 * 5) {
-          // 5MB
-          this.mensaje = 'La imagen es demasiado grande. Debe ser menor a 5MB';
-          this.esExito = false;
-          return;
-        }
-
-        // Validar el tipo de archivo
-        if (!['image/jpeg', 'image/png'].includes(imagenInput.type)) {
-          this.mensaje = 'Solo se permiten archivos de tipo JPEG, PNG';
-          this.esExito = false;
-          return;
-        }
-        formData.append('imagen', imagenInput);
-      }
+          // Validate and add uploaded image
+          formData.append('imagen', imagenInput);
+      } 
 
       // Validar si el correo electrónico y el nombre de usuario ya existen
       this.usuarioService.getUsuarios().subscribe((usuarios) => {
@@ -200,17 +188,20 @@ export class RegistrarUsuarioComponent {
   // Manejar la selección de archivo
   onFileChange(event: any): void {
     if (event.target.files.length > 0) {
-      const file = event.target.files[0];
-      this.registrarForm.patchValue({
-        imagen: file,
-      });
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagenPreview = reader.result;
-      };
-      reader.readAsDataURL(file);
+        const file = event.target.files[0];
+        this.registrarForm.patchValue({
+            imagen: file,
+        });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.imagenPreview = reader.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Use default image for preview
+        this.imagenPreview = 'https://localimg.s3.us-east-2.amazonaws.com/imagenes/pph.png';
     }
-  }
+}
   /* validaciones  */
   validateText(event: KeyboardEvent) {
     const inputChar = String.fromCharCode(event.keyCode);
@@ -256,4 +247,27 @@ export class RegistrarUsuarioComponent {
       event.preventDefault(); // Evitar que se ingrese más de 9 caracteres
     }
   }
+  
+  triggerFileInput() {
+    const fileInput = document.querySelector('#imagen') as HTMLInputElement;
+    fileInput.click();
+  }
+  
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+  
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    const file = event.dataTransfer?.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagenPreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  
+
 }

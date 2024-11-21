@@ -16,7 +16,7 @@ export class ListarAlmacenComponent implements OnInit {
   searchTerm: string = '';
   // Variables de paginación
   page: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 7;
 
   @Output() editarAlmacenes = new EventEmitter<number>(); // Emit an event when editing
   @Output() registrarAlmacen = new EventEmitter<void>(); // Emit an event when registering

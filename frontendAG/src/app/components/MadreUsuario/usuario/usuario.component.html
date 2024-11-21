@@ -1,97 +1,153 @@
 <div class="container">
-  <h2 class="text-center">Lista de Usuarios</h2>
-
+  <h2 class="text-left" style="padding-bottom: 20px;">Lista de Usuarios</h2>
   <!-- Search Input -->
-  <label for="">Campos de busqueda</label><br />
-  <div class="mb-3 d-flex align-items-center">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Ingrese Nombre"
-      [(ngModel)]="searchnombreUsuario"
-    />
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Ingrese Apellido"
-      [(ngModel)]="searchapellido"
-    />
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Ingrese Correo"
-      [(ngModel)]="searchcorreo"
-    />
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Ingrese C.I."
-      [(ngModel)]="searchci"
-    />
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Ingrese D.P."
-      [(ngModel)]="searchdepartamento"
-    />
-    <button class="btn btn-success ms-2" (click)="registrarUsuario()">
-      Registrar
-    </button>
+  <div class="mb-3 d-flex align-items-center gap-2">
+    <!-- Campo Nombre -->
+    <div class="search-field flex-grow-1">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="por Nombre"
+        [(ngModel)]="searchnombreUsuario"
+      />
+    </div>
+  
+    <!-- Campo Apellido -->
+    <div class="search-field">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="por Apellido"
+        [(ngModel)]="searchapellido"
+      />
+    </div>
+  
+    <!-- Campo Correo -->
+    <div class="search-field">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="por Correo"
+        [(ngModel)]="searchcorreo"
+      />
+    </div>
+  
+    <!-- Campo C.I. -->
+    <div class="search-field">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="por C.I."
+        [(ngModel)]="searchci"
+      />
+    </div>
+  
+    <!-- Campo D.P. -->
+    <div class="search-field">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="por D.P."
+        [(ngModel)]="searchdepartamento"
+      />
+    </div>
+  
+    <!-- Botón Registrar -->
+    <div>
+      <button class="btn btn-success px-3 py-2" (click)="registrarUsuario()">
+        + Usuario
+      </button>
+    </div>
   </div>
-
+  
+  <!-- Table -->
   <table class="table table-striped table-bordered">
-    <thead>
+    <thead class="custom-header">
       <tr>
-        <th class="text-center">Foto de Perfil</th>
-        <th class="text-center">Nombre</th>
-        <th class="text-center">Apellido</th>
-        <th class="text-center">Correo</th>
-        <th class="text-center">Telefono</th>
-        <th class="text-center">C.I.</th>
-        <th class="text-center">D.P.</th>
-        <th class="text-center">Obra</th>
-        <th class="text-center">Estado</th>
+        <th class="text-center">
+          Usuario
+        </th>
+        <th class="text-center" (click)="sortTable('correo')">
+          Correo
+          <i [class]="getSortIcon('correo')"></i>
+        </th>
+        <th class="text-center" (click)="sortTable('telefono')">
+          Teléfono
+          <i [class]="getSortIcon('telefono')"></i>
+        </th>
+        <th class="text-center" (click)="sortTable('ci')">
+          C.I.
+          <i [class]="getSortIcon('ci')"></i>
+        </th>
+        <th class="text-center" (click)="sortTable('departamento')">
+          D.P.
+          <i [class]="getSortIcon('departamento')"></i>
+        </th>
+        <th class="text-center" (click)="sortTable('obra')">
+          Obra
+          <i [class]="getSortIcon('obra')"></i>
+        </th>
+        <th class="text-center" (click)="sortTable('estado')">
+          Estado
+          <i [class]="getSortIcon('estado')"></i>
+        </th>
         <th class="text-center">Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let usuario of filteredUsuarios()"
-        [ngClass]="{
-          'table-danger': !usuario.activo,
-          'table-success': usuario.activo
-        }"
-      >
-        <td class="text-start">
-          <img
-            *ngIf="usuario.imagen_url"
-            [src]="usuario.imagen_url"
-            alt="Foto de Perfil"
-            class="img-redonda"
-          />
+      <tr *ngFor="let usuario of sortedUsuarios()">
+        <td class="text-center">
+          <div class="d-flex justify-content-center align-items-center gap-2">
+            <!-- Foto de Perfil -->
+            <img
+              *ngIf="usuario.imagen_url"
+              [src]="usuario.imagen_url"
+              alt="Foto de Perfil"
+              class="img-redonda"
+            />
+            <!-- Nombre y Apellido -->
+            <span class="bold-text">{{ usuario.nombreUsuario }}</span>
+            <span>{{ usuario.apellido }}</span>
+          </div>
         </td>
-        <td class="text-start">{{ usuario.nombreUsuario }}</td>
-        <td class="text-start">{{ usuario.apellido }}</td>
-        <td class="text-start">{{ usuario.correo }}</td>
-        <td class="text-start">{{ usuario.telefono }}</td>
-        <td class="text-start">{{ usuario.ci }}</td>
-        <td class="text-start">{{ usuario.departamento }}</td>
-
-        <td class="text-start">
+        <td class="text-center align-middle">{{ usuario.correo }}</td>
+        <td class="text-center align-middle">{{ usuario.telefono }}</td>
+        <td class="text-right align-middle">{{ usuario.ci }}</td>
+        <td class="text-center align-middle">{{ usuario.departamento }}</td>
+        <td class="text-center align-middle">
           {{ getNombreObra(usuario) }}
         </td>
-        <td>{{ usuario.activo ? "Activo" : "Inactivo" }}</td>
-        <td>
-          <button class="btn btn-primary" (click)="editarUsuario(usuario.id)">
-            Editar
-          </button>
-          <button
-            class="btn"
-            [ngClass]="usuario.activo ? 'btn-danger' : 'btn-success'"
-            (click)="toggleUsuarioActivo(usuario)"
+        <td class="text-center align-middle">
+          <span
+            class="estado-box"
+            [ngClass]="{
+              'activo': usuario.activo,
+              'inactivo': !usuario.activo
+            }"
           >
-            {{ usuario.activo ? "Desactivar" : "Activar" }}
-          </button>
+            {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td class="text-center align-middle">
+          <div class="d-flex gap-3 justify-content-center">
+            <!-- Edit Icon -->
+            <i
+              class="fas fa-edit text-primary clickable-icon"
+              (click)="editarUsuario(usuario.id)"
+              title="Editar"
+            ></i>
+            <!-- Activate/Deactivate Icon -->
+            <i
+              [class]="'fas clickable-icon ' + (usuario.activo ? 'fa-user-times text-danger' : 'fa-user-check text-success')"
+              (click)="toggleUsuarioActivo(usuario)"
+              [title]="usuario.activo ? 'Desactivar' : 'Activar'"
+            ></i>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -103,7 +159,7 @@
       (click)="previousPage()"
       [disabled]="page === 1"
     >
-      Anterior
+      &lt; <!-- Symbol for less than (<) -->
     </button>
     <span>Página {{ page }}</span>
     <button
@@ -111,7 +167,7 @@
       (click)="nextPage()"
       [disabled]="page * pageSize >= usuarios.length"
     >
-      Siguiente
+      &gt; <!-- Symbol for greater than (>) -->
     </button>
   </div>
 </div>

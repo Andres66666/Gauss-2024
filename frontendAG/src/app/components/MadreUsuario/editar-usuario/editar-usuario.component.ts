@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { UsuarioService } from '../services/usuario.service';
 import { Obra, Usuario } from '../models/usuario';
 import { CommonModule } from '@angular/common';
@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+
 @Component({
   selector: 'app-editar-usuario',
   standalone: true,
@@ -20,7 +21,6 @@ import { debounceTime } from 'rxjs/operators';
 export class EditarUsuarioComponent implements OnInit {
   usuario!: Usuario;
   obra: Obra[] = [];
-
   form!: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
@@ -50,7 +50,11 @@ export class EditarUsuarioComponent implements OnInit {
     'BE',
     'PD',
   ];
+
   private ciSubject = new Subject<string>();
+
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef; // Referencia al input de archivo
+
   constructor(private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
@@ -100,9 +104,9 @@ export class EditarUsuarioComponent implements OnInit {
 
       ci: new FormControl(this.ciNumero, [
         Validators.required,
-        Validators.pattern('[0-9]{8,9}'),
-        Validators.minLength(8),
-        Validators.maxLength(9),
+        Validators.pattern('[0-9]{7,8}'),
+        Validators.minLength(7),
+        Validators.maxLength(8),
       ]),
       departamento: new FormControl(
         this.departamentoAbreviatura,
@@ -114,16 +118,44 @@ export class EditarUsuarioComponent implements OnInit {
     });
   }
 
+  // Método para abrir el input de archivo manualmente
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  // Método para manejar el evento de arrastrar sobre el área de carga
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  // Método para manejar el drop del archivo
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      this.handleFile(file);
+    }
+  }
+
+  // Método para manejar el cambio del input de archivo
   onImageChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagenPreview = reader.result; // Set image preview
-      };
-      reader.readAsDataURL(file);
-      this.form.patchValue({ imagen: file });
+      this.handleFile(file);
     }
+  }
+
+  // Método para procesar el archivo y mostrar la vista previa
+  private handleFile(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagenPreview = reader.result;
+    };
+    reader.readAsDataURL(file);
+    this.form.patchValue({ imagen: file });
   }
 
   onSubmit(): void {
@@ -150,65 +182,35 @@ export class EditarUsuarioComponent implements OnInit {
         updatedUsuario.append('imagen', this.form.value.imagen);
       }
 
-      // Verificar datos a enviar
-      console.log('Datos a enviar:', updatedUsuario);
-
-      // Validar si el correo electrónico y el nombre de usuario ya existen
-      this.usuarioService.getUsuarios().subscribe((usuarios) => {
-        const correoExiste = usuarios.find(
-          (usuario) =>
-            usuario.correo === this.form.value.correo &&
-            usuario.id !== this.usuario.id
-        );
-
-        const telefonoExiste = usuarios.find(
-          (usuario) =>
-            usuario.telefono === this.form.value.telefono &&
-            usuario.id !== this.usuario.id
-        );
-        const ciExiste = usuarios.find(
-          (usuario) =>
-            usuario.ci === this.form.value.ci && usuario.id !== this.usuario.id
-        );
-
-        if (correoExiste) {
-          this.errorMessage = 'El correo electrónico ya existe';
-        } else if (telefonoExiste) {
-          this.errorMessage = 'El teléfono ya existe';
-        } else if (ciExiste) {
-          this.errorMessage = 'El C.I. ya Existe';
-        } else {
-          // Editar usuario
-          this.usuarioService
-            .editarUsuario(this.usuario.id, updatedUsuario)
-            .subscribe({
-              next: () => {
-                this.mensajeModal = 'Usuario actualizado exitosamente'; // Mensaje para el modal
-                this.manejarModal = true; // Mostrar el modal
-              },
-              error: (err) => {
-                this.errorModal = 'Error al actualizar el usuario';
-                this.manejarModal = true;
-              },
-            });
-        }
-      });
+      this.usuarioService
+        .editarUsuario(this.usuario.id, updatedUsuario)
+        .subscribe({
+          next: () => {
+            this.mensajeModal = 'Usuario actualizado exitosamente';
+            this.manejarModal = true;
+          },
+          error: () => {
+            this.errorModal = 'Error al actualizar el usuario';
+            this.manejarModal = true;
+          },
+        });
     }
   }
+
   manejarOk() {
-    this.manejarModal = false; // Cerrar el modal
-    this.listarUsuarioEditado.emit(); // Emitir el evento para listar usuarios
+    this.manejarModal = false;
+    this.listarUsuarioEditado.emit();
   }
+
   validateNum(event: KeyboardEvent) {
     const inputChar = String.fromCharCode(event.keyCode);
-    // Aceptar solo números
     if (!/^[0-9]$/.test(inputChar)) {
       event.preventDefault();
     }
   }
+
   validateText(event: KeyboardEvent) {
-    const inputChar = String.fromCharCode(event.keyCode); 
-    // Validar si el carácter ingresado no es una letra ni un espacio
+    const inputChar = String.fromCharCode(event.keyCode);
     if (!/^[a-zA-Z ]+$/.test(inputChar)) {
       event.preventDefault();
     }

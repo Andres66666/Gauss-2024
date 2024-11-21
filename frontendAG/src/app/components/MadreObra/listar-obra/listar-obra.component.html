@@ -1,76 +1,93 @@
 <div class="container">
-  <h2 class="text-center">Lista de Obras</h2>
-  <div class="mb-3 d-flex align-items-center">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Buscar por Nombre de Obra o ubicacion"
-      [(ngModel)]="searchTerm"
-    />
-    <button class="btn btn-success ms-2" (click)="registrarObra()">
-      Registrar
-    </button>
+  <h2 class="text-left" style="padding-bottom: 20px;">Lista de Obras</h2>
+
+  <!-- Search Input and Register Button -->
+  <div class="mb-3 d-flex align-items-center gap-2">
+    <!-- Search Field -->
+    <div class="search-field flex-grow-1">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar por Nombre de Obra o ubicación"
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+    <!-- Register Button -->
+    <div>
+      <button class="btn btn-success px-3 py-2" (click)="registrarObra()">
+        + Obra
+      </button>
+    </div>
   </div>
+
+  <!-- Table -->
   <table class="table table-striped table-bordered">
-    <thead>
+    <thead class="custom-header">
       <tr>
         <th class="text-center">Obra</th>
-        <th class="text-center">Ubicacion de Obra</th>
-        <th class="text-center">Fecha creacion Obra</th>
-        <th class="text-center">Fecha cierre Obra</th>
+        <th class="text-center">Ubicación de Obra</th>
+        <th class="text-center">Fecha Creación Obra</th>
+        <th class="text-center">Fecha Cierre Obra</th>
         <th class="text-center">Estado</th>
-        <th class="text-center">Accion</th>
+        <th class="text-center">Acción</th>
       </tr>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let obra of filteredObra()"
-        [ngClass]="{
-          'table-danger': !obra.estadoObra,
-          'table-success': obra.estadoObra
-        }"
-      >
-        <td class="text-start">{{ obra.nombreObra }}</td>
-        <td class="text-start">{{ obra.ubicacionObra }}</td>
-        <td class="text-start">{{ obra.fecha_creacion_obra }}</td>
-        <td class="text-start">{{ obra.fecha_cierre_obra }}</td>
-
-        <td>{{ obra.estadoObra ? "Activo" : "Inactivo" }}</td>
-        <td>
-          <button class="btn btn-primary" (click)="editarObra(obra.id)">
-            Editar
-          </button>
-          <button
-            class="btn"
-            [ngClass]="obra.estadoObra ? 'btn-danger' : 'btn-success'"
-            (click)="toggleObraActivo(obra)"
+      <tr *ngFor="let obra of filteredObra()">
+        <td class="text-start align-middle">{{ obra.nombreObra }}</td>
+        <td class="text-start align-middle">{{ obra.ubicacionObra }}</td>
+        <td class="text-center align-middle">{{ obra.fecha_creacion_obra }}</td>
+        <td class="text-center align-middle">{{ obra.fecha_cierre_obra }}</td>
+        <td class="text-center align-middle">
+          <span
+            class="estado-box"
+            [ngClass]="obra.estadoObra ? 'activo' : 'inactivo'"
           >
-            {{ obra.estadoObra ? "Desactivar y cerrar obra" : "Activar" }}
-          </button>
+            {{ obra.estadoObra ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td class="text-center align-middle">
+          <div class="d-flex gap-3 justify-content-center">
+            <!-- Edit Icon -->
+            <i
+              class="fas fa-edit text-primary clickable-icon"
+              title="Editar Obra"
+              (click)="editarObra(obra.id)"
+            ></i>
+            <!-- Activate/Deactivate Icon -->
+            <i
+              [class]="'fas clickable-icon ' + (obra.estadoObra ? 'fa-user-times text-danger' : 'fa-user-check text-success')"
+              (click)="toggleObraActivo(obra)"
+              [title]="obra.estadoObra ? 'Desactivar y cerrar obra' : 'Activar'"
+            ></i>
+          </div>
         </td>
       </tr>
     </tbody>
   </table>
-  <!-- Paginación -->
+
+  <!-- Pagination -->
   <div class="d-flex justify-content-between align-items-center mt-3">
     <button
       class="btn btn-secondary"
       (click)="previousPage()"
       [disabled]="page === 1"
     >
-      Anterior
+      &lt; <!-- Symbol for less than (<) -->
     </button>
-    <span>Página {{ page }}</span>
+    <span class="bold-text">Página {{ page }}</span>
     <button
       class="btn btn-secondary"
       (click)="nextPage()"
       [disabled]="page * pageSize >= obra.length"
     >
-      Siguiente
+      &gt; <!-- Symbol for greater than (>) -->
     </button>
   </div>
 </div>
-<!-- Modal de Éxito -->
+
+<!-- Success Modal -->
 <div
   class="modal"
   tabindex="-1"
@@ -81,7 +98,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Información</h5>
+        <h5 class="modal-title bold-text">Información</h5>
         <button type="button" class="close" (click)="manejarModal = false">
           <span>&times;</span>
         </button>
@@ -98,7 +115,7 @@
   </div>
 </div>
 
-<!-- Modal de Error -->
+<!-- Error Modal -->
 <div
   class="modal"
   tabindex="-1"
@@ -109,7 +126,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Error</h5>
+        <h5 class="modal-title bold-text">Error</h5>
         <button type="button" class="close" (click)="manejarModal = false">
           <span>&times;</span>
         </button>

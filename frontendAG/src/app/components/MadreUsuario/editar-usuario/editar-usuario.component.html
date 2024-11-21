@@ -1,82 +1,138 @@
-<!-- editar-usuario.component.html -->
-<div class="container" style="padding-bottom: 50px">
-  <h2>Editar Usuario</h2>
+<div class="container">
+  <h2 class="text-center">Editar Usuario</h2>
   <div class="form-container">
-    <div class="d-flex align-items-center justify-content-between">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="nombreUsuario">Nombre Usuario</label>
-          <input
-            type="text"
-            id="nombreUsuario"
-            formControlName="nombreUsuario"
-            class="form-control"
-            (keypress)="validateText($event)"
-            [ngClass]="{
-              'is-invalid':
-                form.get('nombreUsuario')?.invalid &&
-                form.get('nombreUsuario')?.touched
-            }"
-          />
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <!-- Imagen -->
+        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
           <div
-            *ngIf="
-              form.get('nombreUsuario')?.invalid &&
-              form.get('nombreUsuario')?.touched
-            "
-            class="invalid-feedback"
+            class="upload-box"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+            (click)="triggerFileInput()"
           >
-            El nombre de usuario es requerido.
-          </div>
-          <div
-            *ngIf="
-              form.get('nombreUsuario')?.invalid &&
-              (form.get('nombreUsuario')?.dirty ||
-                form.get('nombreUsuario')?.touched)
-            "
-          >
-            <div *ngIf="form.get('nombreUsuario')?.errors?.['required']">
-              El nombre es obligatorio
-            </div>
-            <div *ngIf="form.get('nombreUsuario')?.errors?.['pattern']">
-              El nombre solo puede contener texto
-            </div>
-          </div>
-        </div>
-        
-        <!-- Campo para apellido del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="apellido" class="form-label">Apellido</label>
-          <input
-            type="text"
-            id="apellido"
-            formControlName="apellido"
-            class="form-control"
-            (keypress)="validateText($event)"
-          />
-          <div
-            *ngIf="
-              form.get('apellido')?.invalid &&
-              (form.get('apellido')?.dirty || form.get('apellido')?.touched)
-            "
-          >
-            <div *ngIf="form.get('apellido')?.errors?.['required']">
-              El apellido es obligatorio
-            </div>
-            <div *ngIf="form.get('apellido')?.errors?.['pattern']">
-              El apellido solo puede contener texto
-            </div>
+            <input
+              id="imagen"
+              type="file"
+              class="d-none"
+              (change)="onImageChange($event)"
+              #fileInput
+            />
+            <ng-container *ngIf="imagenPreview; else placeholder">
+              <img
+                [src]="imagenPreview"
+                alt="Imagen previa"
+                class="img-preview"
+              />
+            </ng-container>
+            <ng-template #placeholder>
+              <div class="placeholder-content">
+                <i class="fa fa-upload upload-icon"></i>
+                <p class="placeholder-text">Foto Usuario</p>
+              </div>
+            </ng-template>
           </div>
         </div>
 
-        <!-- Campo para correo del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="correo" class="form-label">Correo Electrónico</label>
+        <!-- Nombre, Apellido, Teléfono -->
+        <div class="col-12 col-md-9">
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label for="nombreUsuario">Nombre</label>
+              <input
+                type="text"
+                id="nombreUsuario"
+                formControlName="nombreUsuario"
+                class="form-control"
+                (keypress)="validateText($event)"
+                [ngClass]="{
+                  'is-invalid':
+                    form.get('nombreUsuario')?.invalid &&
+                    form.get('nombreUsuario')?.touched
+                }"
+              />
+              <div
+                *ngIf="
+                  form.get('nombreUsuario')?.invalid &&
+                  form.get('nombreUsuario')?.touched
+                "
+                class="text-danger"
+              >
+                <div *ngIf="form.get('nombreUsuario')?.errors?.['required']">
+                  El nombre es obligatorio
+                </div>
+                <div *ngIf="form.get('nombreUsuario')?.errors?.['pattern']">
+                  Solo se permiten letras en el nombre.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label for="apellido">Apellido</label>
+              <input
+                type="text"
+                id="apellido"
+                formControlName="apellido"
+                class="form-control"
+                (keypress)="validateText($event)"
+              />
+              <div
+                *ngIf="
+                  form.get('apellido')?.invalid &&
+                  form.get('apellido')?.touched
+                "
+                class="text-danger"
+              >
+                <div *ngIf="form.get('apellido')?.errors?.['required']">
+                  El apellido es obligatorio
+                </div>
+                <div *ngIf="form.get('apellido')?.errors?.['pattern']">
+                  Solo se permiten letras en el apellido.
+                </div>
+              </div>
+            </div>
+
+            <!-- Campo para teléfono del usuario -->
+            <div class="col-12 mb-3">
+              <label for="telefono">Teléfono</label>
+              <input
+                type="text"
+                id="telefono"
+                formControlName="telefono"
+                class="form-control"
+                (keypress)="validateNum($event)"
+              />
+              <div
+                *ngIf="
+                  form.get('telefono')?.invalid &&
+                  (form.get('telefono')?.touched || form.get('telefono')?.dirty)
+                "
+                class="text-danger"
+              >
+                El teléfono es requerido.
+              </div>
+              <div
+                *ngIf="
+                  form.get('telefono')?.errors?.['telefono-existe']
+                "
+                class="text-danger"
+              >
+                El teléfono ya existe
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Correo -->
+      <div class="row">
+        <div class="col-12 mb-3">
+          <label for="correo">Correo Electrónico</label>
           <input
             type="email"
             id="correo"
             formControlName="correo"
             class="form-control"
-            required
           />
           <div
             *ngIf="
@@ -88,250 +144,176 @@
             Se requiere un correo electrónico válido.
           </div>
         </div>
+      </div>
 
-        <!-- Campo para teléfono del usuario -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="telefono" class="form-label">Teléfono</label>
+      <!-- CI y Departamento -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="ci">Cédula de Identidad (CI)</label>
           <input
+            id="ci"
             type="text"
-            id="telefono"
-            formControlName="telefono"
             class="form-control"
+            formControlName="ci"
+            placeholder="Ingrese el CI"
+            [ngClass]="{
+              'is-invalid': form.get('ci')?.invalid && form.get('ci')?.touched
+            }"
             (keypress)="validateNum($event)"
           />
           <div
             *ngIf="
-              form.get('telefono')?.invalid &&
-              (form.get('telefono')?.touched || form.get('telefono')?.dirty)
+              form.get('ci')?.invalid &&
+              (form.get('ci')?.touched || form.get('ci')?.dirty)
             "
             class="text-danger"
           >
-            El teléfono es requerido
+            <div *ngIf="form.get('ci')?.errors?.['required']">
+              El CI es obligatorio
+            </div>
+            <div
+              *ngIf="
+                form.get('ci')?.errors?.['pattern'] ||
+                form.get('ci')?.errors?.['minlength'] ||
+                form.get('ci')?.errors?.['maxlength']
+              "
+            >
+              El CI debe tener entre 7 y 8 dígitos
+            </div>
+            <div *ngIf="form.get('ci')?.errors?.['ci-existe']">
+              El CI ya existe en la base de datos
+            </div>
           </div>
+        </div>
+
+        <!-- Campo para Departamento -->
+        <div class="col-md-6 mb-3">
+          <label for="departamento">Extensión</label>
+          <select
+            id="departamento"
+            class="form-control"
+            formControlName="departamento"
+            required
+          >
+            <option value="" disabled selected>Seleccione una extensión</option>
+            <option
+              *ngFor="let departamento of departamentos"
+              [value]="departamento"
+              [selected]="departamento === departamentoAbreviatura"
+            >
+              {{ departamento }}
+            </option>
+          </select>
           <div
             *ngIf="
-              form.get('telefono')?.errors?.['telefono-existe']
+              form.get('departamento')?.invalid &&
+              form.get('departamento')?.touched
             "
             class="text-danger"
           >
-            El teléfono ya existe
+            Seleccione un departamento.
           </div>
         </div>
+      </div>
 
-        <!-- Contenedor para CI y Departamento -->
-        <div class="d-flex justify-content-between mb-3">
-          <div class="form-group me-3">
-            <label for="ci">C.I.:</label>
-            <input
-              id="ci"
-              type="text"
-              class="form-control"
-              formControlName="ci"
-              placeholder="Ingrese el CI (Ej: 12345678)"
-              [ngClass]="{
-                'is-invalid': form.get('ci')?.invalid && form.get('ci')?.touched
-              }"
-              (keypress)="validateNum($event)"
-            />
-            <div
-              *ngIf="
-                form.get('ci')?.invalid &&
-                (form.get('ci')?.dirty || form.get('ci')?.touched)
-              "
-              class="text-danger"
-            >
-              <div *ngIf="form.get('ci')?.errors?.['required']">
-                El CI es obligatorio
-              </div>
-              <div
-                *ngIf="form.get('ci')?.errors?.['pattern'] || form.get('ci')?.errors?.['minlength'] || form.get('ci')?.errors?.['maxlength']"
-              >
-                El CI debe tener entre 8 y 9 dígitos
-              </div>
-              <div *ngIf="form.get('ci')?.errors?.['ci-existe']">
-                El CI ya existe en la base de datos
-              </div>
-            </div>
-          </div>
-
-          <!-- Campo para Departamento -->
-          <div class="form-group">
-            <label for="departamento">D.P.:</label>
-            <select
-              id="departamento"
-              class="form-control"
-              formControlName="departamento"
-              required
-            >
-              <option value="" disabled>Seleccione un departamento</option>
-              <option
-                *ngFor="let departamento of departamentos"
-                [value]="departamento"
-                [selected]="departamento === departamentoAbreviatura"
-              >
-                {{ departamento }}
-              </option>
-            </select>
-            <div
-              *ngIf="
-                form.get('departamento')?.invalid &&
-                form.get('departamento')?.touched
-              "
-              class="text-danger"
-            >
-              El departamento es obligatorio.
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="obra" class="form-label">Obra</label>
+      <!-- Obra -->
+      <div class="row">
+        <div class="col-12 mb-3">
+          <label for="obra">Obra</label>
           <select id="obra" formControlName="obra" class="form-select">
             <option *ngFor="let obra of obra" [value]="obra.id">
               {{ obra.nombreObra }}
             </option>
           </select>
-          <div
-            *ngIf="
-              form.get('obra')?.invalid &&
-              (form.get('obra')?.touched || form.get('obra')?.dirty)
-            "
-            class="text-danger"
-          >
-            Se requiere seleccionar una obra.
-          </div>
         </div>
-
-        <!-- Campo para estado activo -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="activo">Estado Activo:</label>
-          <select
-            id="activo"
-            formControlName="activo"
-            class="form-control"
-            required
-          >
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
-          </select>
-          <div
-            *ngIf="
-              form.get('activo')?.invalid &&
-              (form.get('activo')?.touched || form.get('activo')?.dirty)
-            "
-            class="text-danger"
-          >
-            Se requiere seleccionar un estado activo.
-          </div>
-        </div>
-
-        <!-- Campo para imagen -->
-        <div class="form-group d-flex flex-column align-items-start">
-          <label for="imagen" class="form-label">Imagen</label>
-          <input
-            type="file"
-            id="imagen"
-            (change)="onImageChange($event)"
-            class="form-control"
-          />
-        </div>
-
-        <!-- Botón de actualizar usuario -->
-        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
-          Actualizar Usuario
-        </button>
-        <div *ngIf="errorMessage" class="text-danger mt-3">
-          {{ errorMessage }}
-        </div>
-      </form>
-      
-      <div *ngIf="imagenPreview" class="mt-2 ms-3">
-        <img
-          [src]="imagenPreview"
-          alt="Imagen previa"
-          class="img-thumbnail"
-          width="400"
-        />
       </div>
-    </div>
 
-    <!-- Mensaje de alerta -->
+      <!-- Botón -->
+      <div class="row">
+        <div class="col-12">
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            [disabled]="form.invalid"
+          >
+            Actualizar Usuario
+          </button>
+          <div *ngIf="errorMessage" class="text-danger mt-3">
+            {{ errorMessage }}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Modal de Éxito -->
     <div
-      *ngIf="mensaje"
-      class="alert"
-      [ngClass]="{ 'alert-success': esExito, 'alert-danger': !esExito }"
+      class="modal"
+      tabindex="-1"
+      role="dialog"
+      *ngIf="manejarModal && !errorModal"
+      style="display: block"
     >
-      {{ mensaje }}
-    </div>
-  </div>
-
-  <!-- Modal de Éxito -->
-  <div
-    class="modal"
-    tabindex="-1"
-    role="dialog"
-    *ngIf="manejarModal && !errorModal"
-    style="display: block"
-  >
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Información</h5>
-          <button type="button" class="close" (click)="manejarModal = false">
-            <span>&times;</span>
-          </button>
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-          <img
-            src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right1.png"
-            alt=""
-            style="width: 90px; height: 50px; margin-right: 5px"
-          />
-          <div class="flex-grow-1 text-center">
-            <p style="margin: 0">{{ mensajeModal }}</p>
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Información</h5>
+            <button type="button" class="close" (click)="manejarModal = false">
+              <span>&times;</span>
+            </button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="manejarOk()">
-            OK
-          </button>
+          <div class="d-flex align-items-center justify-content-between">
+            <img
+              src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right1.png"
+              alt=""
+              style="width: 90px; height: 50px; margin-right: 5px"
+            />
+            <div class="flex-grow-1 text-center">
+              <p style="margin: 0">{{ mensajeModal }}</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="manejarOk()">
+              OK
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal de Error -->
-  <div
-    class="modal"
-    tabindex="-1"
-    role="dialog"
-    *ngIf="manejarModal && errorModal"
-    style="display: block"
-  >
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Error</h5>
-          <button type="button" class="close" (click)="manejarModal = false">
-            <span>&times;</span>
-          </button>
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-          <img
-            src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/wrong.png"
-            alt=""
-            style="width: 50px; height: 50px; margin-right: 5px"
-          />
-          <div class="flex-grow-1 text-center">
-            <p style="margin: 0">{{ errorModal }}</p>
+    <!-- Modal de Error -->
+    <div
+      class="modal"
+      tabindex="-1"
+      role="dialog"
+      *ngIf="manejarModal && errorModal"
+      style="display: block"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" (click)="manejarModal = false">
+              <span>&times;</span>
+            </button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" (click)="manejarOk()">
-            OK
-          </button>
+          <div class="d-flex align-items-center justify-content-between">
+            <img
+              src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/wrong.png"
+              alt=""
+              style="width: 50px; height: 50px; margin-right: 5px"
+            />
+            <div class="flex-grow-1 text-center">
+              <p style="margin: 0">{{ errorModal }}</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" (click)="manejarOk()">
+              OK
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>

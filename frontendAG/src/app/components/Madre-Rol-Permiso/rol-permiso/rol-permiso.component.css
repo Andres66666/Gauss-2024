@@ -1,0 +1,102 @@
+/* Search Field Styling */
+.search-field {
+    position: relative;
+    flex-grow: 1; /* Ensure input fields stretch proportionally */
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    color: #6c757d;
+    font-size: 16px;
+    z-index: 1;
+  }
+  
+  .search-field .form-control {
+    padding-left: 30px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+  
+  .search-field .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+  }
+  
+  .search-field .form-control:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  }
+  
+  .search-field:hover .search-icon,
+  .search-field .form-control:focus ~ .search-icon {
+    color: #007bff;
+  }
+  
+  /* Table Styling */
+  .table {
+    border-collapse: collapse;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+    overflow: hidden; /* Ensures rounded corners display correctly */
+  }
+  
+  .table-bordered {
+    border: 1px solid #dee2e6;
+  }
+  
+  .table-bordered td,
+  .table-bordered th {
+    border: none;
+    padding: 20px 25px; /* Increase padding for more spacing */
+  }
+  
+  .table-striped tbody tr:not(:last-child) {
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .table tbody tr:hover {
+    background-color: #f8f9fc;
+  }
+  
+  /* Header Styling */
+  .custom-header th {
+    background-color: #919191;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+  }
+  
+  /* Icon Styling */
+  .clickable-icon {
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin: 0 5px;
+    transition: transform 0.2s, color 0.3s;
+  }
+  
+  .clickable-icon:hover {
+    transform: scale(1.2);
+    color: #007bff;
+  }
+
+  /* Pagination Styling */
+  .d-flex.justify-content-between {
+    margin-top: 20px;
+  }
+  
+  /* Flexbox Alignment */
+  .d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  

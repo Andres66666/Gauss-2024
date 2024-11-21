@@ -1,0 +1,145 @@
+/* General Styling */
+.bold-text {
+    font-weight: bold;
+  }
+  
+  /* Align items horizontally in the search and register section */
+  .mb-3.d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem; /* Space between search fields and the button */
+  }
+  
+  /* Search Field Styling */
+  .search-field {
+    position: relative;
+    flex-grow: 1; /* Ensure input fields stretch proportionally */
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px; /* Distance from input's left edge */
+    color: #6c757d; /* Icon color */
+    font-size: 16px; /* Adjust size */
+    z-index: 1;
+  }
+  
+  .search-field .form-control {
+    padding-left: 30px; /* Space for the search icon */
+    border-radius: 10px; /* Rounded corners */
+    border: 1px solid #ccc; /* Default border */
+    box-shadow: none; /* No default shadow */
+  }
+  
+  .search-field .form-control:focus {
+    border-color: #007bff; /* Blue border on focus */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Light blue outline */
+    outline: none;
+  }
+
+  .search-field .form-control:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  }
+
+  .search-field:hover .search-icon,
+  .search-field .form-control:focus ~ .search-icon {
+    color: #007bff;
+  }
+  
+  /* Table Styling */
+  .table {
+    border-collapse: collapse; /* Remove gaps between cells */
+    background-color: #ffffff; /* White background */
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Ensure corners stay rounded */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for contrast */
+    margin-top: 15px;
+  }
+  
+  .table-bordered {
+    border: 1px solid #dee2e6; /* Table border */
+  }
+  
+  .table-bordered td,
+  .table-bordered th {
+    border: none; /* No borders for individual cells */
+    padding: 20px 25px; /* Increase padding for more spacing */
+  }
+  
+  .table-striped tbody tr:not(:last-child) {
+    border-bottom: 1px solid #dee2e6; /* Horizontal line between rows */
+  }
+  
+  .table tbody tr:hover {
+    background-color: #f8f9fc; /* Light blue background on hover */
+  }
+
+  .custom-header th {
+    background-color: #919191; /* Header background */
+    color: #fff; /* White text */
+    font-weight: bold; /* Bold header text */
+    text-align: center; /* Center-align text */
+    padding: 15px; /* Padding for header cells */
+  }
+  
+  /* Clickable Icon Styling */
+  .clickable-icon {
+    cursor: pointer;
+    font-size: 1.2rem; /* Adjust size */
+    margin: 0 5px; /* Spacing */
+    transition: transform 0.2s, color 0.3s; /* Smooth hover effect */
+  }
+  
+  .clickable-icon:hover {
+    transform: scale(1.2); /* Slight enlargement on hover */
+    color: #007bff; /* Highlight color */
+  }
+  
+  /* Status Box */
+  .estado-box {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    color: white;
+    text-align: center;
+  }
+  
+  .estado-box.activo {
+    background-color: #28a745; /* Green */
+    border: 1px solid #218838;
+  }
+  
+  .estado-box.inactivo {
+    background-color: #dc3545; /* Red */
+    border: 1px solid #c82333;
+  }
+  
+  /* Pagination Styling */
+  .d-flex.justify-content-between {
+    margin-top: 20px;
+  }
+  
+  .btn-secondary {
+    border-radius: 5px; /* Rounded corners for buttons */
+  }
+  
+  /* Center icons vertically and horizontally */
+.d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem; /* Adjust spacing between icons */
+  }
+
+  .icon-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    gap: 1.5rem; /* Space between icons */
+    height: 100%; /* Ensures it takes up the full cell height */
+  }

@@ -41,13 +41,23 @@ class LoginView(APIView):
             if not usuario.activo:
                 return Response({'error': 'No puedes iniciar sesión!!!. Comuníquese con el administrador. Gracias.'}, status=status.HTTP_403_FORBIDDEN)
             
+            # Get all roles associated with the user
+            usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
+            if not usuario_roles:
+                return Response({'error': 'El usuario no tiene roles asignados.'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Check if all roles are deactivated
+            active_roles = [usuario_rol.rol for usuario_rol in usuario_roles if usuario_rol.rol.activo]
+            if not active_roles:
+                return Response({'error': 'El rol asignado al usuario está desactivado. No puedes iniciar sesión.'}, status=status.HTTP_403_FORBIDDEN)
+
             if check_password(password, usuario.password):
                 # Generación del token
                 refresh = RefreshToken.for_user(usuario)
                 #return Response({'token': usuario.token}, status=status.HTTP_200_OK)
-                # Obtener roles del usuario
-                usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
-                roles = [usuario_rol.rol.nombreRol for usuario_rol in usuario_roles]
+
+                # Obtener nombres de roles activos del usuario
+                roles = [rol.nombreRol for rol in active_roles]
 
                 # Obtener permisos asociados a los roles del usuario
                 permisos = RolPermisos.objects.filter(rol__in=[usuario_rol.rol for usuario_rol in usuario_roles])
@@ -63,7 +73,6 @@ class LoginView(APIView):
                     'nombreUsuario': usuario.nombreUsuario,
                     'apellido': usuario.apellido,
                     'imagen_url': usuario.imagen_url,
-
                     'roles': roles,
                     'permisos': permisos_nombres
                 }, status=status.HTTP_200_OK)
@@ -191,8 +200,12 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         ci = request.data.get('ci')
         departamento = request.data.get('departamento')
 
-        # Subir la imagen a S3 si se proporciona
-        imagen_url = None
+        
+        # Default image URL
+        default_image_url = "https://localimg.s3.us-east-2.amazonaws.com/imagenes/pph.png"
+
+        # Upload the image to S3 if provided
+        imagen_url = default_image_url  # Set default image URL
         if 'imagen' in request.FILES:
             file = request.FILES['imagen']
             imagen_url = self.upload_image_to_s3(file)

@@ -18,7 +18,7 @@ export class UsuarioRolComponent implements OnInit {
   searchTerm: string = ''; // Property for storing the search term
   // Variables de paginación
   page: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 7;
   paginatedUsuarioroles: UsuarioRol[] = [];
 
   @Output() editar = new EventEmitter<number>();

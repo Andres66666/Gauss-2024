@@ -63,7 +63,10 @@ class Usuarios(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
     obra = models.ForeignKey(Obras, on_delete=models.CASCADE,null=True, blank=True)
-    imagen_url = models.URLField(max_length=500,null=True, blank=True)
+    imagen_url = models.URLField(
+        max_length=500, 
+        default='https://localimg.s3.us-east-2.amazonaws.com/imagenes/pph.png'
+    )
 
     def save(self, *args, **kwargs):
         if not self.password.startswith('pbkdf2'):
