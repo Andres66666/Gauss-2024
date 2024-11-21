@@ -36,13 +36,18 @@ export class EditarSolicitudesComponent {
     private fb: FormBuilder
   ) {
     this.form = this.fb.group({
-      fechaSolicitud: ['', Validators.required],
-      fechaRetornoEstimada: ['', Validators.required],
-      fechaRetornoReal: ['', Validators.required],
-
+      codigoSolicitud: ['', Validators.required],
+      fecha_solicitud: ['', Validators.required],
+      fecha_retorno_estimada: ['', Validators.required],
+      fecha_retorno_real: [''],
+      estado: ['pendiente'], // Valor por defecto
+      motivo_uso: ['', Validators.required],
+      fecha_uso: [''],
       equipo: ['', Validators.required],
-      obra: ['', Validators.required],
       usuario: ['', Validators.required],
+      descripcion_falla: [''],
+      cantidad_fallas_solicitud: [0],
+      horas_uso_solicitud: [0],
     });
   }
 
@@ -53,9 +58,10 @@ export class EditarSolicitudesComponent {
     if (this.solicitudId !== null) {
       this.loadSolicitudData(this.solicitudId);
     } else {
-      console.error('usuarioId is null or undefined');
+      console.error('solicitudId is null or undefined');
     }
   }
+
   loadEquipo(): void {
     this.solicitudesService.getEquipos().subscribe({
       next: (equipo) => {
@@ -66,6 +72,7 @@ export class EditarSolicitudesComponent {
       },
     });
   }
+
   loadUsuario(): void {
     this.solicitudesService.getUsuario().subscribe({
       next: (usuario) => {
@@ -73,6 +80,7 @@ export class EditarSolicitudesComponent {
       },
     });
   }
+
   loadObras(): void {
     this.solicitudesService.getObras().subscribe({
       next: (obra) => {
@@ -80,83 +88,61 @@ export class EditarSolicitudesComponent {
       },
     });
   }
+
   loadSolicitudData(id: number) {
     this.solicitudesService.getSolicitudesById(id).subscribe({
       next: (data) => {
         this.solicitudes = data; // Populate form with user data
         this.initializeForm(); // Initialize form after loading user data
       },
+      error: (error) => {
+        console.error('Error al cargar la solicitud:', error);
+      },
     });
   }
+
   initializeForm() {
-    this.form = new FormGroup({
-      fechaSolicitud: new FormControl(this.solicitudes.fechaSolicitud),
-      fechaRetornoEstimada: new FormControl(
-        this.solicitudes.fechaRetornoEstimada
-      ),
-      fechaRetornoReal: new FormControl(this.solicitudes.fechaRetornoReal),
-      equipo: new FormControl(this.solicitudes.equipo.id, Validators.required),
-      obra: new FormControl(this.solicitudes.obra.id, Validators.required),
-      usuario: new FormControl(
-        this.solicitudes.usuario.id,
-        Validators.required
-      ),
+    this.form.patchValue({
+      codigoSolicitud: this.solicitudes.codigoSolicitud,
+      fecha_solicitud: this.solicitudes.fecha_solicitud,
+      fecha_retorno_estimada: this.solicitudes.fecha_retorno_estimada,
+      fecha_retorno_real: this.solicitudes.fecha_retorno_real,
+      estado: this.solicitudes.estado,
+      motivo_uso: this.solicitudes.motivo_uso,
+      fecha_uso: this.solicitudes.fecha_uso,
+      equipo: this.solicitudes.equipo.id, // Asegúrate de que 'equipo' tenga un campo 'id'
+      usuario: this.solicitudes.usuario.id, // Asegúrate de que 'usuario' tenga un campo 'id'
+      descripcion_falla: this.solicitudes.descripcion_falla,
+      cantidad_fallas_solicitud: this.solicitudes.cantidad_fallas_solicitud,
+      horas_uso_solicitud: this.solicitudes.horas_uso_solicitud,
     });
   }
   onSubmit(): void {
     if (this.form.valid) {
-      const updatedSolicitud: Solicitudes = {
-        id: this.solicitudes.id,
-        fechaSolicitud: this.form.value.fechaSolicitud,
-        fechaRetornoEstimada: this.form.value.fechaRetornoEstimada,
-        fechaRetornoReal: this.form.value.fechaRetornoReal,
-        equipo: {
-          id: this.form.value.equipo,
-          nombreEquipo: this.solicitudes.equipo.nombreEquipo,
-          marca: this.solicitudes.equipo.marca,
-          modelo: this.solicitudes.equipo.modelo,
-          estadoEquipo: this.solicitudes.equipo.estadoEquipo,
-          estadoUsoEquipo: this.solicitudes.equipo.estadoUsoEquipo,
-          vidaUtil: this.solicitudes.equipo.vidaUtil,
-          fechaAdquiscion: this.solicitudes.equipo.fechaAdquiscion,
-          almacen: this.solicitudes.equipo.almacen,
-        },
-        obra: {
-          id: this.form.value.obra,
-          nombreObra: this.solicitudes.obra.nombreObra,
-          ubicacionObra: this.solicitudes.obra.ubicacionObra,
-          estadoObra: this.solicitudes.obra.estadoObra,
-        },
-        usuario: {
-          id: this.form.value.usuario,
-          nombreUsuario: this.solicitudes.usuario.nombreUsuario,
-          apellido: this.solicitudes.usuario.apellido,
-          telefono: this.solicitudes.usuario.telefono,
-          correo: this.solicitudes.usuario.correo,
-          password: this.solicitudes.usuario.password,
-          ci: this.solicitudes.usuario.ci,
-          fecha_creacion: this.solicitudes.usuario.fecha_creacion,
-          activo: this.solicitudes.usuario.activo,
-          obra: this.solicitudes.usuario.obra,
-          imagen: this.solicitudes.usuario.imagen,
-          imagen_url: this.solicitudes.usuario.imagen_url,
-        },
-      };
+      const updatedSolicitud = { ...this.form.value };
+      console.log('Valores enviados:', updatedSolicitud); // Verifica los valores
 
       this.solicitudesService
-        .editarSolicitudes(this.solicitudes.id, updatedSolicitud)
+        .updateSolicitud(this.solicitudId!, updatedSolicitud)
         .subscribe({
           next: () => {
-            this.mensajeModal = 'Solicitud actualizado con éxito';
-            this.manejarModal = true;
+            this.mensajeModal = 'Solicitud actualizada con éxito';
+            this.manejarModal = true; // Mostrar modal de éxito
+            this.listarSolicitudEditado.emit(); // Emitir evento para actualizar la lista
           },
-          error: (err) => {
-            this.errorModal = 'Error al actualizar el solicitud';
-            this.manejarModal = true;
+          error: (error) => {
+            console.error('Error al actualizar la solicitud:', error);
+            this.errorModal =
+              'Error al actualizar la solicitud. Intente nuevamente.';
+            this.manejarModal = true; // Mostrar modal de error
           },
         });
+    } else {
+      this.errorModal = 'Por favor, complete todos los campos requeridos.';
+      this.manejarModal = true; // Mostrar modal de error
     }
   }
+
   manejarOk() {
     this.manejarModal = false;
     this.listarSolicitudEditado.emit();

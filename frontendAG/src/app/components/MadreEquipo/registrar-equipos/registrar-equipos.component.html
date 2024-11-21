@@ -1,234 +1,90 @@
-<div class="container" style="padding-bottom: 50px">
-  <h2>Registrar Equipo</h2>
-  <form [formGroup]="registrarForm" (ngSubmit)="registrarEquipos()">
-    <!-- Campo para código del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="codigoEquipo">Código:</label>
-      <input
-        id="codigoEquipo"
-        type="text"
-        class="form-control"
-        formControlName="codigoEquipo"
-        placeholder="Ingrese el código del equipo"
-      />
-    </div>
+<form [formGroup]="registrarForm" (ngSubmit)="registrarEquipo()">
+  <div>
+    <label for="codigoEquipo">Código de Equipo:</label>
+    <input id="codigoEquipo" formControlName="codigoEquipo" required />
+  </div>
 
-    <!-- Campo para nombre del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="nombreEquipo">Nombre:</label>
-      <input
-        id="nombreEquipo"
-        type="text"
-        class="form-control"
-        formControlName="nombreEquipo"
-        placeholder="Ingrese el nombre del equipo"
-      />
-    </div>
+  <div>
+    <label for="nombreEquipo">Nombre de Equipo:</label>
+    <input id="nombreEquipo" formControlName="nombreEquipo" required />
+  </div>
 
-    <!-- Campo para marca del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="marcaEquipo">Marca:</label>
-      <input
-        id="marcaEquipo"
-        type="text"
-        class="form-control"
-        formControlName="marcaEquipo"
-        placeholder="Ingrese la marca del equipo"
-      />
-    </div>
+  <div>
+    <label for="marcaEquipo">Marca de Equipo:</label>
+    <input id="marcaEquipo" formControlName="marcaEquipo" required />
+  </div>
 
-    <!-- Campo para modelo del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="modeloEquipo">Modelo:</label>
-      <input
-        id="modeloEquipo"
-        type="text"
-        class="form-control"
-        formControlName="modeloEquipo"
-        placeholder="Ingrese el modelo del equipo"
-      />
-    </div>
+  <div>
+    <label for="modeloEquipo">Modelo de Equipo:</label>
+    <input id="modeloEquipo" formControlName="modeloEquipo" required />
+  </div>
+  <div>
+    <label for="vidaUtilEquipo">Modelo de Equipo:</label>
+    <input id="vidaUtilEquipo" formControlName="vidaUtilEquipo" required />
+  </div>
 
-    <!-- Campo para estado de disponibilidad del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="estadoDisponibilidad">Estado de Disponibilidad:</label>
-      <select
-        id="estadoDisponibilidad"
-        class="form-control"
-        formControlName="estadoDisponibilidad"
-      >
-        <option value="" disabled selected>-- Seleccione un estado --</option>
-        <option value="Disponible">Disponible</option>
-        <option value="En uso">En uso</option>
-        <option value="En mantenimiento">En mantenimiento</option>
-      </select>
-    </div>
+  <div>
+    <label for="fechaAdquiscion">Fecha de Adquisición:</label>
+    <input
+      type="date"
+      id="fechaAdquiscion"
+      formControlName="fechaAdquiscion"
+      required
+    />
+  </div>
+  <div>
+    <label for="fechaFabricacion">Fecha de fabricacion :</label>
+    <input
+      type="date"
+      id="fechaFabricacion"
+      formControlName="fechaFabricacion"
+      required
+    />
+  </div>
 
-    <!-- Campo para vida útil del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="vidaUtilEquipo">Vida Útil:</label>
-      <input
-        id="vidaUtilEquipo"
-        type="text"
-        class="form-control"
-        formControlName="vidaUtilEquipo"
-        placeholder="Ingrese la vida útil del equipo"
-      />
-    </div>
+  <div>
+    <label for="obra">Obra:</label>
+    <select id="obra" formControlName="obra" (change)="onObraChange($event)">
+      <option *ngFor="let obra of obras" [value]="obra.id">
+        {{ obra.nombreObra }}
+      </option>
+    </select>
+  </div>
 
-    <!-- Campo para fecha de adquisición del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="fechaAdquiscion">Fecha de Adquisición:</label>
-      <input
-        id="fechaAdquiscion"
-        type="date"
-        class="form-control"
-        formControlName="fechaAdquiscion"
-      />
-    </div>
-
-    <!-- Campo para horas de uso del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="horasUso">Horas de Uso:</label>
-      <input
-        id="horasUso"
-        type="number"
-        class="form-control"
-        formControlName="horasUso"
-        placeholder="Ingrese las horas de uso del equipo"
-      />
-    </div>
-
-    <!-- Campo para edad del equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="edadEquipo">Edad del Equipo:</label>
-      <input
-        id="edadEquipo"
-        type="text"
-        class="form-control"
-        formControlName="edadEquipo"
-        placeholder="Ingrese la edad del equipo"
-      />
-    </div>
-
-    <!-- Selección de obra -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="obra">Obra:</label>
-      <select id="obra" class="form-control" (change)="onObraChange($event)">
-        <option value="" disabled selected>-- Seleccione una obra --</option>
-        <option *ngFor="let obra of obras" [value]="obra.id">
-          {{ obra.nombreObra }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Selección de almacén filtrado por la obra -->
-    <div class="form-group d-flex flex-column align-items-start mt-3">
-      <label for="almacen">Almacén:</label>
-      <select id="almacen" class="form-control" formControlName="almacen">
-        <option value="" disabled selected>-- Seleccione un almacén --</option>
-        <option *ngFor="let almacen of almacenes" [value]="almacen.id">
-          {{ almacen.nombreAlmacen }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Campo para cargar una imagen -->
-    <div class="mb-3 d-flex flex-column align-items-center">
-      <label for="imagenEquipos">Cargar Imagen:</label>
-      <input
-        id="imagenEquipos"
-        type="file"
-        class="form-control"
-        (change)="onFileChange($event)"
-      />
-      <div *ngIf="imagenPreview" class="mt-2">
-        <img
-          [src]="imagenPreview"
-          alt="Imagen previa"
-          class="img-thumbnail"
-          width="200"
-        />
-      </div>
-    </div>
-
-    <!-- Botón de registro -->
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="!registrarForm.valid"
+  <div>
+    <label for="almacen">Almacén:</label>
+    <select
+      id="almacen"
+      formControlName="almacen"
+      [disabled]="!almacenes.length"
     >
-      Registrar Equipo
-    </button>
-  </form>
-</div>
-
-<!-- Modal de Éxito -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && !errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Información</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-between">
-        <img
-          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/right1.png"
-          alt=""
-          style="width: 90px; height: 50px; margin-right: 5px"
-        />
-        <div class="flex-grow-1 text-center">
-          <p style="margin: 0">{{ mensajeModal }}</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
+      <option *ngFor="let almacen of almacenes" [value]="almacen.id">
+        {{ almacen.nombreAlmacen }}
+      </option>
+    </select>
   </div>
-</div>
 
-<!-- Modal de Error -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Error</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-between">
-        <img
-          src="https://localimg.s3.us-east-2.amazonaws.com/imagenes/wrong.png"
-          alt=""
-          style="width: 50px; height: 50px; margin-right: 5px"
-        />
-        <div class="flex-grow-1 text-center">
-          <p style="margin: 0">{{ errorModal }}</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
+  <div>
+    <label for="imagenEquipos">Imagen del Equipo:</label>
+    <input
+      type="file"
+      id="imagenEquipos"
+      (change)="onFileChange($event)"
+      accept="image/jpeg, image/png"
+    />
+    <img
+      *ngIf="imagenPreview"
+      [src]="imagenPreview"
+      alt="Preview"
+      width="150"
+    />
   </div>
-</div>
+
+  <button type="submit" [disabled]="registrarForm.invalid">
+    Registrar Equipo
+  </button>
+
+  <div *ngIf="mensaje" [ngClass]="{ success: esExito, error: !esExito }">
+    {{ mensaje }}
+  </div>
+</form>

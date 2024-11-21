@@ -23,6 +23,7 @@ export class EquiposService {
   editarEquipo(id: number, equipo: FormData): Observable<Equipo> {
     return this.http.put<Equipo>(`${this.apiUrl}equipo/${id}/`, equipo);
   }
+
   // Obtener todos los usuarios
   getAlmacen(): Observable<Almacen[]> {
     return this.http.get<Almacen[]>(`${this.apiUrl}almacen/`);
@@ -33,7 +34,11 @@ export class EquiposService {
   }
 
   // equipos.service.ts
+
   getAlmacenesPorObra(obraId: number): Observable<Almacen[]> {
-    return this.http.get<Almacen[]>(`${this.apiUrl}almacen/?obra=${obraId}`);
+    console.log(`Obra ID seleccionado: ${obraId}`); // Log para verificar el valor
+    return this.http.get<Almacen[]>(
+      `${this.apiUrl}almacen/by_obra/?obra=${obraId}`
+    );
   }
 }

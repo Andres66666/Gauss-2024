@@ -1,186 +1,143 @@
 <div class="container">
   <h2>Registrar Solicitud</h2>
-  <form [formGroup]="registrarForm" (ngSubmit)="registrarSolicitudes()">
-    <!-- Campo para fecha de solicitud -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="fechaSolicitud">Fecha de solicitud:</label>
+  <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="codigoSolicitud">Código de Solicitud:</label>
       <input
-        id="fechaSolicitud"
-        type="date"
-        class="form-control"
-        formControlName="fechaSolicitud"
-        placeholder="Ingrese la fecha de solicitud"
+        type="text"
+        id="codigoSolicitud"
+        formControlName="codigoSolicitud"
         required
       />
-      <div
-        *ngIf="
-          registrarForm.get('fechaSolicitud')?.invalid &&
-          registrarForm.get('fechaSolicitud')?.touched
-        "
-        class="text-danger"
-      >
-        La fecha de solicitud es obligatoria.
-      </div>
     </div>
 
-    <!-- Campo para fecha de retorno estimada -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="fechaRetornoEstimada">Fecha de retorno estimada:</label>
+    <div class="form-group">
+      <label for="fecha_solicitud">Fecha de Solicitud</label>
       <input
-        id="fechaRetornoEstimada"
         type="date"
+        formControlName="fecha_solicitud"
         class="form-control"
-        formControlName="fechaRetornoEstimada"
-        placeholder="Ingrese la fecha de retorno estimada"
         required
       />
-      <div
-        *ngIf="
-          registrarForm.get('fechaRetornoEstimada')?.invalid &&
-          registrarForm.get('fechaRetornoEstimada')?.touched
-        "
-        class="text-danger"
-      >
-        La fecha de retorno estimada es obligatoria.
-      </div>
     </div>
 
-    <!-- Campo para seleccionar un equipo -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="equipo" class="col-form-label">Seleccione un equipo:</label>
-      <select
-        id="equipo"
-        class="form-select"
-        formControlName="equipo"
-        (change)="onEquipoChange($event)"
+    <div class="form-group">
+      <label for="fecha_retorno_estimada">Fecha de Retorno Estimada</label>
+      <input
+        type="date"
+        formControlName="fecha_retorno_estimada"
+        class="form-control"
         required
-      >
-        <option value="">Seleccione un equipo</option>
-        <option *ngFor="let equipo of equipos" [value]="equipo.id">
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_retorno_real">Fecha de Retorno Real:</label>
+      <input
+        type="date"
+        id="fecha_retorno_real"
+        formControlName="fecha_retorno_real"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="estado">Estado:</label>
+      <select id="estado" formControlName="estado">
+        <option value="endiente">Pendiente</option>
+        <option value="completada">Completada</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="En uso">En uso</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="motivo_uso">Motivo de Uso:</label><br />
+      <p><strong>Motivo:</strong></p>
+      <textarea
+        id="motivo_uso"
+        formControlName="motivo_uso"
+        placeholder="Escriba aquí el motivo..."
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_uso">Fecha de Uso</label>
+      <input
+        type="date"
+        formControlName="fecha_uso"
+        class="form-control"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="codigoEquipo">Buscar Equipo por Código:</label>
+      <input
+        type="text"
+        id="codigoEquipo"
+        (input)="buscarEquipo($event)"
+        placeholder="Ingrese el código del equipo"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="equipo">Equipo:</label>
+      <select id="equipo" formControlName="equipo" required>
+        <option *ngFor="let equipo of filteredEquipos" [value]="equipo.id">
           {{ equipo.nombreEquipo }}
         </option>
       </select>
-      <div
-        *ngIf="
-          registrarForm.get('equipo')?.invalid &&
-          registrarForm.get('equipo')?.touched
-        "
-        class="text-danger"
-      >
-        Seleccionar un equipo es obligatorio.
-      </div>
     </div>
 
-    <!-- Campo para seleccionar una obra -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="obra" class="col-form-label">Seleccione una obra:</label>
-      <select id="obra" class="form-select" formControlName="obra" required>
-        <option value="">Seleccione una obra</option>
-        <option *ngFor="let obra of obras" [value]="obra.id">
-          {{ obra.nombreObra }}
+    <div class="form-group">
+      <label for="ciUsuario">Buscar Usuario por CI:</label>
+      <input
+        type="text"
+        id="ciUsuario"
+        (input)="buscarUsuario($event)"
+        placeholder="Ingrese el CI del usuario"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="usuario">Usuario:</label>
+      <select id="usuario" formControlName="usuario" required>
+        <option *ngFor="let usuario of filteredUsuarios" [value]="usuario.id">
+          {{ usuario.nombreUsuario }}
         </option>
       </select>
-
-      <!-- Mostrar la ubicación de la obra seleccionada -->
-      <p *ngIf="ubicacionObra" class="mt-2">Ubicación: {{ ubicacionObra }}</p>
-      <div
-        *ngIf="
-          registrarForm.get('obra')?.invalid &&
-          registrarForm.get('obra')?.touched
-        "
-        class="text-danger"
-      >
-        Seleccionar una obra es obligatorio.
-      </div>
     </div>
-    <!-- Campo para seleccionar un usuario -->
-    <div class="form-group d-flex flex-column align-items-start">
-      <label for="usuario" class="col-form-label">Seleccione un usuario:</label>
-      <select
-        id="usuario"
-        class="form-select"
-        formControlName="usuario"
+    <div class="form-group">
+      <label for="descripcion_falla">Descripción de Falla:</label>
+      <textarea
+        id="descripcion_falla"
+        formControlName="descripcion_falla"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad_fallas_solicitud">Cantidad de Fallas:</label>
+      <input
+        type="number"
+        id="cantidad_fallas_solicitud"
+        formControlName="cantidad_fallas_solicitud"
+        min="0"
         required
-      >
-        <option value="">Seleccione un usuario</option>
-        <option *ngFor="let usuario of usuarios" [value]="usuario.id">
-          {{ usuario.nombreUsuario }} {{ usuario.apellido }}
-        </option>
-      </select>
-      <div
-        *ngIf="
-          registrarForm.get('usuario')?.invalid &&
-          registrarForm.get('usuario')?.touched
-        "
-        class="text-danger"
-      >
-        Seleccionar un usuario es obligatorio.
-      </div>
+      />
     </div>
 
-    <!-- Botón de registrar solicitud -->
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="!registrarForm.valid"
-    >
+    <div class="form-group">
+      <label for="horas_uso_solicitud">Horas de Uso:</label>
+      <input
+        type="number"
+        id="horas_uso_solicitud"
+        formControlName="horas_uso_solicitud"
+        min="0"
+        required
+      />
+    </div>
+
+    <button type="submit" [disabled]="solicitudForm.invalid">
       Registrar Solicitud
     </button>
   </form>
-</div>
-
-<!-- Modal de Éxito -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && !errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Información</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ mensajeModal }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de Error -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Error</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ errorModal }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

@@ -25,35 +25,28 @@ export class RegistrarEquiposComponent implements OnInit {
   manejarModal: boolean = false;
   mensajeModal: string = '';
   errorModal: string = '';
+  selectedObraId: number = 0; // ID de la obra seleccionada
+  esExito: boolean = false;
+  mensaje: string = '';
   @Output() listarEquipo = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private equiposService: EquiposService) {
-    // Inicializar el formulario con los controles necesarios
     this.registrarForm = this.fb.group({
-      codigoEquipo: ['', Validators.required],
-      nombreEquipo: ['', Validators.required],
-      marcaEquipo: ['', Validators.required],
-      modeloEquipo: ['', Validators.required],
-      estadoDisponibilidad: ['', Validators.required],
-      vidaUtilEquipo: ['', Validators.required],
-      fechaAdquiscion: ['', Validators.required],
-      horasUso: [0, [Validators.required, Validators.min(0)]],
-      edadEquipo: ['', Validators.required],
-      almacen: ['', Validators.required],
-      almacen_global: [''], // Nuevo campo para el almacén global (opcional)
-      cantMantCorrectivos: [0, Validators.min(0)], // Nuevo campo
-      numFallasReportdas: [0, Validators.min(0)], // Nuevo campo
-      imagenEquipos: [''],
+      codigoEquipo: ['', [Validators.required]],
+      nombreEquipo: ['', [Validators.required]],
+      marcaEquipo: ['', [Validators.required]],
+      modeloEquipo: ['', [Validators.required]],
+      vidaUtilEquipo: ['', [Validators.required]],
+      fechaAdquiscion: ['', [Validators.required]],
+      fechaFabricacion: [''], // Opcional
+      imagenEquipos_url: [''], // Para cargar la imagen
+      obra: ['', [Validators.required]], // Relación con una obra
+      almacen: ['', [Validators.required]], // Relación con un almacén
     });
-  }
-  ngOnInit(): void {
-    this.loadObras(); // Cargar las obras al iniciar el componente
   }
 
-  loadAlmacenes() {
-    this.equiposService.getAlmacen().subscribe((data) => {
-      this.almacenes = data;
-    });
+  ngOnInit(): void {
+    this.loadObras(); // Cargar las obras al iniciar el componente
   }
 
   loadObras() {
@@ -64,11 +57,13 @@ export class RegistrarEquiposComponent implements OnInit {
 
   onObraChange(event: Event) {
     const obraId = (event.target as HTMLSelectElement).value;
-    const obraIdNumber = Number(obraId); // Asegurarse de que sea un número
+    const obraIdNumber = Number(obraId); // Asegurarte de que sea un número
 
     this.equiposService.getAlmacenesPorObra(obraIdNumber).subscribe(
       (almacenes) => {
         this.almacenes = almacenes; // Actualizar la lista de almacenes
+        this.registrarForm.get('almacen')?.setValue(''); // Reiniciar el almacén seleccionado
+        this.registrarForm.get('almacen')?.updateValueAndValidity(); // Asegurarse de que el formulario se actualice
       },
       (error) => {
         console.error('Error al cargar los almacenes:', error);
@@ -76,88 +71,104 @@ export class RegistrarEquiposComponent implements OnInit {
     );
   }
 
-  registrarEquipos() {
-    const formData = new FormData(); // Usar FormData para incluir la imagen y los datos
-
-    // Añadir cada campo del formulario al formData
-    formData.append(
-      'codigoEquipo',
-      this.registrarForm.get('codigoEquipo')?.value
-    );
-    formData.append(
-      'nombreEquipo',
-      this.registrarForm.get('nombreEquipo')?.value
-    );
-    formData.append(
-      'marcaEquipo',
-      this.registrarForm.get('marcaEquipo')?.value
-    );
-    formData.append(
-      'modeloEquipo',
-      this.registrarForm.get('modeloEquipo')?.value
-    );
-    formData.append(
-      'estadoDisponibilidad',
-      this.registrarForm.get('estadoDisponibilidad')?.value
-    );
-    formData.append(
-      'vidaUtilEquipo',
-      this.registrarForm.get('vidaUtilEquipo')?.value
-    );
-    formData.append(
-      'fechaAdquiscion',
-      this.registrarForm.get('fechaAdquiscion')?.value
-    );
-    formData.append(
-      'horasUso',
-      this.registrarForm.get('horasUso')?.value.toString()
-    ); // Convertir a string
-    formData.append('edadEquipo', this.registrarForm.get('edadEquipo')?.value);
-
-    // Asegúrate de que el almacén esté seleccionado
-    const almacenId = this.registrarForm.get('almacen')?.value;
-    if (!almacenId) {
-      this.errorModal = 'Por favor, seleccione un almacén.';
-      this.manejarModal = true;
-      return; // Detener la ejecución si no hay almacén seleccionado
-    }
-    formData.append('almacen', almacenId);
-
-    // Asegúrate de que el almacén global esté seleccionado si aplica
-    const almacenGlobalId = this.registrarForm.get('almacen_global')?.value;
-    if (almacenGlobalId) {
-      formData.append('almacen_global', almacenGlobalId);
-    }
-
-    // Campos adicionales
-    formData.append(
-      'cantMantCorrectivos',
-      this.registrarForm.get('cantMantCorrectivos')?.value || '0'
-    ); // Default 0
-    formData.append(
-      'numFallasReportdas',
-      this.registrarForm.get('numFallasReportdas')?.value || '0'
-    ); // Default 0
-
-    formData.append(
-      'imagenEquipos',
-      this.registrarForm.get('imagenEquipos')?.value
-    );
-
-    // Registrar equipo
-    this.equiposService
-      .registrarEquipos(formData as unknown as Equipo)
-      .subscribe(
-        (response) => {
-          this.mensajeModal = 'Equipo registrado exitosamente';
-          this.manejarModal = true;
-          this.registrarForm.reset(); // Opcional: Reiniciar el formulario después de un registro exitoso
-        },
-        (error) => {
-          this.errorModal = 'Error al registrar el equipo';
-          this.manejarModal = true;
-        }
+  registrarEquipo() {
+    if (this.registrarForm.valid) {
+      const formData = new FormData(); // Usar FormData para incluir la imagen y los datos
+      // Añadir cada campo del formulario al formData
+      formData.append(
+        'codigoEquipo',
+        this.registrarForm.get('codigoEquipo')?.value
       );
+      formData.append(
+        'nombreEquipo',
+        this.registrarForm.get('nombreEquipo')?.value
+      );
+      formData.append(
+        'marcaEquipo',
+        this.registrarForm.get('marcaEquipo')?.value
+      );
+      formData.append(
+        'modeloEquipo',
+        this.registrarForm.get('modeloEquipo')?.value
+      );
+      formData.append(
+        'vidaUtilEquipo',
+        this.registrarForm.get('vidaUtilEquipo')?.value
+      );
+      formData.append('estadoEquipo', 'true');
+      formData.append(
+        'estadoDisponibilidad',
+        this.registrarForm.get('estadoDisponibilidad')?.value
+      );
+      formData.append(
+        'vidaUtilEquipo',
+        this.registrarForm.get('vidaUtilEquipo')?.value
+      );
+      formData.append(
+        'fechaAdquiscion',
+        this.registrarForm.get('fechaAdquiscion')?.value
+      );
+      formData.append(
+        'fechaFabricacion',
+        this.registrarForm.get('fechaFabricacion')?.value || ''
+      );
+      formData.append(
+        'horasUso',
+        this.registrarForm.get('horasUso')?.value.toString()
+      );
+      formData.append(
+        'edadEquipo',
+        this.registrarForm.get('edadEquipo')?.value
+      );
+      formData.append('obra', this.registrarForm.get('obra')?.value);
+      formData.append('almacen', this.registrarForm.get('almacen')?.value);
+
+      // Si se seleccionó una imagen, añadirla a formData
+      const imagenInput = this.registrarForm.get('imagenEquipos_url')?.value;
+      if (imagenInput) {
+        // Validar el tamaño de la imagen
+        if (imagenInput.size > 1024 * 1024 * 5) {
+          this.mensaje = 'La imagen es demasiado grande. Debe ser menor a 5MB';
+          this.esExito = false;
+          return;
+        }
+
+        // Validar el tipo de archivo
+        if (!['image/jpeg', 'image/png'].includes(imagenInput.type)) {
+          this.mensaje = 'Solo se permiten archivos de tipo JPEG, PNG';
+          this.esExito = false;
+          return;
+        }
+        formData.append('imagenEquipos_url', imagenInput);
+      }
+
+      // Validar si el código de equipo ya existe
+      this.equiposService.getEquipo().subscribe((equipos) => {
+        const codigoExiste = equipos.find(
+          (equipo) =>
+            equipo.codigoEquipo ===
+            this.registrarForm.get('codigoEquipo')?.value
+        );
+
+        if (codigoExiste) {
+          this.mensaje = 'El código de equipo ya existe';
+          this.esExito = false;
+        } else {
+          // Registrar equipo
+          this.equiposService
+            .registrarEquipos(formData as unknown as Equipo)
+            .subscribe(
+              (response) => {
+                alert('Registro de equipo exitoso');
+                this.listarEquipo.emit();
+              },
+              (error) => {
+                alert('Error al registrar equipo');
+              }
+            );
+        }
+      });
+    }
   }
 
   manejarOk() {
@@ -171,7 +182,7 @@ export class RegistrarEquiposComponent implements OnInit {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
       this.registrarForm.patchValue({
-        imagenEquipos: file,
+        imagenEquipos_url: file, // Corrected field name
       });
       const reader = new FileReader();
       reader.onload = (e) => {

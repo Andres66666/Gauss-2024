@@ -1,9 +1,11 @@
+import datetime
 from urllib import request
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import check_password
+from rest_framework.decorators import action
 
 from .serializers import (
     AlmacenesSerializer,
@@ -26,28 +28,45 @@ import json
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class LoginView(APIView):
+    authentication_classes = []  # Elimina autenticación solo para login
+    permission_classes = []      # Deja vacía la lista de permisos
+
     def post(self, request):
+        # Validación del formulario de login
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        # Obtención de los datos validados
         correo = serializer.validated_data.get('correo')
         password = serializer.validated_data.get('password')
 
         try:
+            # Verificación de estado del usuario
             usuario = Usuarios.objects.get(correo=correo)
 
-            # Check if the user is active
+            # Verificar si el usuario está activo
             if not usuario.activo:
                 return Response({'error': 'No puedes iniciar sesión!!!. Comuníquese con el administrador. Gracias.'}, status=status.HTTP_403_FORBIDDEN)
             
+            # Obtener todos los roles asociados con el usuario
+            usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
+            if not usuario_roles:
+                return Response({'error': 'El usuario no tiene roles asignados.'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Verificar si todos los roles están desactivados
+            active_roles = [usuario_rol.rol for usuario_rol in usuario_roles if usuario_rol.rol.activo]
+            if not active_roles:
+                return Response({'error': 'El rol asignado al usuario está desactivado. No puedes iniciar sesión.'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Verificar la contraseña
             if check_password(password, usuario.password):
-                # Generación del token
+                # Generación del token JWT
                 refresh = RefreshToken.for_user(usuario)
-                #return Response({'token': usuario.token}, status=status.HTTP_200_OK)
-                # Obtener roles del usuario
-                usuario_roles = UsuarioRoles.objects.filter(usuario=usuario)
-                roles = [usuario_rol.rol.nombreRol for usuario_rol in usuario_roles]
+                access_token = str(refresh.access_token)
+
+                # Obtener nombres de roles activos del usuario
+                roles = [rol.nombreRol for rol in active_roles]
 
                 # Obtener permisos asociados a los roles del usuario
                 permisos = RolPermisos.objects.filter(rol__in=[usuario_rol.rol for usuario_rol in usuario_roles])
@@ -58,18 +77,22 @@ class LoginView(APIView):
                 return Response({
                     'mensaje': 'Login exitoso',
                     'refresh': str(refresh),
+                    'access_token': access_token,
                     'access': str(refresh.access_token),
                     'usuario': usuario_serializer.data,
                     'nombreUsuario': usuario.nombreUsuario,
                     'apellido': usuario.apellido,
                     'imagen_url': usuario.imagen_url,
-
                     'roles': roles,
-                    'permisos': permisos_nombres
+                    'permisos': permisos_nombres,
+                    'usuario_id': usuario.id
                 }, status=status.HTTP_200_OK)
             else:
+                # Respuesta en caso de credenciales incorrectas
                 return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
+
         except Usuarios.DoesNotExist:
+            # Respuesta en caso de que el usuario no exista
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
 
 class RolViewSet(viewsets.ModelViewSet):
@@ -402,69 +425,118 @@ class AlmacenesViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def by_obra(self, request):
+            obra_id = request.query_params.get('obra')
+            if obra_id:
+                almacenes = Almacenes.objects.filter(obra_id=obra_id)
+                serializer = self.get_serializer(almacenes, many=True)
+                return Response(serializer.data)
+            return Response({"error": "Obra ID no proporcionada"}, status=400)
+
 
 class EquiposViewSet(viewsets.ModelViewSet):
     queryset = Equipos.objects.all()
     serializer_class = EquiposSerializer
-    # Método para crear un equipo
+
     def create(self, request, *args, **kwargs):
-        # Obtener datos del cuerpo de la solicitud
-        data = request.data
-
-        # Validar campos requeridos
-        required_fields = [
-            'codigoEquipo', 'nombreEquipo', 'marcaEquipo', 'modeloEquipo',
-            'estadoEquipo', 'estadoDisponibilidad', 'vidaUtilEquipo',
-            'fechaAdquiscion', 'fechaFabricacion', 'almacen'
-        ]
-        missing_fields = [field for field in required_fields if field not in data]
-        if missing_fields:
-            return Response(
-                {"error": f"Campos faltantes: {', '.join(missing_fields)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Manejo de datos adicionales con valores predeterminados
-        horasUso = data.get('horasUso', 0)
-        edadEquipo = data.get('edadEquipo', None)
+        # Obtener los datos del equipo desde la solicitud
+        codigoEquipo = request.data.get('codigoEquipo')
+        nombreEquipo = request.data.get('nombreEquipo')
+        marcaEquipo = request.data.get('marcaEquipo')
+        modeloEquipo = request.data.get('modeloEquipo')
+        vidaUtilEquipo = request.data.get('vidaUtilEquipo')
+        fechaAdquiscion = request.data.get('fechaAdquiscion')
+        fechaFabricacion = request.data.get('fechaFabricacion')
+        almacen_id = request.data.get('almacen')  # Campo almacen_id de la solicitud
+        imagenEquipos_url = None
 
         # Subir la imagen a S3 si se proporciona
-        imagenEquipos_url = None
-        if 'imagenEquipos' in request.FILES:
-            file = request.FILES['imagenEquipos']
-            try:
-                imagenEquipos_url = self.upload_image_to_s3(file)
-            except Exception as e:
-                return Response(
-                    {"error": f"Error al subir la imagen: {str(e)}"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+        if 'imagenEquipos_url' in request.FILES:
+            file = request.FILES['imagenEquipos_url']
+            imagenEquipos_url = self.upload_image_to_s3(file)
 
-        # Crear el equipo en la base de datos
+        # Verificar que almacen_id no sea nulo
+        if not almacen_id:
+            return Response({'error': 'El campo almacen es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
+            # Crear el equipo
             equipo = Equipos.objects.create(
-                codigoEquipo=data['codigoEquipo'],
-                nombreEquipo=data['nombreEquipo'],
-                marcaEquipo=data['marcaEquipo'],
-                modeloEquipo=data['modeloEquipo'],
-                estadoEquipo=data['estadoEquipo'],
-                estadoDisponibilidad=data['estadoDisponibilidad'],
-                vidaUtilEquipo=data['vidaUtilEquipo'],
-                fechaAdquiscion=data['fechaAdquiscion'],
-                fechaFabricacion=data['fechaFabricacion'],
-                horasUso=horasUso,
-                edadEquipo=edadEquipo,
-                almacen_id=data['almacen'],  # almacen_id es necesario para establecer la relación
-                imagenEquipos_url=imagenEquipos_url
+                codigoEquipo=codigoEquipo,
+                nombreEquipo=nombreEquipo,
+                marcaEquipo=marcaEquipo,
+                modeloEquipo=modeloEquipo,
+                vidaUtilEquipo=vidaUtilEquipo,
+                fechaAdquiscion=fechaAdquiscion,
+                fechaFabricacion=fechaFabricacion,
+                imagenEquipos_url=imagenEquipos_url,
+                almacen_id=almacen_id,  # Asignar el almacen
             )
-            return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(
-                {"error": f"Error al crear el equipo: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def upload_image_to_s4(self, file):
+        return Response(EquiposSerializer(equipo).data, status=status.HTTP_201_CREATED)
+
+    
+    def update(self, request, *args, **kwargs):
+        # Obtener la instancia del equipo a actualizar
+        equipo = self.get_object()
+
+        # Obtener la URL de la imagen antigua
+        old_image_url = equipo.imagenEquipos_url
+
+        # Usar el serializador para validar los datos entrantes
+        serializer = self.get_serializer(equipo, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Actualizar la imagen si se proporciona una nueva
+        if 'imagenEquipos_url' in request.FILES:
+            file = request.FILES['imagenEquipos_url']
+            s3_url = self.upload_image_to_s3(file)
+            equipo.imagenEquipos_url = s3_url  # Guardar la nueva URL de la imagen en la base de datos
+
+        # Actualizar los campos restantes, usando los valores actuales si no se proporcionan nuevos
+        equipo.codigoEquipo = request.data.get('codigoEquipo', equipo.codigoEquipo)
+        equipo.nombreEquipo = request.data.get('nombreEquipo', equipo.nombreEquipo)
+        equipo.marcaEquipo = request.data.get('marcaEquipo', equipo.marcaEquipo)
+        equipo.modeloEquipo = request.data.get('modeloEquipo', equipo.modeloEquipo)
+
+        # Asegurarse de que el valor de estadoEquipo sea un booleano
+        estado_equipo = request.data.get('estadoEquipo', equipo.estadoEquipo)
+        if isinstance(estado_equipo, str):
+            equipo.estadoEquipo = estado_equipo.lower() == 'true'  # Convertir "true"/"false" a booleano
+        else:
+            equipo.estadoEquipo = estado_equipo
+
+        # Actualizar estadoDisponibilidad asegurándose de que sea uno de los valores válidos
+        estadoDisponibilidad = request.data.get('estadoDisponibilidad', equipo.estadoDisponibilidad)
+        if estadoDisponibilidad in ['disponible', 'En uso', 'En mantenimiento']:
+            equipo.estadoDisponibilidad = estadoDisponibilidad
+        else:
+            return Response({'error': 'Estado de disponibilidad no válido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        equipo.vidaUtilEquipo = request.data.get('vidaUtilEquipo', equipo.vidaUtilEquipo)
+        equipo.fechaAdquiscion = request.data.get('fechaAdquiscion', equipo.fechaAdquiscion)
+        equipo.fechaFabricacion = request.data.get('fechaFabricacion', equipo.fechaFabricacion)
+        equipo.horasUso = request.data.get('horasUso', equipo.horasUso)
+        equipo.edadEquipo = request.data.get('edadEquipo', equipo.edadEquipo)
+
+        # Manejo del campo almacen
+        almacen_data = request.data.get('almacen')
+        if almacen_data:
+            equipo.almacen_id = almacen_data  # Asignar el nuevo almacen si se proporciona
+
+        # Guardar la instancia actualizada
+        equipo.save()
+
+        # Retornar la imagen antigua junto con los datos actualizados
+        response_data = serializer.data
+        response_data['old_image_url'] = old_image_url
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def upload_image_to_s3(self, file):
         s3_client = boto3.client('s3',
                                 aws_access_key_id='AKIAXBZV5WHW7U4O2QEF',
                                 aws_secret_access_key='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',
@@ -473,11 +545,13 @@ class EquiposViewSet(viewsets.ModelViewSet):
         try:
             s3_key = f"imagenes/{file.name}"
             s3_client.upload_fileobj(file, 'localimg', s3_key, ExtraArgs={'ContentType': file.content_type})
-            imagenEquipos_url = f"https://localimg.s3.us-east-2.amazonaws.com/{s3_key}"
-            return imagenEquipos_url
+            image_url = f"https://localimg.s3.us-east-2.amazonaws.com/{s3_key}"
+            return image_url
         except Exception as e:
             raise Exception(f"Error subiendo imagen a S3: {str(e)}")
-    
+
+
+
 
 class MantenimientosViewSet(viewsets.ModelViewSet):
     queryset = Mantenimientos.objects.all()
@@ -485,10 +559,6 @@ class MantenimientosViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         equipo_id = request.data.get('equipo')
-
-        # Verificar si el equipo ya está en mantenimiento
-        if Mantenimientos.objects.filter(equipo_id=equipo_id, estadoMantenimiento=True).exists():
-            return Response({'error': 'El equipo ya está en mantenimiento.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Crear el mantenimiento
         try:
@@ -499,72 +569,170 @@ class MantenimientosViewSet(viewsets.ModelViewSet):
         mantenimiento = Mantenimientos.objects.create(
             fechaInicio=request.data.get('fechaInicio'),
             fechaFin=request.data.get('fechaFin'),
-            estadoMantenimiento=True,  # En proceso
-            tipoMantenimiento=request.data.get('tipoMantenimiento'),
             detalleMantenimiento=request.data.get('detalleMantenimiento'),
             responsable=request.data.get('responsable'),
+            tipo_mantenimiento=request.data.get('tipo_mantenimiento'),
             equipo=equipo
         )
 
-        # Cambiar el estado del equipo a "En mantenimiento"
-        equipo.estadoUsoEquipo = 'En mantenimiento'
+        # Incrementar el contador de mantenimientos
+        if mantenimiento.tipo_mantenimiento == 'preventivo':
+            equipo.cantMantPreventivos += 1
+        elif mantenimiento.tipo_mantenimiento == 'correctivo':
+            equipo.cantMantCorrectivos += 1
         equipo.save()
 
         return Response(MantenimientosSerializer(mantenimiento).data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, pk=None):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+    def update(self, request, *args, **kwargs):
+        mantenimiento = self.get_object()
+        equipo = mantenimiento.equipo
+
+        # Guardar el tipo de mantenimiento anterior
+        old_tipo_mantenimiento = mantenimiento.tipo_mantenimiento
+
+        # Actualizar los campos del mantenimiento
+        serializer = self.get_serializer(mantenimiento, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        serializer.save()
 
-        instance.equipo_id = request.data.get('equipo', {}).get('id', instance.equipo_id)
-        instance.save()
-        return Response(serializer.data)
+        # Verificar si el tipo de mantenimiento ha cambiado
+        new_tipo_mantenimiento = request.data.get('tipo_mantenimiento', old_tipo_mantenimiento)
 
-        return Response(serializer.data)
+        if new_tipo_mantenimiento != old_tipo_mantenimiento:
+            # Decrementar el contador del tipo anterior
+            if old_tipo_mantenimiento == 'preventivo':
+                equipo.cantMantPreventivos -= 1
+            elif old_tipo_mantenimiento == 'correctivo':
+                equipo.cantMantCorrectivos -= 1
 
+            # Incrementar el contador del nuevo tipo
+            if new_tipo_mantenimiento == 'preventivo':
+                equipo.cantMantPreventivos += 1
+            elif new_tipo_mantenimiento == 'correctivo':
+                equipo.cantMantCorrectivos += 1
+
+        equipo.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from django.utils import timezone  # Asegúrate de tener esta línea
+from .models import UsoSolicitudesEquipos
+from .serializers import UsoSolicitudesEquiposSerializer
 
 class SolicitudesViewSet(viewsets.ModelViewSet):
     queryset = UsoSolicitudesEquipos.objects.all()
-    serializer_class = UsoSolicitudesEquiposSerializer  # Cambiado a UsoSolicitudesEquiposSerializer
-
-    def update(self, request, pk=None):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        # Actualizar los campos utilizando el serializer
-        instance.fecha_solicitud = request.data.get('fecha_solicitud', instance.fecha_solicitud)
-        instance.fecha_retorno_estimada = request.data.get('fecha_retorno_estimada', instance.fecha_retorno_estimada)
-        instance.fecha_retorno_real = request.data.get('fecha_retorno_real', instance.fecha_retorno_real)
-        instance.equipo_id = request.data.get('equipo', {}).get('id', instance.equipo_id)
-        instance.obra_id = request.data.get('obra', {}).get('id', instance.obra_id)
-        instance.usuario_id = request.data.get('usuario', {}).get('id', instance.usuario_id)
-        instance.save()
-        return Response(serializer.data)
+    serializer_class = UsoSolicitudesEquiposSerializer 
 
     def create(self, request, *args, **kwargs):
-        fechaSolicitud = request.data.get('fechaSolicitud')  # Cambiado a 'fechaSolicitud'
-        fechaRetornoEstimada = request.data.get('fechaRetornoEstimada')  # Cambiado a 'fechaRetornoEstimada'
+        # Obtener el ID del equipo y del usuario desde la solicitud
         equipo_id = request.data.get('equipo')
-        obra_id = request.data.get('obra')
         usuario_id = request.data.get('usuario')
 
+        # Verificar si el equipo existe
         try:
             equipo = Equipos.objects.get(id=equipo_id)
-            obra = Obras.objects.get(id=obra_id)
-            usuario = Usuarios.objects.get(id=usuario_id)
-        except (Equipos.DoesNotExist, Obras.DoesNotExist, Usuarios.DoesNotExist):
-            return Response({'error': 'Equipo, obra o usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        except Equipos.DoesNotExist:
+            return Response({'error': 'Equipo no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-        solicitud = UsoSolicitudesEquipos.objects.create(  # Cambiado a UsoSolicitudesEquipos
-            fecha_solicitud=fechaSolicitud,  # Cambiado a 'fecha_solicitud'
-            fecha_retorno_estimada=fechaRetornoEstimada,  # Cambiado a 'fecha_retorno_estimada'
+        # Verificar si el usuario existe
+        try:
+            usuario = Usuarios.objects.get(id=usuario_id)
+        except Usuarios.DoesNotExist:
+            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar si el equipo está disponible
+        if equipo.estadoDisponibilidad != 'disponible':
+            return Response({'error': 'Equipo no disponible para registrar la solicitud.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear la solicitud
+        solicitud = UsoSolicitudesEquipos(
+            codigoSolicitud=request.data.get('codigoSolicitud'),
+            fecha_solicitud=request.data.get('fecha_solicitud'),
+            fecha_retorno_estimada=request.data.get('fecha_retorno_estimada'),
+            fecha_retorno_real=request.data.get('fecha_retorno_real'),
+            estado=request.data.get('estado', 'pendiente'),  # Valor por defecto
+            motivo_uso=request.data.get('motivo_uso'),
+            fecha_uso=request.data.get('fecha_uso'),
             equipo=equipo,
-            obra=obra,
-            usuario=usuario
+            usuario=usuario,
+            descripcion_falla=request.data.get('descripcion_falla'),
+            cantidad_fallas_solicitud=request.data.get('cantidad_fallas_solicitud', 0),
+            horas_uso_solicitud=request.data.get('horas_uso_solicitud', 0)
         )
 
+        # Guardar la solicitud
+        solicitud.save()
+
+         # Actualizar el estado de disponibilidad del equipo a "en uso"
+        equipo.estadoDisponibilidad = 'En uso'
+        equipo.save()
+        
+
         return Response(UsoSolicitudesEquiposSerializer(solicitud).data, status=status.HTTP_201_CREATED)
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Obtener el ID del equipo y del usuario desde la solicitud
+        equipo_id = request.data.get('equipo')
+        usuario_id = request.data.get('usuario')
+
+        # Verificar si el equipo existe
+        if equipo_id:
+            if isinstance(equipo_id, dict):
+                equipo_id = equipo_id.get('id')
+            try:
+                equipo = Equipos.objects.get(id=equipo_id)
+                instance.equipo = equipo
+            except Equipos.DoesNotExist:
+                return Response({'error': 'Equipo no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar si el usuario existe
+        if usuario_id:
+            if isinstance(usuario_id, dict):
+                usuario_id = usuario_id.get('id')
+            try:
+                usuario = Usuarios.objects.get(id=usuario_id)
+                instance.usuario = usuario
+            except Usuarios.DoesNotExist:
+                return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Actualizar los campos de la solicitud
+        instance.codigoSolicitud = request.data.get('codigoSolicitud', instance.codigoSolicitud)
+        instance.fecha_solicitud = request.data.get('fecha_solicitud', instance.fecha_solicitud)
+        instance.fecha_retorno_estimada = request.data.get('fecha_retorno_estimada', instance.fecha_retorno_estimada)
+
+        # Manejo de la fecha de retorno real
+        fecha_retorno_real = request.data.get('fecha_retorno_real')
+        if fecha_retorno_real:
+            try:
+                instance.fecha_retorno_real = timezone.datetime.strptime(fecha_retorno_real, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({'error': 'Formato de fecha no válido para fecha_retorno_real. Debe ser YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Actualizar otros campos
+        instance.estado = request.data.get('estado', instance.estado)
+        instance.motivo_uso = request.data.get('motivo_uso', instance.motivo_uso)
+        instance.fecha_uso = request.data.get('fecha_uso', instance.fecha_uso)
+        instance.descripcion_falla = request.data.get('descripcion_falla', instance.descripcion_falla)
+        instance.cantidad_fallas_solicitud = request.data.get('cantidad_fallas_solicitud', instance.cantidad_fallas_solicitud)
+        instance.horas_uso_solicitud = request.data.get('horas_uso_solicitud', instance.horas_uso_solicitud)
+
+        # Guardar los cambios
+        try:
+            instance.save()
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Actualizar el equipo correspondiente
+        equipo = instance.equipo
+        equipo.numFallasReportdas += instance.cantidad_fallas_solicitud
+        equipo.horasUso += instance.horas_uso_solicitud
+        equipo.estadoDisponibilidad = 'disponible'  # Cambiar estado a disponible
+        equipo.save()
+
+        # Cambiar 'solicitud' por 'instance'
+        return Response(UsoSolicitudesEquiposSerializer(instance).data, status=status.HTTP_200_OK)

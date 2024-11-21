@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 interface Usuario {
   id: number;
@@ -27,7 +28,7 @@ export class AuthService {
   private nombreUsuario: string = ''; // Variable para almacenar el nombre de usuario
   public apellido: string | null = null; // Variable para almacenar el nombre de usuario
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   login(correo: string, password: string): Observable<Usuario> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -64,5 +65,27 @@ export class AuthService {
   getProtectedData(): Observable<any> {
     const headers = this.getAuthHeaders(); // Obtener cabeceras con el token
     return this.http.get<any>(`${this.apiUrl}protected-endpoint/`, { headers });
+  }
+  // Verificar si el usuario está autenticado (Token presente en localStorage)
+  isAuthenticated(): boolean {
+    return localStorage.getItem('token') !== null;
+  }
+
+  // Función para manejar el cierre de sesión
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('usuario_id');
+    this.router.navigate(['/login']);
+  }
+
+  getUsuarioLocalStorage() {
+    const usuario = localStorage.getItem('usuario');
+    return usuario ? JSON.parse(usuario) : null; // Asegúrate de que el usuario se parsea correctamente
+  }
+  // Obtener el usuario desde localStorage
+  private getUserFromLocalStorage(): Usuario | null {
+    const user = localStorage.getItem('usuario');
+    return user ? JSON.parse(user) : null;
   }
 }

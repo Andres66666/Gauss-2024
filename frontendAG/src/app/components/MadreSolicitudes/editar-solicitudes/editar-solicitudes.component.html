@@ -1,156 +1,160 @@
-<div class="container">
-  <h2 class="text-center">Editar Solicitud</h2>
+<div class="editar-solicitudes">
+  <h2>Editar Solicitud</h2>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <!-- Campo para fecha de solicitud -->
-    <div class="form-group">
-      <label for="fechaSolicitud">Fecha de Solicitud:</label>
+    <div>
+      <label for="codigoSolicitud">Código de Solicitud:</label>
+      <input id="codigoSolicitud" formControlName="codigoSolicitud" />
+      <div
+        *ngIf="
+          form.get('codigoSolicitud')?.invalid &&
+          form.get('codigoSolicitud')?.touched
+        "
+      >
+        <small>El código de solicitud es requerido.</small>
+      </div>
+    </div>
+
+    <div>
+      <label for="fecha_solicitud">Fecha de Solicitud:</label>
       <input
-        id="fechaSolicitud"
+        id="fecha_solicitud"
         type="date"
-        class="form-control"
-        formControlName="fechaSolicitud"
-        required
+        formControlName="fecha_solicitud"
       />
       <div
         *ngIf="
-          form.get('fechaSolicitud')?.invalid &&
-          form.get('fechaSolicitud')?.touched
+          form.get('fecha_solicitud')?.invalid &&
+          form.get('fecha_solicitud')?.touched
         "
-        class="text-danger"
       >
-        La fecha de solicitud es obligatoria.
+        <small>La fecha de solicitud es requerida.</small>
       </div>
     </div>
 
-    <!-- Campo para fecha de retorno estimada -->
-    <div class="form-group">
-      <label for="fechaRetornoEstimada">Fecha de Retorno Estimada:</label>
+    <div>
+      <label for="fecha_retorno_estimada">Fecha de Retorno Estimada:</label>
       <input
-        id="fechaRetornoEstimada"
+        id="fecha_retorno_estimada"
         type="date"
-        class="form-control"
-        formControlName="fechaRetornoEstimada"
-        required
+        formControlName="fecha_retorno_estimada"
       />
       <div
         *ngIf="
-          form.get('fechaRetornoEstimada')?.invalid &&
-          form.get('fechaRetornoEstimada')?.touched
+          form.get('fecha_retorno_estimada')?.invalid &&
+          form.get('fecha_retorno_estimada')?.touched
         "
-        class="text-danger"
       >
-        La fecha de retorno estimada es obligatoria.
+        <small>La fecha de retorno estimada es requerida.</small>
       </div>
     </div>
-
-    <!-- Campo para fecha de retorno real -->
-    <div class="form-group">
-      <label for="fechaRetornoReal">Fecha de Retorno Real:</label>
+    <div>
+      <label for="fecha_retorno_real">Fecha de Retorno Real:</label>
       <input
-        id="fechaRetornoReal"
+        id="fecha_retorno_real"
         type="date"
-        class="form-control"
-        formControlName="fechaRetornoReal"
-        required
+        formControlName="fecha_retorno_real"
       />
+      <!-- No se necesita un mensaje de error aquí, ya que no es obligatorio -->
+    </div>
+
+    <div>
+      <label for="estado">Estado:</label>
+      <select id="estado" formControlName="estado">
+        <option
+          value="pendiente"
+          [selected]="form.get('estado')?.value === 'pendiente'"
+        >
+          Pendiente
+        </option>
+        <option
+          value="completada"
+          [selected]="form.get('estado')?.value === 'completada'"
+        >
+          Completado
+        </option>
+        <option
+          value="cancelado"
+          [selected]="form.get('estado')?.value === 'cancelado'"
+        >
+          Cancelado
+        </option>
+        <option
+          value="En uso"
+          [selected]="form.get('estado')?.value === 'En uso'"
+        >
+          En Uso
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label for="motivo_uso">Motivo de Uso:</label>
+      <input id="motivo_uso" formControlName="motivo_uso" />
       <div
         *ngIf="
-          form.get('fechaRetornoReal')?.invalid &&
-          form.get('fechaRetornoReal')?.touched
+          form.get('motivo_uso')?.invalid && form.get('motivo_uso')?.touched
         "
-        class="text-danger"
       >
-        La fecha de retorno real es obligatoria.
+        <small>El motivo de uso es requerido.</small>
       </div>
     </div>
 
-    <!-- Campo para seleccionar un equipo -->
-    <div class="form-group">
-      <label for="equipo" class="col-form-label">Seleccione un equipo:</label>
-      <select id="equipo" class="form-select" formControlName="equipo" required>
-        <option value="">Seleccione un equipo</option>
-        <option *ngFor="let equipo of equipo" [value]="equipo.id">
-          {{ equipo.nombreEquipo }}
+    <div>
+      <label for="fecha_uso">Fecha de Uso:</label>
+      <input id="fecha_uso" type="date" formControlName="fecha_uso" />
+    </div>
+
+    <div>
+      <label for="equipo">Equipo:</label>
+      <select id="equipo" formControlName="equipo">
+        <option *ngFor="let e of equipo" [value]="e.id">
+          {{ e.nombreEquipo }}
         </option>
       </select>
-      <div
-        *ngIf="form.get('equipo')?.invalid && form.get('equipo')?.touched"
-        class="text-danger"
-      >
-        Seleccionar un equipo es obligatorio.
+      <div *ngIf="form.get('equipo')?.invalid && form.get('equipo')?.touched">
+        <small>El equipo es requerido.</small>
       </div>
     </div>
 
-    <!-- Campo para seleccionar una obra -->
-    <div class="form-group">
-      <label for="obra" class="col-form-label">Seleccione una obra:</label>
-      <select id="obra" class="form-select" formControlName="obra" required>
-        <option value="">Seleccione una obra</option>
-        <option *ngFor="let obra of obra" [value]="obra.id">
-          {{ obra.nombreObra }}
+    <div>
+      <label for="usuario">Usuario:</label>
+      <select id="usuario" formControlName="usuario">
+        <option *ngFor="let u of usuario" [value]="u.id">
+          {{ u.nombreUsuario }}
         </option>
       </select>
-      <div
-        *ngIf="form.get('obra')?.invalid && form.get('obra')?.touched"
-        class="text-danger"
-      >
-        Seleccionar una obra es obligatorio.
+      <div *ngIf="form.get('usuario')?.invalid && form.get('usuario')?.touched">
+        <small>El usuario es requerido.</small>
       </div>
     </div>
 
-    <!-- Campo para seleccionar un usuario -->
-    <div class="form-group">
-      <label for="usuario" class="col-form-label">Seleccione un usuario:</label>
-      <select
-        id="usuario"
-        class="form-select"
-        formControlName="usuario"
-        required
-      >
-        <option value="">Seleccione un usuario</option>
-        <option *ngFor="let usuario of usuario" [value]="usuario.id">
-          {{ usuario.nombreUsuario }} {{ usuario.apellido }}
-        </option>
-      </select>
-      <div
-        *ngIf="form.get('usuario')?.invalid && form.get('usuario')?.touched"
-        class="text-danger"
-      >
-        Seleccionar un usuario es obligatorio.
-      </div>
+    <div>
+      <label for="descripcion_falla">Descripción de Falla:</label>
+      <textarea
+        id="descripcion_falla"
+        formControlName="descripcion_falla"
+      ></textarea>
     </div>
 
-    <!-- Botón de guardar cambios -->
-    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
-      Guardar Cambios
-    </button>
+    <div>
+      <label for="cantidad_fallas_solicitud">Cantidad de Fallas:</label>
+      <input
+        id="cantidad_fallas_solicitud"
+        type="number"
+        formControlName="cantidad_fallas_solicitud"
+      />
+    </div>
+
+    <div>
+      <label for="horas_uso_solicitud">Horas de Uso:</label>
+      <input
+        id="horas_uso_solicitud"
+        type="number"
+        formControlName="horas_uso_solicitud"
+      />
+    </div>
+
+    <button type="submit">Actualizar Solicitud</button>
   </form>
-</div>
-<!-- Modal de Éxito -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && !errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Información</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ mensajeModal }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

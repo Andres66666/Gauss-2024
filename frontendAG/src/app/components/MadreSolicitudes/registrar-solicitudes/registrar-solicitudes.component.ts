@@ -1,3 +1,4 @@
+import { Usuario } from './../../MadreUsuario/models/usuario';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
@@ -7,54 +8,53 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {
-  Almacen,
-  Equipo,
-  Obra,
-  Solicitudes,
-  Usuario,
-} from '../models/solicitudes';
+import { Equipo, Solicitudes } from '../models/solicitudes';
 import { SolicitudesService } from '../services/solicitudes.service';
-import { AuthService } from '../../../services/auth.service';
+
 @Component({
   selector: 'app-registrar-solicitudes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './registrar-solicitudes.component.html',
-  styleUrl: './registrar-solicitudes.component.css',
+  styleUrls: ['./registrar-solicitudes.component.css'],
 })
 export class RegistrarSolicitudesComponent implements OnInit {
-  registrarForm: FormGroup;
+  solicitudForm: FormGroup;
   equipos: Equipo[] = [];
-  almacenes: Almacen[] = [];
-  obras: Obra[] = [];
   usuarios: Usuario[] = [];
-  ubicacionObra: string = '';
 
-  manejarModal: boolean = false;
-  mensajeModal: string = '';
-  errorModal: string = '';
+  nombreUsuario: string = '';
+  apellido: string | null = '';
+
+  filteredEquipos: Equipo[] = [];
+  filteredUsuarios: Usuario[] = [];
+
   @Output() listarSolicitud = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
-    private solicitudesService: SolicitudesService,
-    private authService: AuthService
+    private solicitudesService: SolicitudesService
   ) {
-    this.registrarForm = this.fb.group({
-      fechaSolicitud: ['', Validators.required],
-      fechaRetornoEstimada: ['', Validators.required],
-
+    this.solicitudForm = this.fb.group({
+      codigoSolicitud: ['', Validators.required],
+      fecha_solicitud: ['', Validators.required],
+      fecha_retorno_estimada: ['', Validators.required],
+      fecha_retorno_real: [''], // Este campo puede ser opcional
+      estado: ['En uso', Validators.required], // Valor por defecto
+      motivo_uso: [''],
+      fecha_uso: ['', Validators.required],
       equipo: ['', Validators.required],
-      obra: ['', Validators.required],
       usuario: ['', Validators.required],
+      descripcion_falla: [''],
+      cantidad_fallas_solicitud: [0, [Validators.required, Validators.min(0)]],
+      horas_uso_solicitud: [0, [Validators.required, Validators.min(0)]],
     });
   }
+
   ngOnInit(): void {
     this.loadEquipos();
-    this.loadAlmacenes();
-    this.loadObras();
-    this.loadUsuario();
+    this.loadUsuarios();
+    this.setUsuario();
   }
 
   loadEquipos() {
@@ -63,69 +63,109 @@ export class RegistrarSolicitudesComponent implements OnInit {
     });
   }
 
-  loadAlmacenes() {
-    this.solicitudesService.getAlmacenes().subscribe((data) => {
-      this.almacenes = data;
-    });
-  }
-
-  loadObras() {
-    this.solicitudesService.getObras().subscribe((data) => {
-      this.obras = data;
-    });
-  }
-
-  loadUsuario() {
+  loadUsuarios() {
     this.solicitudesService.getUsuario().subscribe((data) => {
       this.usuarios = data;
     });
   }
-  onEquipoChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement; // Aserción de tipo
-    const equipoId = Number(selectElement.value); // Convertir a número
+  buscarEquipo(event: Event) {
+    const input = event.target as HTMLInputElement; // Casting a HTMLInputElement
+    const codigo = input.value;
 
-    const equipoSeleccionado = this.equipos.find(
-      (equipo) => equipo.id === equipoId
+    if (codigo.trim() === '') {
+      // Si el campo de búsqueda está vacío, limpiar el campo de equipo
+      this.filteredEquipos = [];
+      this.solicitudForm.patchValue({ equipo: '' });
+      return;
+    }
+
+    this.filteredEquipos = this.equipos.filter(
+      (equipo) =>
+        equipo.codigoEquipo.includes(codigo) &&
+        equipo.estadoDisponibilidad !== 'En uso' &&
+        equipo.estadoDisponibilidad !== 'En Mantenimiento'
     );
 
-    if (equipoSeleccionado) {
-      const almacenId = equipoSeleccionado.almacen.id; // Asegúrate de que esto sea correcto
-      const obraId = equipoSeleccionado.almacen.obra.id; // Asegúrate de que esto sea correcto
-
-      // Actualizar el formulario
-      this.registrarForm.patchValue({
-        obra: obraId,
-      });
-
-      // Obtener la obra seleccionada para actualizar la ubicación
-      const obraSeleccionada = this.obras.find((obra) => obra.id === obraId);
-      if (obraSeleccionada) {
-        this.ubicacionObra = obraSeleccionada.ubicacionObra; // Actualizar la ubicación de la obra
-      } else {
-        this.ubicacionObra = ''; // Limpiar la ubicación si no hay obra seleccionada
-      }
+    if (this.filteredEquipos.length === 1) {
+      this.solicitudForm.patchValue({ equipo: this.filteredEquipos[0].id });
+    } else if (this.filteredEquipos.length === 0) {
+      alert('Equipo no disponible'); // Mostrar alerta si no hay equipos disponibles
+      this.solicitudForm.patchValue({ equipo: '' }); // Limpiar el campo de equipo
     }
   }
-  registrarSolicitudes() {
-    if (this.registrarForm.valid) {
-      const nuevoSolicitudes: Solicitudes = {
-        ...this.registrarForm.value,
-      };
 
-      this.solicitudesService.createSolicitudes(nuevoSolicitudes).subscribe(
+  setUsuario() {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+      if (usuario && typeof usuario === 'object') {
+        this.nombreUsuario = usuario.nombreUsuario || '';
+        this.apellido = usuario.apellido || '';
+        // Inicializa el campo motivo_uso con el nombre y apellido del usuario
+        this.solicitudForm.patchValue({
+          motivo_uso: `Solicitado por: ${this.nombreUsuario} ${this.apellido}\n\nMotivo: `,
+        });
+      }
+    } catch (error) {
+      console.error('Error al recuperar el usuario de localStorage', error);
+    }
+  }
+
+  buscarUsuario(event: Event) {
+    const input = event.target as HTMLInputElement; // Casting a HTMLInputElement
+    const ci = input.value;
+
+    if (ci.trim() === '') {
+      // Si el campo de búsqueda está vacío, limpiar el campo de usuario
+      this.filteredUsuarios = [];
+      this.solicitudForm.patchValue({ usuario: '' });
+      return;
+    }
+
+    this.filteredUsuarios = this.usuarios.filter((usuario) =>
+      usuario.ci.includes(ci)
+    );
+
+    if (this.filteredUsuarios.length === 0) {
+      this.solicitudForm.patchValue({ usuario: '' }); // Limpiar el campo de usuario si no hay resultados
+    } else if (this.filteredUsuarios.length === 1) {
+      this.solicitudForm.patchValue({ usuario: this.filteredUsuarios[0].id });
+    }
+  }
+
+  onSubmit() {
+    if (this.solicitudForm.valid) {
+      const nuevaSolicitud: Solicitudes = this.solicitudForm.value;
+
+      // Si fecha_retorno_real está vacío, establecerlo como null
+      if (!nuevaSolicitud.fecha_retorno_real) {
+        nuevaSolicitud.fecha_retorno_real = null;
+      }
+      // Agregar el nombre y apellido al motivo de uso
+      nuevaSolicitud.motivo_uso = `Solicitado por: ${this.nombreUsuario} ${this.apellido}\n\nMotivo: ${nuevaSolicitud.motivo_uso}`;
+
+      console.log('Datos a enviar:', nuevaSolicitud); // Verifica aquí
+      this.solicitudesService.createSolicitudes(nuevaSolicitud).subscribe(
         (response) => {
-          this.mensajeModal = 'Solicitud registrado exitosamente';
-          this.manejarModal = true;
+          console.log('Solicitud registrada con éxito:', response);
+          this.listarSolicitud.emit();
+          this.solicitudForm.reset();
         },
         (error) => {
-          this.errorModal = 'Error al registrar el solicitud';
-          this.manejarModal = true;
+          console.error('Error al registrar la solicitud:', error);
+          // Manejar el error si el equipo no está disponible
+          if (error.status === 400) {
+            alert(error.error.error); // Mostrar el mensaje de error
+          } else {
+            console.error('Error al registrar la solicitud:', error);
+          }
         }
       );
+    } else {
+      console.log('Formulario inválido');
     }
   }
+
   manejarOk() {
-    this.manejarModal = false; // Cerrar el modal
-    this.listarSolicitud.emit(); // Emitir el evento para listar usuarios
+    this.listarSolicitud.emit(); // Emitir el evento para listar solicitudes
   }
 }

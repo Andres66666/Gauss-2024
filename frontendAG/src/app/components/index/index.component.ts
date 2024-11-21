@@ -1,7 +1,7 @@
+import { authGuard } from './../auth.guard';
 import { Mantenimiento } from './../MadreManteniminiento/models/mantenimiento';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
 import { UsuarioComponent } from '../MadreUsuario/usuario/usuario.component';
 import { RolComponent } from '../MadreRol/rol/rol.component';
 import { Component, HostListener, OnInit } from '@angular/core';
@@ -36,8 +36,9 @@ import { EditarMantenimientoComponent } from '../MadreManteniminiento/editar-man
 import { RegistrarSolicitudesComponent } from '../MadreSolicitudes/registrar-solicitudes/registrar-solicitudes.component';
 import { ListarSolicitudesComponent } from '../MadreSolicitudes/listar-solicitudes/listar-solicitudes.component';
 import { EditarSolicitudesComponent } from '../MadreSolicitudes/editar-solicitudes/editar-solicitudes.component';
-import { ListarEquiposOComponent } from "../MadreEquipo/listar-equipos-o/listar-equipos-o.component";
-import { GeneracionReportesComponent } from "../Reportes/generacion-reportes/generacion-reportes.component";
+import { ListarEquiposOComponent } from '../MadreEquipo/listar-equipos-o/listar-equipos-o.component';
+import { GeneracionReportesComponent } from '../Reportes/generacion-reportes/generacion-reportes.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-index',
@@ -77,8 +78,8 @@ import { GeneracionReportesComponent } from "../Reportes/generacion-reportes/gen
     ListarSolicitudesComponent,
     EditarSolicitudesComponent,
     ListarEquiposOComponent,
-    GeneracionReportesComponent
-],
+    GeneracionReportesComponent,
+  ],
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.css'], // Corrected 'styleUrl' to 'styleUrls'
 })
@@ -102,7 +103,12 @@ export class IndexComponent implements OnInit {
   mantenimientoIdParaEditar: number | null = null;
   solicitudIdParaEditar: number | null = null;
 
-  constructor(private router: Router, private windowService: WindowService) {
+  constructor(
+    private storageService: StorageService,
+    private authService: AuthService,
+    private router: Router,
+    private windowService: WindowService
+  ) {
     if (typeof window !== 'undefined') {
       this.windowWidth = window.innerWidth;
     } else {
@@ -145,8 +151,14 @@ export class IndexComponent implements OnInit {
   }
 
   logout(): void {
+    this.storageService.removeItem('token');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('permisos');
     localStorage.removeItem('usuario'); // Eliminar la información del usuario
     this.router.navigate(['/login']); // Redirigir al login
+  }
+  onLogout() {
+    this.authService.logout();
   }
 
   activeSection: string | null = null; // Variable para controlar la sección activa

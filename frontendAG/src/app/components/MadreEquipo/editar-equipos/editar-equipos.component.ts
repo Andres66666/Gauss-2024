@@ -55,25 +55,40 @@ export class EditarEquiposComponent implements OnInit {
     this.equiposService.getEquipoById(id).subscribe({
       next: (data) => {
         this.equipo = data;
+        console.log('Datos del equipo:', this.equipo); // Verifica que el valor sea correcto
         this.initializeForm();
-        // Mostrar imagen antigua
       },
     });
   }
 
   initializeForm() {
     this.form = new FormGroup({
+      codigoEquipo: new FormControl(
+        this.equipo.codigoEquipo,
+        Validators.required
+      ),
       nombreEquipo: new FormControl(
         this.equipo.nombreEquipo,
         Validators.required
       ),
-      marca: new FormControl(this.equipo.marcaEquipo, Validators.required),
-      modelo: new FormControl(this.equipo.modeloEquipo, Validators.required),
-      estadoUsoEquipo: new FormControl(
+      marcaEquipo: new FormControl(
+        this.equipo.marcaEquipo,
+        Validators.required
+      ),
+      modeloEquipo: new FormControl(
+        this.equipo.modeloEquipo,
+        Validators.required
+      ),
+      estadoEquipo: new FormControl(
+        this.equipo.estadoEquipo,
+        Validators.required
+      ),
+
+      estadoDisponibilidad: new FormControl(
         this.equipo.estadoDisponibilidad,
         Validators.required
       ),
-      vidaUtil: new FormControl(
+      vidaUtilEquipo: new FormControl(
         this.equipo.vidaUtilEquipo,
         Validators.required
       ),
@@ -81,9 +96,32 @@ export class EditarEquiposComponent implements OnInit {
         this.equipo.fechaAdquiscion,
         Validators.required
       ),
-      almacen: new FormControl(this.equipo.almacen.id, Validators.required),
+      fechaFabricacion: new FormControl(
+        this.equipo.fechaFabricacion,
+        Validators.required
+      ),
+      horasUso: new FormControl(this.equipo.horasUso, Validators.required),
+      edadEquipo: new FormControl(this.equipo.edadEquipo, Validators.required),
       imagenEquipos: new FormControl(null), // Inicializar el control de la imagen
+      cantMantPreventivos: new FormControl(
+        this.equipo.cantMantPreventivos,
+        Validators.required
+      ),
+      cantMantCorrectivos: new FormControl(
+        this.equipo.cantMantCorrectivos,
+        Validators.required
+      ),
+      numFallasReportdas: new FormControl(
+        this.equipo.numFallasReportdas,
+        Validators.required
+      ),
+      almacen: new FormControl(this.equipo.almacen.id, Validators.required),
     });
+
+    // Asignar la imagen previa si existe
+    if (this.equipo.imagenEquipos_url) {
+      this.imagenPreview = this.equipo.imagenEquipos_url;
+    }
   }
 
   onImageChange(event: Event): void {
@@ -102,17 +140,38 @@ export class EditarEquiposComponent implements OnInit {
     if (this.form.valid) {
       const updatedEquipo: FormData = new FormData();
       updatedEquipo.append('id', this.equipo.id.toString());
+      updatedEquipo.append('codigoEquipo', this.form.value.codigoEquipo);
       updatedEquipo.append('nombreEquipo', this.form.value.nombreEquipo);
-      updatedEquipo.append('marca', this.form.value.marca);
-      updatedEquipo.append('modelo', this.form.value.modelo);
-      updatedEquipo.append('estadoUsoEquipo', this.form.value.estadoUsoEquipo);
-      updatedEquipo.append('vidaUtil', this.form.value.vidaUtil);
+      updatedEquipo.append('marcaEquipo', this.form.value.marcaEquipo);
+      updatedEquipo.append('modeloEquipo', this.form.value.modeloEquipo);
+      updatedEquipo.append('estadoEquipo', this.form.value.estadoEquipo);
+      updatedEquipo.append(
+        'estadoDisponibilidad',
+        this.form.value.estadoDisponibilidad
+      );
+      updatedEquipo.append('vidaUtilEquipo', this.form.value.vidaUtilEquipo);
       updatedEquipo.append('fechaAdquiscion', this.form.value.fechaAdquiscion);
       updatedEquipo.append(
-        'almacen',
-        JSON.stringify({ id: this.form.value.almacen })
+        'fechaFabricacion',
+        this.form.value.fechaFabricacion
       );
+      updatedEquipo.append('horasUso', this.form.value.horasUso.toString());
+      updatedEquipo.append('edadEquipo', this.form.value.edadEquipo);
+      updatedEquipo.append(
+        'cantMantPreventivos',
+        this.form.value.cantMantPreventivos.toString()
+      );
+      updatedEquipo.append(
+        'cantMantCorrectivos',
+        this.form.value.cantMantCorrectivos.toString()
+      );
+      updatedEquipo.append(
+        'numFallasReportdas',
+        this.form.value.numFallasReportdas.toString()
+      );
+      updatedEquipo.append('almacen', this.form.value.almacen.toString());
 
+      // Si hay una nueva imagen, agregarla al FormData
       if (this.form.value.imagenEquipos) {
         updatedEquipo.append('imagenEquipos', this.form.value.imagenEquipos);
       }
