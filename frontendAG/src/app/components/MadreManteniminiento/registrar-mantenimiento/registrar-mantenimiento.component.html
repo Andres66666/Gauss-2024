@@ -1,253 +1,147 @@
 <div class="container">
-  <h2>Registrar Mantenimiento</h2>
-  <form [formGroup]="registrarForm" (ngSubmit)="registrarMantenimiento()">
-    <!-- Campo para fecha de inicio del mantenimiento -->
+  <h2 *ngIf="isEditing">Editar Mantenimiento</h2>
+  <h2 *ngIf="!isEditing">Registrar Nuevo Mantenimiento</h2>
+
+  <form [formGroup]="mantenimientoForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="fechaInicio">Fecha de inicio:</label>
+      <label for="fechaInicio">Fecha de Inicio:</label>
       <input
+        type="date"
         id="fechaInicio"
-        type="date"
-        class="form-control"
         formControlName="fechaInicio"
-        placeholder="Ingrese la fecha de inicio del mantenimiento"
+        class="form-control"
         required
       />
       <div
         *ngIf="
-          registrarForm.get('fechaInicio')?.invalid &&
-          registrarForm.get('fechaInicio')?.touched
+          mantenimientoForm.get('fechaInicio')?.invalid &&
+          (mantenimientoForm.get('fechaInicio')?.touched ||
+            mantenimientoForm.get('fechaInicio')?.dirty)
         "
         class="text-danger"
       >
-        La fecha de inicio es obligatoria.
+        La fecha de inicio es requerida.
       </div>
     </div>
 
-    <!-- Campo para fecha de fin del mantenimiento -->
     <div class="form-group">
-      <label for="fechaFin">Fecha de fin:</label>
+      <label for="fechaFin">Fecha de Fin:</label>
       <input
-        id="fechaFin"
         type="date"
-        class="form-control"
+        id="fechaFin"
         formControlName="fechaFin"
-        placeholder="Ingrese la fecha de fin del mantenimiento"
+        class="form-control"
         required
       />
       <div
         *ngIf="
-          registrarForm.get('fechaFin')?.invalid &&
-          registrarForm.get('fechaFin')?.touched
+          mantenimientoForm.get('fechaFin')?.invalid &&
+          (mantenimientoForm.get('fechaFin')?.touched ||
+            mantenimientoForm.get('fechaFin')?.dirty)
         "
         class="text-danger"
       >
-        La fecha de fin es obligatoria.
+        La fecha de fin es requerida.
       </div>
     </div>
 
-    <!-- Campo para tipo de mantenimiento -->
     <div class="form-group">
-      <label for="tipoMantenimiento">Tipo de mantenimiento:</label>
-      <select
-        id="tipoMantenimiento"
-        class="form-control"
-        formControlName="tipoMantenimiento"
-        required
-      >
-        <option value="Correctivo">Correctivo</option>
-        <option value="Preventivo">Preventivo</option>
-      </select>
-      <div
-        *ngIf="
-          registrarForm.get('tipoMantenimiento')?.invalid &&
-          registrarForm.get('tipoMantenimiento')?.touched
-        "
-        class="text-danger"
-      >
-        Seleccionar un tipo de mantenimiento es obligatorio.
-      </div>
-    </div>
-
-    <!-- Campo para detalle del mantenimiento -->
-    <div class="form-group">
-      <label for="detalleMantenimiento">Detalle del mantenimiento:</label>
+      <label for="detalleMantenimiento">Detalle del Mantenimiento:</label>
       <textarea
         id="detalleMantenimiento"
-        class="form-control"
         formControlName="detalleMantenimiento"
-        placeholder="Ingrese el detalle del mantenimiento"
+        class="form-control"
         required
       ></textarea>
       <div
         *ngIf="
-          registrarForm.get('detalleMantenimiento')?.invalid &&
-          registrarForm.get('detalleMantenimiento')?.touched
+          mantenimientoForm.get('detalleMantenimiento')?.invalid &&
+          (mantenimientoForm.get('detalleMantenimiento')?.touched ||
+            mantenimientoForm.get('detalleMantenimiento')?.dirty)
         "
         class="text-danger"
       >
-        El detalle del mantenimiento es obligatorio.
+        El detalle del mantenimiento es requerido.
       </div>
     </div>
 
-    <!-- Campo para seleccionar tipo de responsable -->
-
-    <div class="form-group d-flex align-items-center">
-      <label for="tipoResponsable" class="me-2">Tipo de Responsable:</label>
-      <select
-        id="tipoResponsable"
-        class="form-control me-2"
-        formControlName="tipoResponsable"
-        (change)="onTipoResponsableChange($event)"
-        required
-      >
-        <option value="persona">Persona</option>
-        <option value="empresa">Empresa</option>
-      </select>
-
-      <!-- Mensaje de error para el tipo de responsable -->
-      <div
-        *ngIf="
-          registrarForm.get('tipoResponsable')?.invalid &&
-          registrarForm.get('tipoResponsable')?.touched
-        "
-        class="text-danger me-2"
-      >
-        Seleccionar un tipo de responsable es obligatorio.
-      </div>
-    </div>
-
-    <!-- Campo para responsable del mantenimiento -->
-    <div class="form-group d-flex align-items-center">
-      <label for="responsable" class="me-2">Responsable:</label>
+    <div class="form-group">
+      <label for="responsable">Responsable:</label>
       <input
-        id="responsable"
         type="text"
-        class="form-control me-2"
+        id="responsable"
         formControlName="responsable"
-        placeholder="Ingrese el responsable del mantenimiento"
+        class="form-control"
         required
       />
       <div
         *ngIf="
-          registrarForm.get('responsable')?.invalid &&
-          registrarForm.get('responsable')?.touched
+          mantenimientoForm.get('responsable')?.invalid &&
+          (mantenimientoForm.get('responsable')?.touched ||
+            mantenimientoForm.get('responsable')?.dirty)
         "
         class="text-danger"
       >
-        El responsable es obligatorio.
+        El responsable es requerido.
       </div>
     </div>
 
-    <!-- Campo para seleccionar un equipo -->
     <div class="form-group">
-      <label for="equipo" class="col-form-label">Seleccione un equipo:</label>
+      <label for="tipo_mantenimiento">Tipo de Mantenimiento:</label>
       <select
-        #equipoSelect
-        formControlName="equipo"
-        (change)="seleccionarEquipo(equipoSelect.value)"
-        class="form-select"
+        id="tipo_mantenimiento"
+        formControlName="tipo_mantenimiento"
+        class="form-control"
+        required
       >
-        <option value="">Seleccione un equipo</option>
-        <option *ngFor="let equipo of equipos" [value]="equipo.id.toString()">
+        <option value="" disabled selected>Seleccione un tipo</option>
+        <option value="preventivo">Preventivo</option>
+        <option value="correctivo">Correctivo</option>
+      </select>
+      <div
+        *ngIf="
+          mantenimientoForm.get('tipo_mantenimiento')?.invalid &&
+          (mantenimientoForm.get('tipo_mantenimiento')?.touched ||
+            mantenimientoForm.get('tipo_mantenimiento')?.dirty)
+        "
+        class="text-danger"
+      >
+        El tipo de mantenimiento es requerido.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="equipo">Equipo:</label>
+      <select
+        id="equipo"
+        formControlName="equipo"
+        class="form-control"
+        required
+      >
+        <option value="" disabled selected>Seleccione un equipo</option>
+        <option *ngFor="let equipo of equipos$ | async" [value]="equipo.id">
           {{ equipo.nombreEquipo }}
         </option>
       </select>
-
-      <div class="mb-3">
-        <label for="almacen" class="col-form-label">Almacen:</label>
-        <input
-          type="text"
-          id="almacen"
-          class="form-control"
-          [value]="almacenSeleccionado"
-          readonly
-        />
-      </div>
-
-      <div class="mb-3">
-        <label for="obra" class="col-form-label">Obra:</label>
-        <input
-          type="text"
-          id="obra"
-          class="form-control"
-          [value]="obraSeleccionada"
-          readonly
-        />
-      </div>
-
       <div
         *ngIf="
-          registrarForm.get('equipo')?.invalid &&
-          registrarForm.get('equipo')?.touched
+          mantenimientoForm.get('equipo')?.invalid &&
+          (mantenimientoForm.get('equipo')?.touched ||
+            mantenimientoForm.get('equipo')?.dirty)
         "
         class="text-danger"
       >
-        Seleccionar un equipo es obligatorio.
+        El equipo es requerido.
       </div>
     </div>
-    <!-- Botón de registro -->
+
     <button
       type="submit"
       class="btn btn-primary"
-      [disabled]="!registrarForm.valid"
+      [disabled]="mantenimientoForm.invalid"
     >
-      Registrar Mantenimiento
+      Guardar Mantenimiento
     </button>
+    <a routerLink="/mantenimientos" class="btn btn-secondary">Cancelar</a>
   </form>
-</div>
-
-<!-- Modal de Éxito -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && !errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Información</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ mensajeModal }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de Error -->
-<div
-  class="modal"
-  tabindex="-1"
-  role="dialog"
-  *ngIf="manejarModal && errorModal"
-  style="display: block"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Error</h5>
-        <button type="button" class="close" (click)="manejarModal = false">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ errorModal }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="manejarOk()">
-          OK
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

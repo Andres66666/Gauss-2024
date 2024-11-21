@@ -1,6 +1,29 @@
-<div class="container">
+<div class="container-fluid">
   <h2>Editar Equipo</h2>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Nombre del Equipo -->
+    <div class="form-group">
+      <label for="codigoEquipo">codigo:</label>
+      <input
+        type="text"
+        id="codigoEquipo"
+        formControlName="codigoEquipo"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            form.get('codigoEquipo')?.invalid &&
+            form.get('codigoEquipo')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          form.get('codigoEquipo')?.invalid && form.get('codigoEquipo')?.touched
+        "
+        class="invalid-feedback"
+      >
+        El nombre del equipo es requerido.
+      </div>
+    </div>
     <div class="form-group">
       <label for="nombreEquipo">Nombre del Equipo:</label>
       <input
@@ -20,58 +43,63 @@
         "
         class="invalid-feedback"
       >
-        El nombre Equipo es requerido.
+        El nombre del equipo es requerido.
       </div>
     </div>
 
+    <!-- Marca -->
     <div class="form-group">
-      <label for="marca">Marca:</label>
+      <label for="marcaEquipo">Marca:</label>
       <input
         type="text"
-        id="marca"
-        formControlName="marca"
+        id="marcaEquipo"
+        formControlName="marcaEquipo"
         class="form-control"
         required
       />
     </div>
 
+    <!-- Modelo -->
     <div class="form-group">
-      <label for="modelo">Modelo:</label>
+      <label for="modeloEquipo">Modelo:</label>
       <input
         type="text"
-        id="modelo"
-        formControlName="modelo"
+        id="modeloEquipo"
+        formControlName="modeloEquipo"
         class="form-control"
         required
       />
     </div>
 
+    <!-- Estado de Disponibilidad -->
     <div class="form-group">
-      <label for="estadoUsoEquipo">Estado de Uso:</label>
+      <label for="estadoDisponibilidad">Estado de Disponibilidad:</label>
       <select
-        id="estadoUsoEquipo"
-        formControlName="estadoUsoEquipo"
+        id="estadoDisponibilidad"
+        formControlName="estadoDisponibilidad"
         class="form-control"
         required
       >
         <option value="" disabled>Seleccionar estado</option>
-        <option value="Disponible">Disponible</option>
+        <option value="disponible">Disponible</option>
         <option value="En uso">En uso</option>
         <option value="En mantenimiento">En mantenimiento</option>
       </select>
     </div>
 
+    <!-- Vida Útil -->
     <div class="form-group">
-      <label for="vidaUtil">Vida Útil:</label>
+      <label for="vidaUtilEquipo">Vida Útil:</label>
       <input
         type="text"
-        id="vidaUtil"
-        formControlName="vidaUtil"
+        id="vidaUtilEquipo"
+        formControlName="vidaUtilEquipo"
         class="form-control"
         required
       />
     </div>
 
+    <!-- Fecha de Adquisición -->
     <div class="form-group">
       <label for="fechaAdquiscion">Fecha de Adquisición:</label>
       <input
@@ -83,9 +111,82 @@
       />
     </div>
 
+    <!-- Fecha de Fabricación -->
+    <div class="form-group">
+      <label for="fechaFabricacion">Fecha de Fabricación:</label>
+      <input
+        type="date"
+        id="fechaFabricacion"
+        formControlName="fechaFabricacion"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <!-- Horas de Uso -->
+    <div class="form-group">
+      <label for="horasUso">Horas de Uso:</label>
+      <input
+        type="number"
+        id="horasUso"
+        formControlName="horasUso"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <!-- Edad del Equipo -->
+    <div class="form-group">
+      <label for="edadEquipo">Edad del Equipo:</label>
+      <input
+        type="text"
+        id="edadEquipo"
+        formControlName="edadEquipo"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <!-- Cantidad de Mantenimiento Preventivos -->
+    <div class="form-group">
+      <label for="cantMantPreventivos"
+        >Cantidad de Mantenimiento Preventivos:</label
+      >
+      <input
+        type="number"
+        id="cantMantPreventivos"
+        formControlName="cantMantPreventivos"
+        class="form-control"
+      />
+    </div>
+
+    <!-- Cantidad de Mantenimiento Correctivos -->
+    <div class="form-group">
+      <label for="cantMantCorrectivos"
+        >Cantidad de Mantenimiento Correctivos:</label
+      >
+      <input
+        type="number"
+        id="cantMantCorrectivos"
+        formControlName="cantMantCorrectivos"
+        class="form-control"
+      />
+    </div>
+
+    <!-- Número de Fallas Reportadas -->
+    <div class="form-group">
+      <label for="numFallasReportdas">Número de Fallas Reportadas:</label>
+      <input
+        type="number"
+        id="numFallasReportdas"
+        formControlName="numFallasReportdas"
+        class="form-control"
+      />
+    </div>
+
+    <!-- Almacén -->
     <div class="form-group">
       <label for="almacen">Almacén:</label>
-
       <select
         id="almacen"
         formControlName="almacen"
@@ -96,21 +197,14 @@
           {{ almacen.nombreAlmacen }}
         </option>
       </select>
-      <div
-        *ngIf="
-          form.get('almacen')?.invalid &&
-          (form.get('almacen')?.touched || form.get('almacen')?.dirty)
-        "
-        class="text-danger"
-      >
-        Se requiere seleccionar una almacen.
-      </div>
     </div>
+
+    <!-- Imagen del Equipo -->
     <div class="form-group">
-      <label for="imagenEquipos">Imagen del Equipo:</label>
+      <label for="imagenEquipos_url">Imagen del Equipo:</label>
       <input
         type="file"
-        id="imagenEquipos"
+        id="imagenEquipos_url"
         (change)="onImageChange($event)"
         class="form-control"
       />
@@ -129,6 +223,7 @@
     </button>
   </form>
 </div>
+
 <!-- Modal de Éxito -->
 <div
   class="modal"
@@ -153,7 +248,6 @@
         />
         <div class="flex-grow-1 text-center">
           <p style="margin: 0">{{ mensajeModal }}</p>
-          <!-- Elimina el margen del párrafo -->
         </div>
       </div>
       <div class="modal-footer">

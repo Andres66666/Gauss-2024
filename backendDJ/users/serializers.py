@@ -73,7 +73,6 @@ class MantenimientosSerializer(serializers.ModelSerializer):
 
 class UsoSolicitudesEquiposSerializer(serializers.ModelSerializer):
     equipo = EquiposSerializer(read_only=True)
-    obra = ObrasSerializer(read_only=True)
     usuario = UsuarioSerializer(read_only=True)
 
     class Meta:

@@ -1,5 +1,4 @@
 // mantenimiento.model.ts
-
 export interface Obra {
   id: number;
   nombreObra: string;
@@ -13,23 +12,30 @@ export interface Almacen {
   obra: Obra;
 }
 export interface Equipo {
-  id: number; // Este campo es opcional si es generado automáticamente por el backend
+  id: number;
+  codigoEquipo: string;
   nombreEquipo: string;
-  marca: string;
-  modelo: string;
+  marcaEquipo: string;
+  modeloEquipo: string;
   estadoEquipo: boolean;
-  estadoUsoEquipo: 'Disponible' | 'En uso' | 'En mantenimiento'; // Usando un tipo de unión para las opciones
-  vidaUtil: string; // Puede ser 'años' o 'horas'
-  fechaAdquiscion: string; // Usa string o Date según tu preferencia
-  almacen: Almacen; // O puedes usar el tipo Almacenes si ya has definido la interfaz
+  estadoDisponibilidad: string;
+  vidaUtilEquipo: string;
+  fechaAdquiscion: Date;
+  fechaFabricacion: Date;
+  horasUso: number;
+  edadEquipo: string;
+  imagenEquipos_url: string;
+  cantMantPreventivos: number;
+  cantMantCorrectivos: number;
+  numFallasReportdas: number;
+  almacen: Almacen;
 }
 export interface Mantenimiento {
   id: number;
   fechaInicio: Date;
   fechaFin: Date;
-  estadoMantenimiento: boolean;
-  tipoMantenimiento: string; // true: preventivo, false: correctivo
   detalleMantenimiento: string;
   responsable: string;
+  tipo_mantenimiento: string; // true: preventivo, false: correctivo
   equipo: Equipo; // Asumimos que solo necesitamos la referencia del equipo por su ID
 }

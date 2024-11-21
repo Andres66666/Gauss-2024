@@ -38,75 +38,186 @@ import { GeneracionReportesUsuariosComponent } from './components/Reportes/gener
 import { GeneracionReportesEquiposComponent } from './components/Reportes/generacion-reportes-equipos/generacion-reportes-equipos.component';
 import { GeneracionReportesMantenimientosComponent } from './components/Reportes/generacion-reportes-mantenimientos/generacion-reportes-mantenimientos.component';
 import { GeneracionReportesObrasComponent } from './components/Reportes/generacion-reportes-obras/generacion-reportes-obras.component';
+import { authGuard } from './components/auth.guard';
+import { SolicituSolicitanteComponent } from './components/MadreSolicitudes/solicitu-solicitante/solicitu-solicitante.component';
+
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  /* { path: '', redirectTo: '/login', pathMatch: 'full' }, */
   { path: 'login', component: LoginComponent },
-  { path: 'index', component: IndexComponent },
-  { path: 'usuario', component: UsuarioComponent },
-  { path: 'rol', component: RolComponent },
-  { path: 'permiso', component: PermisoComponent },
-  { path: 'usuario-rol', component: UsuarioRolComponent },
-  { path: 'rol-permiso', component: RolPermisoComponent },
-
-  /* seccion de registrar editar  */
-  { path: 'registrar-usuario', component: RegistrarUsuarioComponent },
-  { path: 'editar-usuario/:id', component: EditarUsuarioComponent },
-
-  { path: 'registrar-rol', component: RegistrarRolComponent },
-  { path: 'editar-rol', component: EditarRolComponent },
-
-  { path: 'registrar-permiso', component: RegistrarPermisoComponent },
-  { path: 'editar-permiso', component: EditarPermisoComponent },
-
-  { path: 'registrar-rolpermiso', component: RegistrarRolpermisoComponent },
-  { path: 'editar-rolpermiso/:id', component: EditarRolpermisoComponent },
-
-  { path: 'registrar-usuariorol', component: RegistrarUsuariorolComponent },
-  { path: 'editar-usuariorol/:id', component: EditarUsuariorolComponent },
-
-  { path: 'registrar-obra', component: RegistrarObraComponent },
-  { path: 'editar-obra/:id', component: EditarObraComponent },
-  { path: 'listar-obra', component: ListarObraComponent },
-
-  { path: 'registrar-almacen', component: RegistrarAlmacenComponent },
-  { path: 'editar-almacen/:id', component: EditarAlmacenComponent },
-  { path: 'listar-almacen', component: ListarAlmacenComponent },
-
-  { path: 'registrar-equipo', component: RegistrarEquiposComponent },
-  { path: 'editar-equipo/:id', component: EditarEquiposComponent },
-  { path: 'listar-equipo', component: ListarEquiposComponent },
-
+  { path: 'index', component: IndexComponent, canActivate: [authGuard] },
+  { path: 'usuario', component: UsuarioComponent, canActivate: [authGuard] },
+  { path: 'rol', component: RolComponent, canActivate: [authGuard] },
+  { path: 'permiso', component: PermisoComponent, canActivate: [authGuard] },
+  {
+    path: 'usuario-rol',
+    component: UsuarioRolComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'rol-permiso',
+    component: RolPermisoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-usuario',
+    component: RegistrarUsuarioComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-usuario/:id',
+    component: EditarUsuarioComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-rol',
+    component: RegistrarRolComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-rol',
+    component: EditarRolComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-permiso',
+    component: RegistrarPermisoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-permiso',
+    component: EditarPermisoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-rolpermiso',
+    component: RegistrarRolpermisoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-rolpermiso/:id',
+    component: EditarRolpermisoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-usuariorol',
+    component: RegistrarUsuariorolComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-usuariorol/:id',
+    component: EditarUsuariorolComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-obra',
+    component: RegistrarObraComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-obra/:id',
+    component: EditarObraComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-obra',
+    component: ListarObraComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-almacen',
+    component: RegistrarAlmacenComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-almacen/:id',
+    component: EditarAlmacenComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-almacen',
+    component: ListarAlmacenComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-equipo',
+    component: RegistrarEquiposComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-equipo/:id',
+    component: EditarEquiposComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-equipo',
+    component: ListarEquiposComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'registrar-mantenimiento',
     component: RegistrarMantenimientoComponent,
+    canActivate: [authGuard],
   },
-  { path: 'editar-mantenimiento/:id', component: EditarMantenimientoComponent },
-  { path: 'listar-mantenimiento', component: ListarMantenimientoComponent },
-
-  { path: 'registrar-solicitud', component: RegistrarSolicitudesComponent },
-  { path: 'editar-solicitud/:id', component: EditarSolicitudesComponent },
-  { path: 'listar-solicitud', component: ListarSolicitudesComponent },
-
-  { path: 'listar-equipo-O', component: ListarEquiposOComponent },
-
-  /* esta es la seccion de reportes  */
-  { path: 'generacion-reportes', component: GeneracionReportesComponent },
+  {
+    path: 'editar-mantenimiento/:id',
+    component: EditarMantenimientoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-mantenimiento',
+    component: ListarMantenimientoComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'registrar-solicitud',
+    component: RegistrarSolicitudesComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'editar-solicitud/:id',
+    component: EditarSolicitudesComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-solicitud',
+    component: ListarSolicitudesComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'listar-equipo-O',
+    component: ListarEquiposOComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'generacion-reportes',
+    component: GeneracionReportesComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'generacion-reportes-usuarios',
     component: GeneracionReportesUsuariosComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'generacion-reportes-equipos',
     component: GeneracionReportesEquiposComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'generacion-reportes-mantenimientos',
     component: GeneracionReportesMantenimientosComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'generacion-reportes-obras',
     component: GeneracionReportesObrasComponent,
+    canActivate: [authGuard],
+  },
+
+  {
+    path: 'Solicitu-Solicitante',
+    component: SolicituSolicitanteComponent,
+    canActivate: [authGuard],
   },
 
   { path: '**', redirectTo: '' },

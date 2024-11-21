@@ -30,14 +30,11 @@ export class SolicitudesService {
   createSolicitudes(solicitudes: Solicitudes): Observable<Solicitudes> {
     return this.http.post<Solicitudes>(`${this.apiUrl}solicitud/`, solicitudes);
   }
-  
-  editarSolicitudes(
-    id: number,
-    solicitudes: Solicitudes
-  ): Observable<Solicitudes> {
+
+  updateSolicitud(id: number, solicitud: Solicitudes): Observable<Solicitudes> {
     return this.http.put<Solicitudes>(
       `${this.apiUrl}solicitud/${id}/`,
-      solicitudes
+      solicitud
     );
   }
   // Obtener todos los equipos

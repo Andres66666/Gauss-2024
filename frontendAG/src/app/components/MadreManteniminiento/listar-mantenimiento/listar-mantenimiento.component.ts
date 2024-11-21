@@ -43,10 +43,17 @@ export class ListarMantenimientoComponent implements OnInit {
     if (!this.searchTerm) {
       return this.mantenimientos;
     }
-    return this.mantenimientos.filter((mantenimiento) =>
-      mantenimiento.equipo.nombreEquipo
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
+    return this.mantenimientos.filter(
+      (mantenimiento) =>
+        mantenimiento.equipo.nombreEquipo
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        mantenimiento.detalleMantenimiento
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        mantenimiento.responsable
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
     );
   }
 }

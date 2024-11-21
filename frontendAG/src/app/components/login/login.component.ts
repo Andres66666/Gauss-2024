@@ -32,6 +32,15 @@ export class LoginComponent {
           return; // Exit early if user is inactive
         }
 
+        // Verificar que el usuario tiene el token
+        if (response.access) {
+          localStorage.setItem('token', response.access);
+          alert('Inicio de sesión exitoso. Token: ' + response.access); // Mostrar alerta con el token
+        } else {
+          this.error = 'No se ha generado un token de acceso.';
+          return;
+        }
+
         if (response.mensaje) {
           this.mensaje = response.mensaje;
           this.error = '';

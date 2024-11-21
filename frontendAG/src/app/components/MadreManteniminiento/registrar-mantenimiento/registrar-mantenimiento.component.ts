@@ -6,9 +6,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Almacen, Equipo, Mantenimiento, Obra } from '../models/mantenimiento';
+import { Equipo, Mantenimiento } from '../models/mantenimiento';
 import { MantenimientoService } from '../service/mantenimiento.service';
 import { CommonModule } from '@angular/common';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-registrar-mantenimiento',
@@ -18,17 +19,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './registrar-mantenimiento.component.css',
 })
 export class RegistrarMantenimientoComponent implements OnInit {
-  registrarForm: FormGroup;
-  equipos: Equipo[] = [];
-  almacenes: Almacen[] = [];
-  obras: Obra[] = [];
-  almacenSeleccionado: any;
-  obraSeleccionada: any;
-  tipoResponsable: string = 'persona'; // Valor por defecto
-
-  manejarModal: boolean = false;
-  mensajeModal: string = '';
-  errorModal: string = '';
+  mantenimientoForm: FormGroup;
+  equipos$: Observable<Equipo[]> = of([]); // Inicializar con un Observable vacío
+  isEditing: boolean = false;
 
   @Output() listarMantenimiento = new EventEmitter<void>();
 
@@ -36,123 +29,41 @@ export class RegistrarMantenimientoComponent implements OnInit {
     private fb: FormBuilder,
     private mantenimientoService: MantenimientoService
   ) {
-    this.registrarForm = this.fb.group({
+    this.mantenimientoForm = this.fb.group({
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
-      tipoMantenimiento: ['', Validators.required],
       detalleMantenimiento: ['', Validators.required],
       responsable: ['', Validators.required],
-      equipo: ['', Validators.required],
-      almacenId: [''],
-      obraId: [''],
-      tipoResponsable: ['', Validators.required],
+      tipo_mantenimiento: ['', Validators.required], // 'preventivo' o 'correctivo'
+      equipo: [null, Validators.required], // ID del equipo
     });
   }
 
   ngOnInit(): void {
-    this.loadEquipos();
-    this.loadAlmacenes();
-    this.loadObras();
-
-    this.mantenimientoService.getEquipos().subscribe((data) => {
-      this.equipos = data;
-    });
-    this.mantenimientoService.getAlmacenes().subscribe((data) => {
-      this.almacenes = data;
-    });
+    this.equipos$ = this.mantenimientoService.getEquipos(); // Obtener la lista de equipos
   }
 
-  onTipoResponsableChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.registrarForm.get('tipoResponsable')?.setValue(selectElement.value); // Actualiza el valor en el formulario
-  }
+  onSubmit(): void {
+    if (this.mantenimientoForm.valid) {
+      const mantenimiento: Mantenimiento = {
+        id: 0, // Asumimos que es un nuevo mantenimiento, por lo que el ID es 0
+        ...this.mantenimientoForm.value,
+      };
 
-  seleccionarEquipo(equipoId: string) {
-    const id = parseInt(equipoId, 10);
-    const equipo = this.equipos.find((e) => e.id === id);
-    if (equipo) {
-      const almacenId = equipo.almacen.id;
-      const almacen = this.almacenes.find((a) => a.id === almacenId);
-      if (almacen) {
-        this.almacenSeleccionado = almacen.nombreAlmacen;
-        const obraId = almacen.obra.id;
-        const obra = this.obras.find((o) => o.id === obraId);
-        if (obra) {
-          this.obraSeleccionada = obra.nombreObra;
-          const detalleMantenimientoControl = this.registrarForm.get(
-            'detalleMantenimiento'
-          );
-          if (detalleMantenimientoControl) {
-            const detalleMantenimiento = detalleMantenimientoControl.value;
-            const texto = `Equipo: ${equipo.nombreEquipo}, Almacen: ${almacen.nombreAlmacen}, Obra: ${obra.nombreObra}`;
-            detalleMantenimientoControl.setValue(
-              detalleMantenimiento + '\n' + texto
-            );
-          }
-        }
-      }
-    }
-  }
-  loadEquipos() {
-    this.mantenimientoService.getEquipos().subscribe((data) => {
-      this.equipos = data;
-    });
-  }
-
-  loadAlmacenes() {
-    this.mantenimientoService.getAlmacenes().subscribe((data) => {
-      this.almacenes = data;
-    });
-  }
-
-  loadObras() {
-    this.mantenimientoService.getObras().subscribe((data) => {
-      this.obras = data;
-    });
-  }
-  registrarMantenimiento() {
-    if (this.registrarForm.valid) {
-      const detalleMantenimientoControl = this.registrarForm.get(
-        'detalleMantenimiento'
-      );
-      const equipoControl = this.registrarForm.get('equipo');
-
-      if (detalleMantenimientoControl && equipoControl) {
-        const tipoResponsable =
-          this.registrarForm.get('tipoResponsable')?.value;
-        const responsable = this.registrarForm.get('responsable')?.value;
-
-        // Formatear el responsable
-        const responsableFormateado = `${tipoResponsable}: ${responsable}`;
-
-        const nuevoMantenimiento: Mantenimiento = {
-          ...this.registrarForm.value,
-          equipoId: parseInt(equipoControl.value),
-          almacenId: this.almacenSeleccionado, // Asegúrate de que esto sea el ID y no el nombre
-          obraId: this.obraSeleccionada, // Asegúrate de que esto sea el ID y no el nombre
-          detalleMantenimiento: detalleMantenimientoControl.value,
-          responsable: responsableFormateado,
-          estadoMantenimiento: true,
-        };
-
-        this.mantenimientoService
-          .createMantenimiento(nuevoMantenimiento)
-          .subscribe(
-            (response) => {
-              this.mensajeModal = 'Mantenimiento registrado exitosamente'; // Mensaje para el modal
-              this.manejarModal = true; // Mostrar el modal
-            },
-            (error) => {
-              this.errorModal = 'Error al registrar el mantenimiento';
-              this.manejarModal = true;
-            }
-          );
-      }
+      // Crear nuevo mantenimiento
+      this.mantenimientoService.createMantenimiento(mantenimiento).subscribe({
+        next: () => {
+          console.log('Mantenimiento creado con éxito');
+          this.listarMantenimiento.emit(); // Emitir el evento para listar mantenimientos
+        },
+        error: (err) => {
+          console.error('Error al crear el mantenimiento:', err);
+        },
+      });
     }
   }
 
   manejarOk() {
-    this.manejarModal = false; // Cerrar el modal
     this.listarMantenimiento.emit(); // Emitir el evento para listar usuarios
   }
 }

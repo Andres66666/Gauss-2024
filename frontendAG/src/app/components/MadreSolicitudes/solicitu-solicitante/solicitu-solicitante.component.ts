@@ -12,13 +12,14 @@ import { Equipo, Solicitudes } from '../models/solicitudes';
 import { SolicitudesService } from '../services/solicitudes.service';
 
 @Component({
-  selector: 'app-registrar-solicitudes',
+  selector: 'app-solicitu-solicitante',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './registrar-solicitudes.component.html',
-  styleUrls: ['./registrar-solicitudes.component.css'],
+
+  templateUrl: './solicitu-solicitante.component.html',
+  styleUrl: './solicitu-solicitante.component.css',
 })
-export class RegistrarSolicitudesComponent implements OnInit {
+export class SolicituSolicitanteComponent implements OnInit {
   solicitudForm: FormGroup;
   equipos: Equipo[] = [];
   usuarios: Usuario[] = [];

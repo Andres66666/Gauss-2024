@@ -100,39 +100,25 @@ class Equipos(models.Model):
     marcaEquipo = models.CharField(max_length=50)
     modeloEquipo = models.CharField(max_length=50)
     estadoEquipo = models.BooleanField(default=True)
-    estadoDisponibilidad = models.CharField(max_length=20)
-    vidaUtilEquipo = models.CharField(max_length=20)  # años o horas  numero 
+    estadoDisponibilidad = models.CharField(max_length=20,default='disponible')
+    vidaUtilEquipo = models.CharField(max_length=20, default='0')  # ojo años o horas  numero 
     fechaAdquiscion = models.DateField()
-    fechaFabricacion = models.DateField(null=True, blank=True)
+    fechaFabricacion = models.DateField()
     horasUso = models.FloatField(default=0) 
-    edadEquipo = models.CharField(max_length=20)
+    edadEquipo = models.CharField(max_length=20, default='0')
     imagenEquipos_url = models.URLField(max_length=500,null=True, blank=True)
     cantMantPreventivos = models.PositiveIntegerField(default=0)
     cantMantCorrectivos = models.PositiveIntegerField(default=0)
     numFallasReportdas = models.PositiveIntegerField(default=0)
 
-    almacen = models.ForeignKey(Almacenes, on_delete=models.CASCADE) 
+    almacen = models.ForeignKey(Almacenes, on_delete=models.CASCADE, null=True, blank=True)
+
+
     def __str__(self):
         return self.nombreEquipo
     
     
-class FallasEquipos(models.Model):
-    fecha_falla = models.DateField()  # Fecha en que ocurrió la falla
-    descripcion = models.TextField()  # Descripción de la falla
-    estado = models.CharField(max_length=20, choices=[
-        ('reportada', 'Reportada'),
-        ('resuelta', 'Resuelta'),
-    ])
-    equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE, related_name='fallas')  # Relación con el equipo
 
-    def __str__(self):
-        return f'Falla en {self.equipo} el {self.fecha_falla}'
-    
-    def save(self, *args, **kwargs):
-        if not self.pk:  # Solo incrementar si es una nueva falla
-            self.equipo.numFallasReportdas += 1
-            self.equipo.save()
-        super().save(*args, **kwargs)
 
 
 class Mantenimientos(models.Model):
@@ -142,26 +128,15 @@ class Mantenimientos(models.Model):
     ]
     fechaInicio = models.DateField()
     fechaFin = models.DateField()
-    cantMantPre = models.PositiveIntegerField(default=0)
-    cantMantCor = models.PositiveIntegerField(default=0)
-    estadoMantenimiento = models.BooleanField(default=True) 
     detalleMantenimiento = models.TextField()
     responsable = models.CharField(max_length=100)
     tipo_mantenimiento = models.CharField(max_length=20, choices=TIPO_MANTENIMIENTO_CHOICES)  # Tipo de mantenimiento
-
     equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE)
 
-
-    
     def save(self, *args, **kwargs):
         if self.fechaInicio > self.fechaFin:
             raise ValueError("La fecha de inicio no puede ser mayor que la fecha de fin.")
         super().save(*args, **kwargs)
-        if self.tipo_mantenimiento == 'preventivo':
-            self.equipo.cantMantPreventivos += 1
-        elif self.tipo_mantenimiento == 'correctivo':
-            self.equipo.cantMantCorrectivos += 1
-        self.equipo.save()
     def __str__(self):
         return f'Mantenimiento {self.fechaInicio} - {self.fechaFin}'
     
@@ -174,23 +149,20 @@ class UsoSolicitudesEquipos(models.Model):
     estado = models.CharField(max_length=20, choices=[
         ('pendiente', 'Pendiente'),
         ('completada', 'Completada'),
-        ('cancelada', 'Cancelada')
+        ('cancelada', 'Cancelada'),
+        ('en uso', 'En Uso')
+
     ])
-    motivo = models.TextField(null=True, blank=True)  # Motivo de la solicitud
+    motivo_uso = models.TextField(null=True, blank=True)  # Motivo de la solicitud
     fecha_uso = models.DateField()  # Fecha en que se utilizó el equipo
     equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE)  # Equipo utilizado
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)  # Usuario que utilizó el equipo
-    descripcion_uso = models.TextField(null=True, blank=True)  # Descripción de cómo se utilizó el equipo
+    descripcion_falla = models.TextField(null=True, blank=True)  # Descripción de cómo se utilizó el equipo
+    cantidad_fallas_solicitud = models.PositiveIntegerField(default=0)  # Nueva propiedad para la cantidad de fallas
+    horas_uso_solicitud = models.PositiveIntegerField(default=0)  # Horas de uso estimadas
 
     def __str__(self):
         return f'Solicitud de {self.equipo} por {self.usuario} el {self.fecha_solicitud}'
-    def save(self, *args, **kwargs):
-        if self.estado == 'completada' and self.fecha_retorno_real:
-            dias_uso = (self.fecha_retorno_real - self.fecha_uso).days
-            if dias_uso > 0:
-                self.equipo.horasUso += dias_uso * 8  # Ejemplo: 8 horas por día
-                self.equipo.save()
-        super().save(*args, **kwargs)
 
 class HistorialTraspasosEquipos(models.Model):
     equipo = models.ForeignKey(Equipos, on_delete=models.CASCADE)

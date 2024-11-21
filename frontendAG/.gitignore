@@ -40,3 +40,13 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Python
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
