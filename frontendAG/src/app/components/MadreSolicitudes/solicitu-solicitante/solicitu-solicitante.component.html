@@ -1,1 +1,143 @@
-<p>solicitu-solicitante works!</p>
+<div class="container">
+  <h2>Registrar Solicitud</h2>
+  <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="codigoSolicitud">Código de Solicitud:</label>
+      <input
+        type="text"
+        id="codigoSolicitud"
+        formControlName="codigoSolicitud"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_solicitud">Fecha de Solicitud</label>
+      <input
+        type="date"
+        formControlName="fecha_solicitud"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_retorno_estimada">Fecha de Retorno Estimada</label>
+      <input
+        type="date"
+        formControlName="fecha_retorno_estimada"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_retorno_real">Fecha de Retorno Real:</label>
+      <input
+        type="date"
+        id="fecha_retorno_real"
+        formControlName="fecha_retorno_real"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="estado">Estado:</label>
+      <select id="estado" formControlName="estado">
+        <option value="endiente">Pendiente</option>
+        <option value="completada">Completada</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="En uso">En uso</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="motivo_uso">Motivo de Uso:</label><br />
+      <p><strong>Motivo:</strong></p>
+      <textarea
+        id="motivo_uso"
+        formControlName="motivo_uso"
+        placeholder="Escriba aquí el motivo..."
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="fecha_uso">Fecha de Uso</label>
+      <input
+        type="date"
+        formControlName="fecha_uso"
+        class="form-control"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="codigoEquipo">Buscar Equipo por Código:</label>
+      <input
+        type="text"
+        id="codigoEquipo"
+        (input)="buscarEquipo($event)"
+        placeholder="Ingrese el código del equipo"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="equipo">Equipo:</label>
+      <select id="equipo" formControlName="equipo" required>
+        <option *ngFor="let equipo of filteredEquipos" [value]="equipo.id">
+          {{ equipo.nombreEquipo }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="ciUsuario">Buscar Usuario por CI:</label>
+      <input
+        type="text"
+        id="ciUsuario"
+        (input)="buscarUsuario($event)"
+        placeholder="Ingrese el CI del usuario"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="usuario">Usuario:</label>
+      <select id="usuario" formControlName="usuario" required>
+        <option *ngFor="let usuario of filteredUsuarios" [value]="usuario.id">
+          {{ usuario.nombreUsuario }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="descripcion_falla">Descripción de Falla:</label>
+      <textarea
+        id="descripcion_falla"
+        formControlName="descripcion_falla"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad_fallas_solicitud">Cantidad de Fallas:</label>
+      <input
+        type="number"
+        id="cantidad_fallas_solicitud"
+        formControlName="cantidad_fallas_solicitud"
+        min="0"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="horas_uso_solicitud">Horas de Uso:</label>
+      <input
+        type="number"
+        id="horas_uso_solicitud"
+        formControlName="horas_uso_solicitud"
+        min="0"
+        required
+      />
+    </div>
+
+    <button type="submit" [disabled]="solicitudForm.invalid">
+      Registrar Solicitud
+    </button>
+  </form>
+</div>

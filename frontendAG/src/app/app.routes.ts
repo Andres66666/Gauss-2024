@@ -39,6 +39,7 @@ import { GeneracionReportesEquiposComponent } from './components/Reportes/genera
 import { GeneracionReportesMantenimientosComponent } from './components/Reportes/generacion-reportes-mantenimientos/generacion-reportes-mantenimientos.component';
 import { GeneracionReportesObrasComponent } from './components/Reportes/generacion-reportes-obras/generacion-reportes-obras.component';
 import { authGuard } from './components/auth.guard';
+import { SolicituSolicitanteComponent } from './components/MadreSolicitudes/solicitu-solicitante/solicitu-solicitante.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -212,5 +213,12 @@ export const routes: Routes = [
     component: GeneracionReportesObrasComponent,
     canActivate: [authGuard],
   },
+
+  {
+    path: 'Solicitu-Solicitante',
+    component: SolicituSolicitanteComponent,
+    canActivate: [authGuard],
+  },
+
   { path: '**', redirectTo: '' },
 ];

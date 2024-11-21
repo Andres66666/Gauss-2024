@@ -416,6 +416,7 @@
           (editar)="mostrarComponente('EditarEquipo', $event)"
         ></app-listar-equipos>
       </ng-container>
+
       <ng-container *ngIf="componenteActual === 'VerEquiposO'">
         <app-listar-equipos-o></app-listar-equipos-o>
       </ng-container>
@@ -479,6 +480,9 @@
       <!-- esta es la seccion dereportes -->
       <ng-container *ngIf="componenteActual === 'VerReportes'">
         <app-generacion-reportes></app-generacion-reportes>
+      </ng-container>
+      <ng-container *ngIf="componenteActual === 'VerSolicitudesexternas'">
+        <app-solicitu-solicitante></app-solicitu-solicitante>
       </ng-container>
     </div>
   </div>
